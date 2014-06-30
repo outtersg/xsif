@@ -1,27 +1,105 @@
 <?php
 
+class SortieHtml
+{
+	public function commencer()
+	{
+		$this->_sortir('<?xml version="1" encoding="UTF-8"?>
+		<html>
+			<head>
+				<title>Diagramme</title>
+				<style type="text/css">
+					table, td
+					{
+						border-collapse: collapse;
+						border: 1px solid grey;
+					}
+				</style>
+			</head>
+		<body>'."\n");
+	}
+	
+	public function commencerTable($chaine)
+	{
+		$this->_sortir($chaine);
+		$this->_ligneOuverte = false;
+		$this->_ligneEcrite = false;
+	}
+	
+	public function debutLigne($chaine)
+	{
+		$this->_finirLigne();
+		$this->_commencerLigne();
+		$this->_sortir($chaine);
+	}
+	
+	public function ligne($chaine)
+	{
+		if($this->_ligneEcrite)
+			$this->_finirLigne();
+		$this->_commencerLigne();
+		$this->_sortir($chaine);
+		$this->_ligneEcrite = true;
+	}
+	
+	public function finLigne($chaine)
+	{
+		$this->_sortir($chaine);
+	}
+	
+	protected function _commencerLigne()
+	{
+		if(!$this->_ligneOuverte)
+			$this->_sortir('<tr>');
+		$this->_ligneOuverte = true;
+		$this->_ligneEcrite = false;
+	}
+	
+	protected function _finirLigne()
+	{
+		if($this->_ligneOuverte)
+			$this->_sortir('</tr>'."\n");
+		$this->_ligneOuverte = false;
+		$this->_ligneEcrite = false;
+	}
+	
+	public function finirTable($chaine)
+	{
+		$this->_finirLigne();
+		$this->_sortir($chaine);
+	}
+	
+	public function finir()
+	{
+		$this->_sortir('</body></html>');
+	}
+	
+	public function _sortir($chaine)
+	{
+		echo $chaine;
+	}
+}
+
 class Ecrivain
 {
 	public function __construct($modele)
 	{
 		$this->_modele = $modele;
-	}
-	
-	public function sortir($chaine)
-	{
-		echo $chaine;
+		$this->_sortie = new SortieHtml;
 	}
 	
 	public function ecrire($typeRacine)
 	{
+		$this->_sortie->commencer();
 		$this->_resoudre($this->_modele[$typeRacine]);
 		$r = array($typeRacine);
 		$pondus = 0;
 		while(count($r) > $pondus)
 		{
-			$this->_pondre($this->_modele[$typeRacine], $r[$pondus]);
+			$this->_modele[$r[$pondus]]->pondre($r[$pondus], null, $this->_sortie, $r);
 			++$pondus;
 		}
+		$this->_sortie->finir();
 	}
 	
 	protected function _resoudre($arboModele)
@@ -32,6 +110,7 @@ class Ecrivain
 			{
 				if(is_string($element['t']))
 				{
+					$arboModele->contenu[$cle]['classe'] = $element['t'];
 					if(!isset($this->_modele[$element['t']]))
 						$this->_modele[$element['t']] = new Simple($element['t']);
 					$arboModele->contenu[$cle]['t'] = $this->_modele[$element['t']];
@@ -45,11 +124,6 @@ class Ecrivain
 				$arboModele->contenu = $arboModele->contenu[0]['t']->contenu;
 		}
 	}
-	
-	protected function _pondre($arboModele, & $pileRestesAFaire)
-	{
-		$arboModele->pondre($this, $pileRestesAFaire);
-	}
 }
 
 class Type
@@ -58,14 +132,14 @@ class Type
 	
 	public function nCellules($infosInvocation)
 	{
-		$r = 1;
-		if(isset($infosInvocation['n']))
-			++$r;
-		return $r;
+		return $this->_maxCellulesFils() + (isset($infosInvocation['n']) ? 1 : 0);
 	}
 	
 	protected function _maxCellulesFils()
 	{
+		if(!isset($this->contenu))
+			return 1;
+		
 		$r = 0;
 		foreach($this->contenu as $ligne)
 			if(($r1 = $ligne['t']->nCellules($ligne)) > $r)
@@ -73,47 +147,74 @@ class Type
 		return $r;
 	}
 	
-	public function pondre($sortie, & $pileResteAFaire)
+	public function pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire, $nCellules = 0)
 	{
+		if(!isset($this->contenu))
+			return;
 		
+		foreach($this->contenu as $fils)
+			$fils['t']->pondre($chemin.'.'.$fils['l'], $fils, $sortie, $pileResteAFaire, $nCellules - (isset($infosInvocation['n']) ? 1 : 0));
+		if(isset($infosInvocation['n']))
+			$sortie->finLigne('<td>'.$infosInvocation['n'].'</td>');
 	}
 }
 
 class Simple extends Type
 {
+	public function pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire, $nCellules = 0)
+	{
+		$nCellulesReel = $nCellules - (isset($infosInvocation['n']) ? 1 : 0);
+		$sortie->ligne('<td colspan="'.$nCellulesReel.'">'.htmlspecialchars($infosInvocation['l']).'</td>');
+		if(isset($infosInvocation['n']))
+			$sortie->finLigne('<td>'.$infosInvocation['n'].'</td>');
+	}
 }
 
 class Complexe extends Type
 {
-	public function pondre($sortie, & $pileResteAFaire)
+	public function pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire, $nCellules = 0)
 	{
+		$nomClasse = explode('#', $chemin, 2);
+		$nomClasse = $nomClasse[1];
+		
+		// Si on est appelés dans le cadre d'un autre, on s'inscrit uniquement comme libellé dans celui-ci, et on se met en file d'attente pour la "vraie" ponte.
+		if(isset($infosInvocation))
+		{
+			$nCellulesReel = $nCellules - (isset($infosInvocation['n']) ? 1 : 0);
+			$sortie->ligne('<td colspan="'.$nCellulesReel.'">'.htmlspecialchars($infosInvocation['l']).'</td>');
+			if(isset($infosInvocation['n']))
+				$sortie->finLigne('<td>'.$infosInvocation['n'].'</td>');
+			$nomBloc = isset($infosInvocation['classe']) ? $infosInvocation['classe'] : $chemin;
+			if(!in_array($nomBloc, $pileResteAFaire))
+				$pileResteAFaire[] = $nomBloc;
+			if(!isset($this->_modele[$nomBloc]))
+				$this->_modele[$nomBloc] = $infosInvocation['t'];
+			return;
+		}
+		
 		$nCellules = $this->_maxCellulesFils();
-		$sortie->sortir('<table><tr><th colspan="'.$nCellules.'">'.htmlspecialchars('Nom type').'</th></tr>'."\n");
+		$sortie->commencerTable('<table>'."\n".'<tr><th colspan="'.$nCellules.'">'.htmlspecialchars($nomClasse).'</th></tr>'."\n");
 		foreach($this->contenu as $fils)
-			$fils['t']->pondre($sortie, & $pileResteAFaire);
-		$sortie->sortir('</table>'."\n");
+			$fils['t']->pondre($chemin.'.'.(isset($fils['l']) ? $fils['l'] : get_class($fils['t'])), $fils, $sortie, $pileResteAFaire, $nCellules);
+		$sortie->finirTable('</table>'."\n");
 	}
 }
 
 class Sequence extends Type
 {
-	public function nCellules($infosInvocation)
-	{
-		return $this->_maxCellulesFils();
-	}
 }
 
 class Variante extends Type
 {
 	public function nCellules($infosInvocation)
 	{
-		return 1 + $this->_maxCellulesFils();
+		return 1 + parent::nCellules($infosInvocation);
 	}
 	
-	public function pondre($sortie, & $pileResteAFaire)
+	public function pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire, $nCellules = 0)
 	{
-		$sortie->sortir('<tr><td rowspan="'.count($this->_contenu).'">∈</td>');
-		
+		$sortie->debutLigne('<td rowspan="'.count($this->contenu).'">∈</td>');
+		parent::pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire, $nCellules - 1);
 	}
 }
 
@@ -121,7 +222,15 @@ class Groupe extends Type
 {
 	public function nCellules($infosInvocation)
 	{
-		return $this->_maxCellulesFils() + (isset($infosInvocation['n']) ? 1 : 0);
+		return parent::nCellules($infosInvocation) + (isset($infosInvocation['n']) ? 1 : 0);
+	}
+	
+	public function pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire, $nCellules = 0)
+	{
+		$nCellulesReel = $nCellules - (isset($infosInvocation['n']) ? 1 : 0);
+		parent::pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire, $nCellulesReel);
+		if(isset($infosInvocation['n']))
+			$sortie->finLigne('<td>'.$infosInvocation['n'].'</td>');
 	}
 }
 
