@@ -203,24 +203,7 @@ class Type
 {
 	public $contenu;
 	
-	public function nCellules($infosInvocation)
-	{
-		return $this->_maxCellulesFils() + (isset($infosInvocation['n']) ? 1 : 0);
-	}
-	
-	protected function _maxCellulesFils()
-	{
-		if(!isset($this->contenu))
-			return 1;
-		
-		$r = 0;
-		foreach($this->contenu as $ligne)
-			if(($r1 = $ligne['t']->nCellules($ligne)) > $r)
-				$r = $r1;
-		return $r;
-	}
-	
-	public function pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire, $nCellules = 0)
+	public function pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire)
 	{
 		if(!isset($this->contenu))
 			return;
@@ -228,7 +211,7 @@ class Type
 		if(isset($infosInvocation['n']))
 			$sortie->commencerMarge($infosInvocation['n']);
 		foreach($this->contenu as $fils)
-			$fils['t']->pondre($chemin.'.'.$fils['l'], $fils, $sortie, $pileResteAFaire, $nCellules - (isset($infosInvocation['n']) ? 1 : 0));
+			$fils['t']->pondre($chemin.'.'.$fils['l'], $fils, $sortie, $pileResteAFaire);
 		if(isset($infosInvocation['n']))
 			$sortie->finirMarge();
 	}
@@ -236,7 +219,7 @@ class Type
 
 class Simple extends Type
 {
-	public function pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire, $nCellules = 0)
+	public function pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire)
 	{
 		if(isset($infosInvocation['n']))
 			$sortie->commencerMarge($infosInvocation['n']);
@@ -248,7 +231,7 @@ class Simple extends Type
 
 class Complexe extends Type
 {
-	public function pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire, $nCellules = 0)
+	public function pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire)
 	{
 		$nomClasse = explode('#', $chemin, 2);
 		$nomClasse = $nomClasse[1];
@@ -270,11 +253,10 @@ class Complexe extends Type
 			return;
 		}
 		
-		$nCellules = $this->_maxCellulesFils();
 		$sortie->commencerBloc();
 		$sortie->ligne($nomClasse, true);
 		foreach($this->contenu as $fils)
-			$fils['t']->pondre($chemin.'.'.(isset($fils['l']) ? $fils['l'] : get_class($fils['t'])), $fils, $sortie, $pileResteAFaire, $nCellules);
+			$fils['t']->pondre($chemin.'.'.(isset($fils['l']) ? $fils['l'] : get_class($fils['t'])), $fils, $sortie, $pileResteAFaire);
 		$sortie->finirBloc();
 	}
 }
@@ -285,25 +267,16 @@ class Sequence extends Type
 
 class Variante extends Type
 {
-	public function nCellules($infosInvocation)
-	{
-		return 1 + parent::nCellules($infosInvocation);
-	}
-	
-	public function pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire, $nCellules = 0)
+	public function pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire)
 	{
 		$sortie->commencerMarge('∈', true); // Essayer aussi les caractères 2261, 2263, 2999, 2E3D, FE19.
-		parent::pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire, $nCellules - 1);
+		parent::pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire);
 		$sortie->finirMarge();
 	}
 }
 
 class Groupe extends Type
 {
-	public function nCellules($infosInvocation)
-	{
-		return parent::nCellules($infosInvocation) + (isset($infosInvocation['n']) ? 1 : 0);
-	}
 }
 
 $variante = new Variante;
