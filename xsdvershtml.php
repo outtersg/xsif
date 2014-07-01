@@ -31,7 +31,7 @@ class SortieHtml
 	
 	protected function _ajouter($chaine)
 	{
-		if(!count($this->_marges))
+		if(!isset($this->_contenuBloc))
 			$this->_sortir($chaine);
 		else
 			$this->_contenuBloc .= $chaine;
@@ -79,20 +79,16 @@ class SortieHtml
 			$this->_contenuBloc = substr($this->_contenuBloc, 0, $marge['insert'] + $decalage + 1).substr($this->_contenuBloc, $marge['insert'] + 1);
 		else
 			$this->_contenuBloc = substr($this->_contenuBloc, 0, $marge['insert']).$nLignes.substr($this->_contenuBloc, $marge['insert']);
-		
-		if(!count($this->_marges))
-		{
-			$this->_sortir($this->_contenuBloc);
-			$this->_contenuBloc = '';
-		}
 	}
 	
-	public function ligne($chaine)
+	public function ligne($chaine, $enTete = false)
 	{
+		$balise = $enTete ? 'th' : 'td';
+		
 		if($this->_ligneEcrite)
 			$this->_finirLigne();
 		$this->_commencerLigne();
-		$this->_ajouter($chaine);
+		$this->_ajouter('<'.$balise.' colspan="@'.count($this->_marges).'">'.htmlspecialchars($chaine).'</'.$balise.'>');
 		$this->_ligneEcrite = true;
 	}
 	
@@ -123,7 +119,27 @@ class SortieHtml
 	public function finirBloc($chaine)
 	{
 		$this->_finirLigne();
-		$this->_sortir($chaine);
+		$this->_ajouter($chaine);
+		$contenuBloc = $this->_contenuBloc;
+		$this->_contenuBloc = null;
+		
+		// Les colspan du bloc sont maintenant recalculés en fonction de la ligne sur laquelle il y a le plus de marges (son colspan vaudra alors 1).
+		
+		preg_match_all('# colspan="@([0-9]*)"#', $contenuBloc, $r);
+		$max = 0;
+		foreach($r[1] as $num)
+			if($num > $max)
+				$max = $num;
+		$this->_maxColspan = $max + 1;
+		$contenuBloc = preg_replace_callback('# colspan="@([0-9]*)"#', array($this, '_remplColspan'), $contenuBloc);
+		
+		$this->_sortir($contenuBloc);
+	}
+	
+	public function _remplColspan($res)
+	{
+		$nouveau = $this->_maxColspan - $res[1];
+		return $nouveau == 1 ? '' : ' colspan="'.$nouveau.'"';
 	}
 	
 	public function finir()
@@ -222,10 +238,9 @@ class Simple extends Type
 {
 	public function pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire, $nCellules = 0)
 	{
-		$nCellulesReel = $nCellules - (isset($infosInvocation['n']) ? 1 : 0);
 		if(isset($infosInvocation['n']))
 			$sortie->commencerMarge($infosInvocation['n']);
-		$sortie->ligne('<td colspan="'.$nCellulesReel.'">'.htmlspecialchars($infosInvocation['l']).'</td>');
+		$sortie->ligne($infosInvocation['l']);
 		if(isset($infosInvocation['n']))
 			$sortie->finirMarge();
 	}
@@ -241,10 +256,9 @@ class Complexe extends Type
 		// Si on est appelés dans le cadre d'un autre, on s'inscrit uniquement comme libellé dans celui-ci, et on se met en file d'attente pour la "vraie" ponte.
 		if(isset($infosInvocation))
 		{
-			$nCellulesReel = $nCellules - (isset($infosInvocation['n']) ? 1 : 0);
 			if(isset($infosInvocation['n']))
 				$sortie->commencerMarge($infosInvocation['n']);
-			$sortie->ligne('<td colspan="'.$nCellulesReel.'">'.htmlspecialchars($infosInvocation['l']).'</td>');
+			$sortie->ligne($infosInvocation['l']);
 			if(isset($infosInvocation['n']))
 				$sortie->finirMarge();
 			
@@ -257,7 +271,8 @@ class Complexe extends Type
 		}
 		
 		$nCellules = $this->_maxCellulesFils();
-		$sortie->commencerBloc('<table>'."\n".'<tr><th colspan="'.$nCellules.'">'.htmlspecialchars($nomClasse).'</th></tr>'."\n");
+		$sortie->commencerBloc('<table>'."\n");
+		$sortie->ligne($nomClasse, true);
 		foreach($this->contenu as $fils)
 			$fils['t']->pondre($chemin.'.'.(isset($fils['l']) ? $fils['l'] : get_class($fils['t'])), $fils, $sortie, $pileResteAFaire, $nCellules);
 		$sortie->finirBloc('</table>'."\n");
