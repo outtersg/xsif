@@ -19,9 +19,9 @@ class SortieHtml
 		<body>'."\n");
 	}
 	
-	public function commencerBloc($chaine)
+	public function commencerBloc()
 	{
-		$this->_sortir($chaine);
+		$this->_sortir('<table>'."\n");
 		$this->_ligneOuverte = false;
 		$this->_ligneEcrite = false; // A-t-on écrit le contenu de cette ligne du bloc (reste éventuellement les marges)?
 		$this->_marges = array();
@@ -116,10 +116,10 @@ class SortieHtml
 		}
 	}
 	
-	public function finirBloc($chaine)
+	public function finirBloc()
 	{
 		$this->_finirLigne();
-		$this->_ajouter($chaine);
+		$this->_ajouter('</table>'."\n");
 		$contenuBloc = $this->_contenuBloc;
 		$this->_contenuBloc = null;
 		
@@ -271,11 +271,11 @@ class Complexe extends Type
 		}
 		
 		$nCellules = $this->_maxCellulesFils();
-		$sortie->commencerBloc('<table>'."\n");
+		$sortie->commencerBloc();
 		$sortie->ligne($nomClasse, true);
 		foreach($this->contenu as $fils)
 			$fils['t']->pondre($chemin.'.'.(isset($fils['l']) ? $fils['l'] : get_class($fils['t'])), $fils, $sortie, $pileResteAFaire, $nCellules);
-		$sortie->finirBloc('</table>'."\n");
+		$sortie->finirBloc();
 	}
 }
 
