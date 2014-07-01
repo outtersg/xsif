@@ -12,7 +12,23 @@ class SortieHtml
 					table, td
 					{
 						border-collapse: collapse;
-						border: 1px solid grey;
+					}
+					td
+					{
+						border: 1px solid #7F3F00;
+						padding-left: 0.5em;
+						padding-right: 0.5em;
+					}
+					table
+					{
+						border: 3px double #7F3F00;
+						background: #FFFFDF;
+					}
+					td i
+					{
+						padding-left: 0.5em;
+						font-size: 80%;
+						color: #BF5F00;
 					}
 				</style>
 			</head>
@@ -81,14 +97,14 @@ class SortieHtml
 			$this->_contenuBloc = substr($this->_contenuBloc, 0, $marge['insert']).$nLignes.substr($this->_contenuBloc, $marge['insert']);
 	}
 	
-	public function ligne($chaine, $enTete = false)
+	public function ligne($chaine, $enTete = false, $supplement = null)
 	{
 		$balise = $enTete ? 'th' : 'td';
 		
 		if($this->_ligneEcrite)
 			$this->_finirLigne();
 		$this->_commencerLigne();
-		$this->_ajouter('<'.$balise.' colspan="@'.count($this->_marges).'">'.htmlspecialchars($chaine).'</'.$balise.'>');
+		$this->_ajouter('<'.$balise.' colspan="@'.count($this->_marges).'">'.htmlspecialchars($chaine).($supplement ? '<i>'.htmlspecialchars($supplement).'</i>' : '').'</'.$balise.'>');
 		$this->_ligneEcrite = true;
 	}
 	
@@ -205,13 +221,11 @@ class Type
 	
 	public function pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire)
 	{
-		if(!isset($this->contenu))
-			return;
-		
+		$classeNS = explode('#', $infosInvocation['classe'], 2);
+		$classeSimple = array_pop($classeNS);
 		if(isset($infosInvocation['n']))
 			$sortie->commencerMarge($infosInvocation['n']);
-		foreach($this->contenu as $fils)
-			$fils['t']->pondre($chemin.'.'.$fils['l'], $fils, $sortie, $pileResteAFaire);
+		$sortie->ligne($infosInvocation['l'], false, $classeSimple);
 		if(isset($infosInvocation['n']))
 			$sortie->finirMarge();
 	}
@@ -219,14 +233,6 @@ class Type
 
 class Simple extends Type
 {
-	public function pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire)
-	{
-		if(isset($infosInvocation['n']))
-			$sortie->commencerMarge($infosInvocation['n']);
-		$sortie->ligne($infosInvocation['l']);
-		if(isset($infosInvocation['n']))
-			$sortie->finirMarge();
-	}
 }
 
 class Complexe extends Type
@@ -239,11 +245,7 @@ class Complexe extends Type
 		// Si on est appelés dans le cadre d'un autre, on s'inscrit uniquement comme libellé dans celui-ci, et on se met en file d'attente pour la "vraie" ponte.
 		if(isset($infosInvocation))
 		{
-			if(isset($infosInvocation['n']))
-				$sortie->commencerMarge($infosInvocation['n']);
-			$sortie->ligne($infosInvocation['l']);
-			if(isset($infosInvocation['n']))
-				$sortie->finirMarge();
+			parent::pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire);
 			
 			$nomBloc = isset($infosInvocation['classe']) ? $infosInvocation['classe'] : $chemin;
 			if(!in_array($nomBloc, $pileResteAFaire))
@@ -261,11 +263,27 @@ class Complexe extends Type
 	}
 }
 
-class Sequence extends Type
+class Liste extends Type
+{
+	public function pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire)
+	{
+		if(!isset($this->contenu))
+			return;
+		
+		if(isset($infosInvocation['n']))
+			$sortie->commencerMarge($infosInvocation['n']);
+		foreach($this->contenu as $fils)
+			$fils['t']->pondre($chemin.'.'.$fils['l'], $fils, $sortie, $pileResteAFaire);
+		if(isset($infosInvocation['n']))
+			$sortie->finirMarge();
+	}
+}
+
+class Sequence extends Liste
 {
 }
 
-class Variante extends Type
+class Variante extends Liste
 {
 	public function pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire)
 	{
@@ -275,7 +293,7 @@ class Variante extends Type
 	}
 }
 
-class Groupe extends Type
+class Groupe extends Liste
 {
 }
 
