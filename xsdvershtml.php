@@ -19,18 +19,72 @@ class SortieHtml
 		<body>'."\n");
 	}
 	
-	public function commencerTable($chaine)
+	public function commencerBloc($chaine)
 	{
 		$this->_sortir($chaine);
 		$this->_ligneOuverte = false;
-		$this->_ligneEcrite = false;
+		$this->_ligneEcrite = false; // A-t-on écrit le contenu de cette ligne du bloc (reste éventuellement les marges)?
+		$this->_marges = array();
+		$this->_numLigne = 0;
+		$this->_contenuBloc = '';
 	}
 	
-	public function debutLigne($chaine)
+	protected function _ajouter($chaine)
 	{
-		$this->_finirLigne();
+		if(!count($this->_marges))
+			$this->_sortir($chaine);
+		else
+			$this->_contenuBloc .= $chaine;
+	}
+	
+	public function commencerMarge($chaine, $aGauche = false)
+	{
+		// Les marges sont pondues avant la ligne.
+		if($this->_ligneEcrite) // Donc si on est en cours d'écriture pour une, c'est qu'on prépare la marge pour la suivante.
+			$this->_finirLigne();
 		$this->_commencerLigne();
-		$this->_sortir($chaine);
+		
+		$this->_marges[] = array('contenu' => $chaine, 'ligne' => $this->_numLigne);
+		
+		if($aGauche)
+			$this->_pondreMarge(count($this->_marges) - 1);
+	}
+	
+	protected function _pondreMarge($numMarge)
+	{
+		$this->_ajouter('<td rowspan="');
+		$this->_marges[$numMarge]['insert'] = strlen($this->_contenuBloc);
+		$this->_ajouter('">'.htmlspecialchars($this->_marges[$numMarge]['contenu']).'</td>');
+		unset($this->_marges[$numMarge]['contenu']);
+	}
+	
+	public function finirMarge()
+	{
+		// On s'assure que le HTML a été déjà préparé, hein.
+		if(isset($this->_marges[count($this->_marges) - 1]['contenu']))
+			$this->_pondreMarge(count($this->_marges) - 1);
+		
+		$marge = array_pop($this->_marges);
+		$nLignes = $this->_numLigne - $marge['ligne'] + 1;
+		
+		if($nLignes == 1) // rowspan="1", la mention est inutile.
+			$decalage = - strlen(' rowspan=""');
+		else
+			$decalage = strlen($nLignes);
+		foreach($this->_marges as & $autreMarge)
+			if(isset($autreMarge['insert']) && $autreMarge['insert'] >= $marge['insert']) // Peut arriver si sur la même ligne on été posées une marge droite puis une gauche: la fermeture de la gauche intervient avant celle de la droite, décalant l'endroit où l'on inscrira le rowspan de la marge droite.
+				$autreMarge['insert'] += $decalage;
+		
+		if($nLignes == 1)
+			$this->_contenuBloc = substr($this->_contenuBloc, 0, $marge['insert'] + $decalage + 1).substr($this->_contenuBloc, $marge['insert'] + 1);
+		else
+			$this->_contenuBloc = substr($this->_contenuBloc, 0, $marge['insert']).$nLignes.substr($this->_contenuBloc, $marge['insert']);
+		
+		if(!count($this->_marges))
+		{
+			$this->_sortir($this->_contenuBloc);
+			$this->_contenuBloc = '';
+		}
 	}
 	
 	public function ligne($chaine)
@@ -38,32 +92,35 @@ class SortieHtml
 		if($this->_ligneEcrite)
 			$this->_finirLigne();
 		$this->_commencerLigne();
-		$this->_sortir($chaine);
+		$this->_ajouter($chaine);
 		$this->_ligneEcrite = true;
-	}
-	
-	public function finLigne($chaine)
-	{
-		$this->_sortir($chaine);
 	}
 	
 	protected function _commencerLigne()
 	{
 		if(!$this->_ligneOuverte)
-			$this->_sortir('<tr>');
-		$this->_ligneOuverte = true;
-		$this->_ligneEcrite = false;
+		{
+			$this->_ajouter('<tr>');
+			++$this->_numLigne;
+			$this->_ligneOuverte = true;
+			$this->_ligneEcrite = false;
+		}
 	}
 	
 	protected function _finirLigne()
 	{
 		if($this->_ligneOuverte)
-			$this->_sortir('</tr>'."\n");
-		$this->_ligneOuverte = false;
-		$this->_ligneEcrite = false;
+		{
+			// On pond les marges droite pas encore écrite (en HTML, le td rowspan multiple est écrit avec la première ligne qu'il couvre).
+			for($numMarge = count($this->_marges); --$numMarge >= 0 && isset($this->_marges[$numMarge]['contenu']);)
+				$this->_pondreMarge($numMarge);
+			$this->_ajouter('</tr>'."\n");
+			$this->_ligneOuverte = false;
+			$this->_ligneEcrite = false;
+		}
 	}
 	
-	public function finirTable($chaine)
+	public function finirBloc($chaine)
 	{
 		$this->_finirLigne();
 		$this->_sortir($chaine);
@@ -152,10 +209,12 @@ class Type
 		if(!isset($this->contenu))
 			return;
 		
+		if(isset($infosInvocation['n']))
+			$sortie->commencerMarge($infosInvocation['n']);
 		foreach($this->contenu as $fils)
 			$fils['t']->pondre($chemin.'.'.$fils['l'], $fils, $sortie, $pileResteAFaire, $nCellules - (isset($infosInvocation['n']) ? 1 : 0));
 		if(isset($infosInvocation['n']))
-			$sortie->finLigne('<td>'.$infosInvocation['n'].'</td>');
+			$sortie->finirMarge();
 	}
 }
 
@@ -164,9 +223,11 @@ class Simple extends Type
 	public function pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire, $nCellules = 0)
 	{
 		$nCellulesReel = $nCellules - (isset($infosInvocation['n']) ? 1 : 0);
+		if(isset($infosInvocation['n']))
+			$sortie->commencerMarge($infosInvocation['n']);
 		$sortie->ligne('<td colspan="'.$nCellulesReel.'">'.htmlspecialchars($infosInvocation['l']).'</td>');
 		if(isset($infosInvocation['n']))
-			$sortie->finLigne('<td>'.$infosInvocation['n'].'</td>');
+			$sortie->finirMarge();
 	}
 }
 
@@ -181,9 +242,12 @@ class Complexe extends Type
 		if(isset($infosInvocation))
 		{
 			$nCellulesReel = $nCellules - (isset($infosInvocation['n']) ? 1 : 0);
+			if(isset($infosInvocation['n']))
+				$sortie->commencerMarge($infosInvocation['n']);
 			$sortie->ligne('<td colspan="'.$nCellulesReel.'">'.htmlspecialchars($infosInvocation['l']).'</td>');
 			if(isset($infosInvocation['n']))
-				$sortie->finLigne('<td>'.$infosInvocation['n'].'</td>');
+				$sortie->finirMarge();
+			
 			$nomBloc = isset($infosInvocation['classe']) ? $infosInvocation['classe'] : $chemin;
 			if(!in_array($nomBloc, $pileResteAFaire))
 				$pileResteAFaire[] = $nomBloc;
@@ -193,10 +257,10 @@ class Complexe extends Type
 		}
 		
 		$nCellules = $this->_maxCellulesFils();
-		$sortie->commencerTable('<table>'."\n".'<tr><th colspan="'.$nCellules.'">'.htmlspecialchars($nomClasse).'</th></tr>'."\n");
+		$sortie->commencerBloc('<table>'."\n".'<tr><th colspan="'.$nCellules.'">'.htmlspecialchars($nomClasse).'</th></tr>'."\n");
 		foreach($this->contenu as $fils)
 			$fils['t']->pondre($chemin.'.'.(isset($fils['l']) ? $fils['l'] : get_class($fils['t'])), $fils, $sortie, $pileResteAFaire, $nCellules);
-		$sortie->finirTable('</table>'."\n");
+		$sortie->finirBloc('</table>'."\n");
 	}
 }
 
@@ -213,8 +277,9 @@ class Variante extends Type
 	
 	public function pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire, $nCellules = 0)
 	{
-		$sortie->debutLigne('<td rowspan="'.count($this->contenu).'">∈</td>');
+		$sortie->commencerMarge('∈', true); // Essayer aussi les caractères 2261, 2263, 2999, 2E3D, FE19.
 		parent::pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire, $nCellules - 1);
+		$sortie->finirMarge();
 	}
 }
 
@@ -224,19 +289,11 @@ class Groupe extends Type
 	{
 		return parent::nCellules($infosInvocation) + (isset($infosInvocation['n']) ? 1 : 0);
 	}
-	
-	public function pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire, $nCellules = 0)
-	{
-		$nCellulesReel = $nCellules - (isset($infosInvocation['n']) ? 1 : 0);
-		parent::pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire, $nCellulesReel);
-		if(isset($infosInvocation['n']))
-			$sortie->finLigne('<td>'.$infosInvocation['n'].'</td>');
-	}
 }
 
 $variante = new Variante;
 $variante->contenu[] = array('t' => new Sequence);
-$variante->contenu[0]['t']->contenu[] = array('l' => 'equipe', 't' => 'local#Equipe', 'n' => '1..n');
+$variante->contenu[0]['t']->contenu[] = array('l' => 'equipe', 't' => 'local#Equipe', 'n' => '+');
 $variante->contenu[0]['t']->contenu[] = array('l' => 'equipeDeChefs', 't' => 'local#Equipe');
 
 $typeRacine = new Complexe;
@@ -249,7 +306,7 @@ $personne->contenu[] = array('l' => 'nom', 't' => 'xsd#string');
 
 $typeEquipe = new Complexe;
 $typeEquipe->contenu[] = array('t' => new Sequence);
-$typeEquipe->contenu[0]['t']->contenu[] = array('l' => 'optionnel', 't' => $personne, 'n' => '1..n');
+$typeEquipe->contenu[0]['t']->contenu[] = array('l' => 'gusse', 't' => $personne, 'n' => '+');
 $typeEquipe->contenu[0]['t']->contenu[] = array('l' => 'attribut', 't' => 'xsd#string', 'n' => '*');
 
 $modele = array
