@@ -177,15 +177,21 @@ class Ecrivain
 		$this->_sortie = new SortieHtml;
 	}
 	
-	public function ecrire($typeRacine)
+	public function ecrire($typeRacine = null)
 	{
+		if(!isset($typeRacine))
+		{
+			$nomTypes = array_keys($this->_modele);
+			$typeRacine = $nomTypes[0];
+		}
+		
 		$this->_sortie->commencer();
 		$this->_resoudre($this->_modele[$typeRacine]);
-		$r = array($typeRacine);
+		$this->resteAFaire = array($typeRacine);
 		$pondus = 0;
-		while(count($r) > $pondus)
+		while(count($this->resteAFaire) > $pondus)
 		{
-			$this->_modele[$r[$pondus]]->pondre($r[$pondus], null, $this->_sortie, $r);
+			$this->_modele[$this->resteAFaire[$pondus]]->pondre($this->resteAFaire[$pondus], null, $this->_sortie, $this);
 			++$pondus;
 		}
 		$this->_sortie->finir();
@@ -219,13 +225,18 @@ class Type
 {
 	public $contenu;
 	
-	public function pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire)
+	public function pondre($chemin, $infosInvocation, $sortie, $registre)
 	{
-		$classeNS = explode('#', $infosInvocation['classe'], 2);
-		$classeSimple = array_pop($classeNS);
+		if(!isset($infosInvocation['classe']))
+			$classeSimple = null;
+		else
+		{
+			$classeNS = explode('#', $infosInvocation['classe'], 2);
+			$classeSimple = array_pop($classeNS);
+		}
 		if(isset($infosInvocation['n']))
 			$sortie->commencerMarge($infosInvocation['n']);
-		$sortie->ligne($infosInvocation['l'], false, $classeSimple);
+		$sortie->ligne($infosInvocation['l'], false, $classeSimple.(isset($infosInvocation['text']) ? $infosInvocation['text'] : '')); // text: Type.EXTension
 		if(isset($infosInvocation['n']))
 			$sortie->finirMarge();
 	}
@@ -237,35 +248,43 @@ class Simple extends Type
 
 class Complexe extends Type
 {
-	public function pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire)
+	public function pondre($chemin, $infosInvocation, $sortie, $registre)
 	{
 		$nomClasse = explode('#', $chemin, 2);
 		$nomClasse = $nomClasse[1];
 		
+		// Si on est utilisé comme extension d'une autre classe, on lui fournit notre contenu comme s'il était sien.
+		if(isset($infosInvocation) && isset($infosInvocation['commeExtension']))
+		{
+			$pseudoListe = new Liste;
+			$pseudoListe->contenu = $this->contenu;
+			return $pseudoListe->pondre($chemin, $infosInvocation, $sortie, $registre);
+		}
 		// Si on est appelés dans le cadre d'un autre, on s'inscrit uniquement comme libellé dans celui-ci, et on se met en file d'attente pour la "vraie" ponte.
 		if(isset($infosInvocation))
 		{
-			parent::pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire);
+			parent::pondre($chemin, $infosInvocation, $sortie, $registre);
 			
 			$nomBloc = isset($infosInvocation['classe']) ? $infosInvocation['classe'] : $chemin;
-			if(!in_array($nomBloc, $pileResteAFaire))
-				$pileResteAFaire[] = $nomBloc;
-			if(!isset($this->_modele[$nomBloc]))
-				$this->_modele[$nomBloc] = $infosInvocation['t'];
+			if(!in_array($nomBloc, $registre->resteAFaire))
+				$registre->resteAFaire[] = $nomBloc;
+			if(!isset($registre->_modele[$nomBloc]))
+				$registre->_modele[$nomBloc] = $infosInvocation['t'];
 			return;
 		}
 		
 		$sortie->commencerBloc();
 		$sortie->ligne($nomClasse, true);
-		foreach($this->contenu as $fils)
-			$fils['t']->pondre($chemin.'.'.(isset($fils['l']) ? $fils['l'] : get_class($fils['t'])), $fils, $sortie, $pileResteAFaire);
+		$pseudoListe = new Liste;
+		$pseudoListe->contenu = $this->contenu;
+		$pseudoListe->pondre($chemin, array(), $sortie, $registre);
 		$sortie->finirBloc();
 	}
 }
 
 class Liste extends Type
 {
-	public function pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire)
+	public function pondre($chemin, $infosInvocation, $sortie, $registre)
 	{
 		if(!isset($this->contenu))
 			return;
@@ -273,7 +292,7 @@ class Liste extends Type
 		if(isset($infosInvocation['n']))
 			$sortie->commencerMarge($infosInvocation['n']);
 		foreach($this->contenu as $fils)
-			$fils['t']->pondre($chemin.'.'.$fils['l'], $fils, $sortie, $pileResteAFaire);
+			$fils['t']->pondre($chemin.'.'.(isset($fils['l']) ? $fils['l'] : get_class($fils['t'])), $fils, $sortie, $registre);
 		if(isset($infosInvocation['n']))
 			$sortie->finirMarge();
 	}
@@ -285,10 +304,10 @@ class Sequence extends Liste
 
 class Variante extends Liste
 {
-	public function pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire)
+	public function pondre($chemin, $infosInvocation, $sortie, $registre)
 	{
 		$sortie->commencerMarge('∈', true); // Essayer aussi les caractères 2261, 2263, 2999, 2E3D, FE19.
-		parent::pondre($chemin, $infosInvocation, $sortie, & $pileResteAFaire);
+		parent::pondre($chemin, $infosInvocation, $sortie, $registre);
 		$sortie->finirMarge();
 	}
 }
@@ -297,6 +316,7 @@ class Groupe extends Liste
 {
 }
 
+/*
 $variante = new Variante;
 $variante->contenu[] = array('t' => new Sequence);
 $variante->contenu[0]['t']->contenu[] = array('l' => 'equipe', 't' => 'local#Equipe', 'n' => '+');
@@ -320,8 +340,14 @@ $modele = array
 	'local#Racine' => $typeRacine,
 	'local#Equipe' => $typeEquipe,
 );
+*/
+
+require_once dirname(__FILE__).'/chargeur.php';
+
+$c = new Chargeur;
+$modele = $c->charge($argv[1]);
 
 $e = new Ecrivain($modele);
-$e->ecrire('local#Racine');
+$e->ecrire();
 
 ?>
