@@ -2,8 +2,13 @@
 
 class SortieHtml
 {
+	protected $_attrId = 'id';
+	
 	public function commencer()
 	{
+		$this->_lignes = array();
+		$this->_blocs = array();
+		
 		$this->_sortir('<?xml version="1" encoding="UTF-8"?>
 		<html>
 			<head>
@@ -35,8 +40,10 @@ class SortieHtml
 		<body>'."\n");
 	}
 	
-	public function commencerBloc()
+	public function commencerBloc($nom, $identifiant = null)
 	{
+		$this->_blocs[$this->_blocActuel = isset($identifiant) ? $identifiant : $nom] = $numBloc = count($this->_blocs); // Le nom permettra par la suite de retrouver le numéro.
+		
 		$this->_sortir('<table>'."\n");
 		$this->_ligneOuverte = false;
 		$this->_ligneEcrite = false; // A-t-on écrit le contenu de cette ligne du bloc (reste éventuellement les marges)?
@@ -104,8 +111,14 @@ class SortieHtml
 		if($this->_ligneEcrite)
 			$this->_finirLigne();
 		$this->_commencerLigne();
-		$this->_ajouter('<'.$balise.' colspan="@'.count($this->_marges).'">'.htmlspecialchars($chaine).($supplement ? '<i>'.htmlspecialchars($supplement).'</i>' : '').'</'.$balise.'>');
+		$this->_ajouter('<'.$balise.' colspan="@'.count($this->_marges).'" '.$this->_attrId.'="l'.count($this->_lignes).'">'.htmlspecialchars($chaine).($supplement ? '<i>'.htmlspecialchars($supplement).'</i>' : '').'</'.$balise.'>');
 		$this->_ligneEcrite = true;
+		$this->_lignes[count($this->_lignes)] = $this->_blocActuel; // Le numéro permettra de retrouver le bloc.
+	}
+	
+	public function lien($versBloc)
+	{
+		$this->_liens[] = array(count($this->_lignes) - 1, $versBloc); // Ligne actuelle.
 	}
 	
 	protected function _commencerLigne()
@@ -171,8 +184,11 @@ class SortieHtml
 
 class SortieGraphviz extends SortieHtml
 {
+	protected $_attrId = 'port';
+	
 	public function commencer()
 	{
+		$this->_lignes = array();
 		$this->_blocs = array();
 		
 		$this->_sortir('
@@ -183,12 +199,11 @@ digraph Schema
 ');
 	}
 	
-	public function commencerBloc()
+	public function commencerBloc($nom, $identifiant = null)
 	{
-		$this->_blocs[] = $numBloc = count($this->_blocs);
-		$nomBloc = 'b'.$numBloc;
+		$nomBloc = 'b'.count($this->_blocs);
 		$this->_sortir($nomBloc.' [ label=< ');
-		parent::commencerBloc();
+		parent::commencerBloc($nom, $identifiant);
 	}
 	
 	public function ligne($chaine, $enTete = false, $supplement = null)
@@ -204,6 +219,8 @@ digraph Schema
 	
 	public function finir()
 	{
+		foreach($this->_liens as $lien)
+			$this->_sortir('b'.$this->_blocs[$this->_lignes[$lien[0]]].':l'.$lien[0].' -> '.'b'.$this->_blocs[$lien[1]]."\n"); // Toujours d'une ligne vers un bloc.
 		$this->_sortir('}');
 	}
 }
@@ -309,10 +326,11 @@ class Complexe extends Type
 				$registre->resteAFaire[] = $nomBloc;
 			if(!isset($registre->_modele[$nomBloc]))
 				$registre->_modele[$nomBloc] = $infosInvocation['t'];
+			$sortie->lien($nomBloc);
 			return;
 		}
 		
-		$sortie->commencerBloc();
+		$sortie->commencerBloc($nomClasse, $chemin);
 		$sortie->ligne($nomClasse, true);
 		$pseudoListe = new Liste;
 		$pseudoListe->contenu = $this->contenu;
