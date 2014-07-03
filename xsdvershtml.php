@@ -213,7 +213,7 @@ class Ecrivain
 	public function __construct($modele)
 	{
 		$this->_modele = $modele;
-		$this->_sortie = new SortieHtml;
+		$this->_sortie = new SortieGraphviz;
 	}
 	
 	public function ecrire($typeRacine = null)
