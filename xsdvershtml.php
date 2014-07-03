@@ -169,6 +169,45 @@ class SortieHtml
 	}
 }
 
+class SortieGraphviz extends SortieHtml
+{
+	public function commencer()
+	{
+		$this->_blocs = array();
+		
+		$this->_sortir('
+digraph Schema
+{
+	edge [ fontname="Lato" fontsize=12 ];
+	node [ shape=none fontname="Lato" fontsize=12 ];
+');
+	}
+	
+	public function commencerBloc()
+	{
+		$this->_blocs[] = $numBloc = count($this->_blocs);
+		$nomBloc = 'b'.$numBloc;
+		$this->_sortir($nomBloc.' [ label=< ');
+		parent::commencerBloc();
+	}
+	
+	public function ligne($chaine, $enTete = false, $supplement = null)
+	{
+		return parent::ligne($chaine, false, $supplement); // Graphviz ne gère pas les th.
+	}
+	
+	public function finirBloc()
+	{
+		parent::finirBloc();
+		$this->_sortir('> ]'."\n");
+	}
+	
+	public function finir()
+	{
+		$this->_sortir('}');
+	}
+}
+
 class Ecrivain
 {
 	public function __construct($modele)
