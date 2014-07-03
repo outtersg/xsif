@@ -111,7 +111,7 @@ class SortieHtml
 		if($this->_ligneEcrite)
 			$this->_finirLigne();
 		$this->_commencerLigne();
-		$this->_ajouter('<'.$balise.' colspan="@'.count($this->_marges).'" '.$this->_attrId.'="l'.count($this->_lignes).'">'.htmlspecialchars($chaine).($supplement ? '<i>'.htmlspecialchars($supplement).'</i>' : '').'</'.$balise.'>');
+		$this->_ajouter('<'.$balise.' colspan="@'.count($this->_marges).'">'.htmlspecialchars($chaine).($supplement ? '<i>'.htmlspecialchars($supplement).'</i>' : '').'</'.$balise.'>');
 		$this->_ligneEcrite = true;
 		$this->_lignes[count($this->_lignes)] = $this->_blocActuel; // Le numéro permettra de retrouver le bloc.
 	}
@@ -139,7 +139,8 @@ class SortieHtml
 			// On pond les marges droite pas encore écrite (en HTML, le td rowspan multiple est écrit avec la première ligne qu'il couvre).
 			for($numMarge = count($this->_marges); --$numMarge >= 0 && isset($this->_marges[$numMarge]['contenu']);)
 				$this->_pondreMarge($numMarge);
-			$this->_ajouter('</tr>'."\n");
+ 			$this->_ajouter('<td '.$this->_attrId.'="l'.(count($this->_lignes) - 1).'"></td>'); // L'ancre est ajoutée comme dernière colonne invisible de la table, afin de toujours se trouver à droite, même des marges droite.
+ 			$this->_ajouter('</tr>'."\n");
 			$this->_ligneOuverte = false;
 			$this->_ligneEcrite = false;
 		}
@@ -220,7 +221,7 @@ digraph Schema
 	public function finir()
 	{
 		foreach($this->_liens as $lien)
-			$this->_sortir('b'.$this->_blocs[$this->_lignes[$lien[0]]].':l'.$lien[0].' -> '.'b'.$this->_blocs[$lien[1]]."\n"); // Toujours d'une ligne vers un bloc.
+			$this->_sortir('b'.$this->_blocs[$this->_lignes[$lien[0]]].':l'.$lien[0].':e -> b'.$this->_blocs[$lien[1]]."\n"); // Toujours d'une ligne vers un bloc.
 		$this->_sortir('}');
 	}
 }
