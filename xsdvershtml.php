@@ -111,7 +111,16 @@ class SortieHtml
 		if($this->_ligneEcrite)
 			$this->_finirLigne();
 		$this->_commencerLigne();
-		$this->_ajouter('<'.$balise.' colspan="@'.count($this->_marges).'">'.htmlspecialchars($chaine).($supplement ? '<i>'.htmlspecialchars($supplement).'</i>' : '').'</'.$balise.'>');
+		if(!isset($this->_premiereLigneBlocs[$this->_blocActuel]))
+		{
+			$id = count($this->_lignes);
+			$this->_premiereLigneBlocs[$this->_blocActuel] = $id;
+			$this->_lignes[count($this->_lignes)] = $this->_blocActuel;
+			$chaineId = ' '.$this->_attrId.'="e'.$id.'"';
+		}
+		else
+			$chaineId = '';
+		$this->_ajouter('<'.$balise.' colspan="@'.count($this->_marges).'"'.$chaineId.'>'.htmlspecialchars($chaine).($supplement ? '<i>'.htmlspecialchars($supplement).'</i>' : '').'</'.$balise.'>');
 		$this->_ligneEcrite = true;
 		$this->_lignes[count($this->_lignes)] = $this->_blocActuel; // Le numéro permettra de retrouver le bloc.
 	}
@@ -221,7 +230,7 @@ digraph Schema
 	public function finir()
 	{
 		foreach($this->_liens as $lien)
-			$this->_sortir('b'.$this->_blocs[$this->_lignes[$lien[0]]].':l'.$lien[0].':e -> b'.$this->_blocs[$lien[1]]."\n"); // Toujours d'une ligne vers un bloc.
+			$this->_sortir('b'.$this->_blocs[$this->_lignes[$lien[0]]].':l'.$lien[0].':e -> b'.$this->_blocs[$lien[1]].':e'.$this->_premiereLigneBlocs[$lien[1]]."\n"); // Toujours d'une ligne vers un bloc.
 		$this->_sortir('}');
 	}
 }
