@@ -202,7 +202,9 @@ class Chargeur
 			switch($element->type)
 			{
 				case 'element':
-					if(count(array_diff_key($r, array('t' => 1, 'l' => 1))) == 0 && count($element->attr) == 1 && isset($element->attr['name']) && $element->attr['name'] == $r['l'] && count($element->contenu) == 1) // Peut être le résultat d'une compression antérieure (element > complexContent > restriction devenus un simple element, par exemple).
+					// Si notre élément peut être remplacé par son contenu (pas d'attributs en commun si ce n'est le type), on combine.
+					// Ce peut être le résultat d'une compression antérieure (element > complexContent > restriction devenus un simple element, par exemple).
+					if(count($element->contenu) == 1 && count(array_intersect_key($r, $element->contenu[0]) == 1))
 						$r = $element->contenu[0] + $r;
 					break;
 				case 'extension':
