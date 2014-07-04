@@ -45,8 +45,10 @@ class Chargeur
 						$element = new stdClass;
 					}
 					break;
+				case 'include':
 				case 'import':
-					/* À FAIRE */
+					if($noeud->hasAttributeNS(null, 'schemaLocation'))
+						$this->charge($noeud->getAttributeNS(null, 'schemaLocation'));
 					return;
 				case 'sequence': $element = new Sequence; break;
 				case 'choice': $element = new Variante; break;
