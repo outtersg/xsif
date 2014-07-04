@@ -68,6 +68,7 @@ class Chargeur
 					}
 					break;
 				case 'annotation': return;
+				case 'attribute':
 				case 'element':
 					if(($element = $this->_noeudEnRef($noeud, 'type')))
 						break;
