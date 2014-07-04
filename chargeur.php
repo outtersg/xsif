@@ -31,8 +31,8 @@ class Chargeur
 					if($noeud->hasAttributeNS(null, 'targetNamespace'))
 					{
 						$nouvelEspace = 1;
-						$this->_espaceCible = $noeud->getAttributeNS(null, 'targetNamespace');
 						$this->_pileEspacesCible[] = $this->_espaceCible;
+						$this->_espaceCible = $noeud->getAttributeNS(null, 'targetNamespace');
 						
 						$element = new stdClass;
 					}
