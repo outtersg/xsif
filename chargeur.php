@@ -25,6 +25,14 @@ class Chargeur
 		
 		$this->_cheminActuel = $ancienChemin;
 		
+		// Si la racine par défaut n'est pas en première position, on la replace.
+		if(isset($this->_racine) && ($cleTypes = array_keys($this->_types)) && $cleTypes[0] != $this->_racine)
+		{
+			$racine = $this->_types[$this->_racine];
+			unset($this->_types[$this->_racine]);
+			$this->_types = array($this->_racine => $racine) + $this->_types;
+		}
+		
 		return $this->_types;
 	}
 	
@@ -153,6 +161,9 @@ class Chargeur
 			$classe = $espace.'#'.$nom;
 			$element->contenu = array();
 			$this->_types[$classe] = $element;
+			// Si c'est la première déclaration du fichier racine (la pile ne contient que le schéma du premier XSD), cette déclaration sera notre racine par défaut.
+			if(count($this->_pileEspacesCible) == 1 && !isset($this->_racine))
+				$this->_racine = $classe;
 		}
 	}
 	
