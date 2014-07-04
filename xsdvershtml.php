@@ -292,6 +292,12 @@ class Ecrivain
 			$nomTypes = array_keys($this->_modele);
 			$typeRacine = $nomTypes[0];
 		}
+		if(strpos($typeRacine, '#') === false)
+		{
+			$nomTypes = array_keys($this->_modele);
+			$premierType = explode('#', $nomTypes[0], 2);
+			$typeRacine = $premierType[0].'#'.$typeRacine;
+		}
 		
 		$this->_sortie->commencer();
 		$this->_resoudre($this->_modele[$typeRacine]);
