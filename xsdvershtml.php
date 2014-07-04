@@ -352,6 +352,15 @@ class Type
 
 class Simple extends Type
 {
+	public function pondre($chemin, $infosInvocation, $sortie, $registre)
+	{
+		if($registre->detaillerLesSimples && isset($this->contenu) && count($this->contenu) == 1 && isset($this->contenu[0]['t']) && $this->contenu[0]['t'] instanceof Simple)
+		{
+			$nouvelleInvocation = array_intersect_key($this->contenu[0], array('t' => 1, 'classe' => 1)) + $infosInvocation + $this->contenu[0];
+			return $this->contenu[0]['t']->pondre($chemin, $nouvelleInvocation, $sortie, $registre);
+		}
+		return parent::pondre($chemin, $infosInvocation, $sortie, $registre);
+	}
 }
 
 class Complexe extends Type
