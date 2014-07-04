@@ -3,12 +3,27 @@
 class SortieHtml
 {
 	protected $_attrId = 'id';
+	protected $_attrsTable = '';
+	protected $_attrsColDroite = '';
+	
+	public function __construct($chemin = null)
+	{
+		$this->_chemin = $chemin;
+	}
 	
 	public function commencer()
 	{
+		if(isset($this->_chemin))
+			$this->_s = fopen($this->_chemin, 'w');
+		
 		$this->_lignes = array();
 		$this->_blocs = array();
 		
+		$this->_commencer();
+	}
+	
+	protected function _commencer()
+	{
 		$this->_sortir('<?xml version="1" encoding="UTF-8"?>
 		<html>
 			<head>
@@ -181,13 +196,23 @@ class SortieHtml
 		return $nouveau == 1 ? '' : ' colspan="'.$nouveau.'"';
 	}
 	
-	public function finir()
+	protected function _finir()
 	{
 		$this->_sortir('</body></html>');
 	}
 	
+	public function finir()
+	{
+		$this->_finir();
+		if(isset($this->_s))
+			fclose($this->_s);
+	}
+	
 	public function _sortir($chaine)
 	{
+		if(isset($this->_s))
+			fwrite($this->_s, $chaine);
+		else
 		echo $chaine;
 	}
 }
@@ -196,11 +221,8 @@ class SortieGraphviz extends SortieHtml
 {
 	protected $_attrId = 'port';
 	
-	public function commencer()
+	protected function _commencer()
 	{
-		$this->_lignes = array();
-		$this->_blocs = array();
-		
 		$this->_sortir('
 digraph Schema
 {
@@ -227,7 +249,7 @@ digraph Schema
 		$this->_sortir('> ]'."\n");
 	}
 	
-	public function finir()
+	protected function _finir()
 	{
 		foreach($this->_liens as $lien)
 			$this->_sortir('b'.$this->_blocs[$this->_lignes[$lien[0]]].':l'.$lien[0].':e -> b'.$this->_blocs[$lien[1]].':e'.$this->_premiereLigneBlocs[$lien[1]]."\n"); // Toujours d'une ligne vers un bloc.
@@ -240,11 +262,17 @@ class Ecrivain
 	public function __construct($modele)
 	{
 		$this->_modele = $modele;
-		$this->_sortie = new SortieGraphviz;
 	}
 	
-	public function ecrire($typeRacine = null)
+	public function ecrire($typeRacine = null, $detaillerLesSimples = false, $cheminSortie = null)
 	{
+		if(!isset($cheminSortie))
+			$this->_sortie = new SortieGraphviz;
+		else
+			$this->_sortie = new SortieGraphviz($cheminSortie);
+		
+		$this->detaillerLesSimples = $detaillerLesSimples;
+		
 		if(!isset($typeRacine))
 		{
 			$nomTypes = array_keys($this->_modele);
@@ -411,10 +439,22 @@ $modele = array
 
 require_once dirname(__FILE__).'/chargeur.php';
 
+$detailSimples = false;
+for($i = 0; ++$i < count($argv);)
+	switch($argv[$i])
+	{
+		case '-r': $racines[] = $argv[++$i]; break;
+		case '-ds': $detailSimples = true; break;
+		default: $source = $argv[$i]; break;
+	}
+
 $c = new Chargeur;
-$modele = $c->charge($argv[1]);
+$modele = $c->charge($source);
 
 $e = new Ecrivain($modele);
-$e->ecrire();
+if(!isset($racines))
+	$e->ecrire($racine, $detailSimples);
+else foreach($racines as $racine)
+	$e->ecrire($racine, $detailSimples, dirname($source).'/'.preg_replace('/[^#]*#/', '', $racine).'.dot');
 
 ?>
