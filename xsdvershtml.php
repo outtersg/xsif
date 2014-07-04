@@ -59,7 +59,7 @@ class SortieHtml
 	{
 		$this->_blocs[$this->_blocActuel = isset($identifiant) ? $identifiant : $nom] = $numBloc = count($this->_blocs); // Le nom permettra par la suite de retrouver le numéro.
 		
-		$this->_sortir('<table>'."\n");
+		$this->_sortir('<table'.$this->_attrsTable.'>'."\n");
 		$this->_ligneOuverte = false;
 		$this->_ligneEcrite = false; // A-t-on écrit le contenu de cette ligne du bloc (reste éventuellement les marges)?
 		$this->_marges = array();
@@ -121,8 +121,6 @@ class SortieHtml
 	
 	public function ligne($chaine, $enTete = false, $supplement = null)
 	{
-		$balise = $enTete ? 'th' : 'td';
-		
 		if($this->_ligneEcrite)
 			$this->_finirLigne();
 		$this->_commencerLigne();
@@ -135,9 +133,15 @@ class SortieHtml
 		}
 		else
 			$chaineId = '';
-		$this->_ajouter('<'.$balise.' colspan="@'.count($this->_marges).'"'.$chaineId.'>'.htmlspecialchars($chaine).($supplement ? '<i>'.htmlspecialchars($supplement).'</i>' : '').'</'.$balise.'>');
+		$this->_ligne($chaine, $chaineId, $supplement);
 		$this->_ligneEcrite = true;
 		$this->_lignes[count($this->_lignes)] = $this->_blocActuel; // Le numéro permettra de retrouver le bloc.
+	}
+	
+	public function _ligne($chaine, $chaineIdSiEntete, $supplement = null)
+	{
+		$balise = $chaineIdSiEntete ? 'th' : 'td';
+		$this->_ajouter('<'.$balise.' colspan="@'.count($this->_marges).'"'.$chaineIdSiEntete.'>'.htmlspecialchars($chaine).($supplement ? '<i>'.htmlspecialchars($supplement).'</i>' : '').'</'.$balise.'>');
 	}
 	
 	public function lien($versBloc)
@@ -163,7 +167,7 @@ class SortieHtml
 			// On pond les marges droite pas encore écrite (en HTML, le td rowspan multiple est écrit avec la première ligne qu'il couvre).
 			for($numMarge = count($this->_marges); --$numMarge >= 0 && isset($this->_marges[$numMarge]['contenu']);)
 				$this->_pondreMarge($numMarge);
- 			$this->_ajouter('<td '.$this->_attrId.'="l'.(count($this->_lignes) - 1).'"></td>'); // L'ancre est ajoutée comme dernière colonne invisible de la table, afin de toujours se trouver à droite, même des marges droite.
+ 			$this->_ajouter('<td '.$this->_attrId.'="l'.(count($this->_lignes) - 1).'"'.$this->_attrsColDroite.'></td>'); // L'ancre est ajoutée comme dernière colonne invisible de la table, afin de toujours se trouver à droite, même des marges droite.
  			$this->_ajouter('</tr>'."\n");
 			$this->_ligneOuverte = false;
 			$this->_ligneEcrite = false;
@@ -220,6 +224,8 @@ class SortieHtml
 class SortieGraphviz extends SortieHtml
 {
 	protected $_attrId = 'port';
+	protected $_attrsTable = ' cellborder="1" cellspacing="0" border="0" bgcolor="#FFFFDF" color="#7F3F00"';
+	protected $_attrsColDroite = ' width="0" cellpadding="0" border="0"';
 	
 	protected function _commencer()
 	{
@@ -238,9 +244,17 @@ digraph Schema
 		parent::commencerBloc($nom, $identifiant);
 	}
 	
-	public function ligne($chaine, $enTete = false, $supplement = null)
+	public function _ligne($chaine, $chaineIdSiEntete, $supplement = null)
 	{
-		return parent::ligne($chaine, false, $supplement); // Graphviz ne gère pas les th.
+		$chaineTitre = htmlspecialchars($chaine);
+		if($chaineIdSiEntete)
+		{
+			$chaineTitre = '<font color="#FFFFFF"><b>'.$chaineTitre.'</b></font>';
+			$attrsTd = $chaineIdSiEntete.' bgcolor="#7F3F00"';
+		}
+		else
+			$attrsTd = ' align="left"';
+		$this->_ajouter('<td colspan="@'.count($this->_marges).'"'.$attrsTd.'>'.$chaineTitre.($supplement ? '&nbsp;<font point-size="9.6" color="#BF5F00"><i>'.htmlspecialchars($supplement).'</i></font>' : '').'</td>');
 	}
 	
 	public function finirBloc()
