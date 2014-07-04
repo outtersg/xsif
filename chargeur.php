@@ -4,18 +4,26 @@ define('XS', 'http://www.w3.org/2001/XMLSchema');
 
 class Chargeur
 {
+	protected $_cheminActuel;
 	protected $_espaceCible = null;
 	protected $_pileEspacesCible = array();
 	protected $_types = array();
 	
 	public function charge($chemin)
 	{
+		$ancienChemin = $this->_cheminActuel;
+		if(isset($ancienChemin))
+			$chemin = dirname($ancienChemin).'/'.$chemin;
+		$this->_cheminActuel = $chemin;
+		
 		$doc = new DOMDocument();
 		$doc->loadXML(file_get_contents($chemin));
 		
 		$racine = $doc->documentElement;
 		
 		$this->_compile($racine);
+		
+		$this->_cheminActuel = $ancienChemin;
 		
 		return $this->_types;
 	}
