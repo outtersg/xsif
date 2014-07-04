@@ -76,7 +76,12 @@ class Chargeur
 				case 'complexContent':
 				case 'pattern':
 				case 'maxLength':
+				case 'minLength':
 				case 'length':
+				case 'maxInclusive':
+				case 'minInclusive':
+				case 'totalDigits':
+				case 'fractionDigits':
 					$element = new Interne($noeud->localName, $noeud->attributes);
 					break;
 				case 'extension':
@@ -210,29 +215,80 @@ class Chargeur
 					break;
 				case 'restriction':
 					if(isset($element->contenu))
-						if(count($element->contenu) == 1 && $element->contenu[0]['t'] instanceof Interne)
-							switch($element->contenu[0]['t']->type)
-							{
-								case 'maxLength':
-									$r['t'] = $r['t']->attr['base'];
-									$r['text'] = '['.$element->contenu[0]['t']->attr['value'].']';
-									break;
-								case 'length':
-									$r['t'] = $r['t']->attr['base'];
-									$r['text'] = '{'.$element->contenu[0]['t']->attr['value'].'}';
-									break;
-							}
-						else
 						{
 							$enum = array();
+						$taille = array();
+						$plage = array();
+						$decimaux = array();
 							foreach($element->contenu as $sousElement)
-								if($sousElement['t'] instanceof Interne && $sousElement['t']->type == 'enumeration')
+								if($sousElement['t'] instanceof Interne)
+								switch($sousElement['t']->type)
+								{
+									case 'enumeration':
 									$enum[] = $sousElement['t']->attr['value'];
+										break;
+									case 'minLength':
+										$val = $sousElement['t']->attr['value'];
+										if(!$val) $val = null;
+										$taille[$sousElement['t']->type] = $val; // On inscrit de toute façon la taille, histoire d'avoir un élément dans $taille.
+										break;
+									case 'maxLength':
+									case 'length':
+										$val = $sousElement['t']->attr['value'];
+										$taille[$sousElement['t']->type] = $val;
+										break;
+									case 'maxInclusive':
+									case 'minInclusive':
+										$val = $sousElement['t']->attr['value'];
+										$plage[$sousElement['t']->type] = $val;
+										break;
+									case 'totalDigits':
+									case 'fractionDigits':
+										$val = $sousElement['t']->attr['value'];
+										$decimaux[$sousElement['t']->type] = $val;
+										break;
+									default:
+										break 3;
+								}
 								else
 									break 2;
+						if(count($enum))
+						{
 							$r['t'] = $r['t']->attr['base'];
 							$r['text'] = '{'.implode(',', $enum).'}';
 						}
+						else if(count($decimaux))
+						{
+							$r['t'] = $r['t']->attr['base'];
+							$nApres = isset($decimaux['fractionDigits']) ? $decimaux['fractionDigits'] : 0;
+							$nAvant = $decimaux['totalDigits'] - $nApres;
+							$r['text'] = '{'.$nAvant.($nApres ? '.'.$nApres : '').'}';
+						}
+						else if(count($plage))
+						{
+							$r['t'] = $r['t']->attr['base'];
+							if(isset($plage['minInclusive']) && isset($plage['maxInclusive']))
+								$r['text'] = '['.$plage['minInclusive'].';'.$plage['maxInclusive'].']';
+							else if(isset($plage['minInclusive']))
+								$r['text'] = '≥'.$plage['minInclusive'];
+							else
+								$r['text'] = '≤'.$plage['maxInclusive'];
+						}
+						else if(count($taille))
+						{
+							$r['t'] = $r['t']->attr['base'];
+							if(isset($taille['length']))
+								$r['text'] = '{'.$taille['length'].'}';
+							else if(!isset($taille['minLength']))
+								$r['text'] = '['.$taille['maxLength'].']';
+							else if(!isset($taille['maxLength']))
+								$r['text'] = '{'.$taille['minLength'].'+}';
+							else
+								$r['text'] = '{'.$taille['minLength'].'..'.$taille['maxLength'].'}';
+						}
+					}
+					else // Une restriction sans restriction, c'est le type de base, en fait.
+						$r['t'] = $r['t']->attr['base'];
 					break;
 				case 'complexContent':
 					if(!count($element->attr) && count($element->contenu) == 1 && count($element->contenu[0]) == 1) // contenu[0] == 1 pour être sûr qu'il n'y a que le 't' =>.
