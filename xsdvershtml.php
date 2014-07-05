@@ -250,7 +250,7 @@ digraph Schema
 		$chaineTitre = htmlspecialchars($chaine);
 		if($chaineIdSiEntete)
 		{
-			$chaineTitre = '<font color="#FFFFFF"><b>'.$chaineTitre.'</b></font>';
+			$chaineTitre = '<font color="#FFFFFF"><b>&nbsp;&nbsp;&nbsp;'.$chaineTitre.'&nbsp;&nbsp;&nbsp;</b></font>';
 			$attrsTd = $chaineIdSiEntete.' bgcolor="#7F3F00"';
 		}
 		else
