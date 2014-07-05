@@ -266,6 +266,7 @@ digraph Schema
 	
 	protected function _finir()
 	{
+		if(isset($this->_liens))
 		foreach($this->_liens as $lien)
 			$this->_sortir('b'.$this->_blocs[$this->_lignes[$lien[0]]].':l'.$lien[0].':e -> b'.$this->_blocs[$lien[1]].':e'.$this->_premiereLigneBlocs[$lien[1]].':w'."\n"); // Toujours d'une ligne vers un bloc.
 		$this->_sortir('}');
