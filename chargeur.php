@@ -8,12 +8,21 @@ class Chargeur
 	protected $_espaceCible = null;
 	protected $_pileEspacesCible = array();
 	protected $_types = array();
+	protected $_fichiers = array();
 	
 	public function charge($chemin)
 	{
 		$ancienChemin = $this->_cheminActuel;
 		if(isset($ancienChemin))
 			$chemin = dirname($ancienChemin).'/'.$chemin;
+		$chemin = realpath($chemin);
+		
+		// Inutile de refaire un fichier déjà parcouru.
+		// À FAIRE?: dans le cas d'un include dans un nœud intérieur, faudrait-il réinclure quand même son contenu à la manière d'un <group>?
+		if(isset($this->_fichiers[$chemin]))
+			return;
+		$this->_fichiers[$chemin] = true;
+		
 		$this->_cheminActuel = $chemin;
 		
 		$doc = new DOMDocument();
