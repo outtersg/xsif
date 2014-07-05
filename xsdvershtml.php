@@ -483,7 +483,7 @@ $modele = $c->charge($source);
 
 $e = new Ecrivain($modele);
 if(!isset($racines))
-	$e->ecrire($racine, $detailSimples);
+	$e->ecrire(null, $detailSimples);
 else foreach($racines as $racine)
 	$e->ecrire($racine, $detailSimples, dirname($source).'/'.preg_replace('/[^#]*#/', '', $racine).'.dot');
 
