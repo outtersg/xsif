@@ -268,6 +268,7 @@ digraph Schema
 	{
 		if(isset($this->_liens))
 		foreach($this->_liens as $lien)
+			if(isset($this->_premiereLigneBlocs[$lien[1]])) // Certains blocs ont pu être occultés par un filtre.
 			$this->_sortir('b'.$this->_blocs[$this->_lignes[$lien[0]]].':l'.$lien[0].':e -> b'.$this->_blocs[$lien[1]].':e'.$this->_premiereLigneBlocs[$lien[1]].':w'."\n"); // Toujours d'une ligne vers un bloc.
 		$this->_sortir('}');
 	}
@@ -278,6 +279,12 @@ class Ecrivain
 	public function __construct($modele)
 	{
 		$this->_modele = $modele;
+	}
+	
+	public function filtre($filtre)
+	{
+		if(0 + $filtre) // Nombre de niveaux à afficher.
+			$this->_niveauMax = 0 + $filtre;
 	}
 	
 	public function ecrire($typeRacine = null, $detaillerLesSimples = false, $cheminSortie = null)
@@ -301,6 +308,8 @@ class Ecrivain
 			$typeRacine = $premierType[0].'#'.$typeRacine;
 		}
 		
+		$this->_niveauActuel = 0;
+		
 		$this->_sortie->commencer();
 		$this->_resoudre($this->_modele[$typeRacine]);
 		$this->resteAFaire = array($typeRacine);
@@ -311,6 +320,22 @@ class Ecrivain
 			++$pondus;
 		}
 		$this->_sortie->finir();
+	}
+	
+	public function niveau($idBloc, $niveau = null)
+	{
+		// Fixation.
+		if(isset($niveau))
+		{
+			if(isset($this->_niveaux[$idBloc]) && $this->_niveaux[$idBloc] < $niveau)
+				return;
+			$this->_niveaux[$idBloc] = $niveau;
+			return;
+		}
+		// Obtention.
+		if(!isset($this->_niveaux[$idBloc])) // Si l'on ne possède pas encore d'indication de niveau pour un bloc, c'est qu'il n'a jamais été appelé depuis quelqu'autre, donc est probablement racine.
+			$this->_niveaux[$idBloc] = 0;
+		return $this->_niveaux[$idBloc];
 	}
 	
 	protected function _resoudre($arboModele)
@@ -395,9 +420,16 @@ class Complexe extends Type
 				$registre->resteAFaire[] = $nomBloc;
 			if(!isset($registre->_modele[$nomBloc]))
 				$registre->_modele[$nomBloc] = $infosInvocation['t'];
+			$registre->niveau($nomBloc, $registre->_niveauActuel + 1);
 			$sortie->lien($nomBloc);
 			return;
 		}
+		
+		if(isset($registre->_niveauMax) && $registre->niveau($chemin) >= $registre->_niveauMax)
+			return;
+		
+		$niveauActuel = $registre->_niveauActuel;
+		$registre->_niveauActuel = $registre->niveau($chemin);
 		
 		$sortie->commencerBloc($nomClasse, $chemin);
 		$sortie->ligne($nomClasse, true);
@@ -405,6 +437,8 @@ class Complexe extends Type
 		$pseudoListe->contenu = $this->contenu;
 		$pseudoListe->pondre($chemin, array(), $sortie, $registre);
 		$sortie->finirBloc();
+		
+		$registre->_niveauActuel = $niveauActuel;
 	}
 }
 
@@ -471,9 +505,11 @@ $modele = array
 require_once dirname(__FILE__).'/chargeur.php';
 
 $detailSimples = false;
+$niveaux = null;
 for($i = 0; ++$i < count($argv);)
 	switch($argv[$i])
 	{
+		case '-n': $niveaux = $argv[++$i]; break;
 		case '-r': $racines[] = $argv[++$i]; break;
 		case '-ds': $detailSimples = true; break;
 		default: $source = $argv[$i]; break;
@@ -483,6 +519,8 @@ $c = new Chargeur;
 $modele = $c->charge($source);
 
 $e = new Ecrivain($modele);
+if(isset($niveaux))
+	$e->filtre($niveaux);
 if(!isset($racines))
 	$e->ecrire(null, $detailSimples);
 else foreach($racines as $racine)
