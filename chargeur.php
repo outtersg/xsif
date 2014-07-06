@@ -238,10 +238,11 @@ class Chargeur
 						$r = $element->contenu[0] + $r;
 					break;
 				case 'extension':
-					if(isset($element->contenu) && count($element->contenu) == 1)
+					if(!isset($element->contenu) || count($element->contenu) == 1)
 					{
 						$nouveau = new Liste;
 						$nouveau->contenu[] = array('t' => $element->attr['base'], 'commeExtension' => true);
+						if(isset($element->contenu))
 						$nouveau->contenu = array_merge($nouveau->contenu, $element->contenu);
 						$r['t'] = $nouveau;
 					}
