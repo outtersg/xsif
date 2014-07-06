@@ -1,4 +1,8 @@
 <?php
+/* xsif
+ * Représentation en diagrammes d'un .xsd
+ * xs comme XML Schema, et if pour exprimer la représentation en arbre, de façon élégante et compacte (parce que l'if est, de tous les arbres que je connaisse, celui qui possède le nom le plus concis, et aux couleurs raffinées vert sombre et rouge délicat, ainsi que marron et ocre pour le tronc. Et puis il y en a dans le jardin de mes parents et j'aime bien).
+ */
 
 class SortieHtml
 {
