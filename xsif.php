@@ -554,6 +554,7 @@ $modele = array
 
 require_once dirname(__FILE__).'/chargeur.php';
 
+$sources = array();
 $detailSimples = false;
 $niveaux = null;
 for($i = 0; ++$i < count($argv);)
@@ -562,10 +563,11 @@ for($i = 0; ++$i < count($argv);)
 		case '-n': $niveaux = $argv[++$i]; break;
 		case '-r': $racines[] = $argv[++$i]; break;
 		case '-ds': $detailSimples = true; break;
-		default: $source = $argv[$i]; break;
+		default: $sources[] = $argv[$i]; break;
 	}
 
 $c = new Chargeur;
+foreach($sources as $source)
 $modele = $c->charge($source);
 
 $e = new Ecrivain($modele);
