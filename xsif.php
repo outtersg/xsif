@@ -330,9 +330,33 @@ class Ecrivain
 		if(strpos($typeRacine, '#') === false)
 		{
 			$nomTypes = array_keys($this->_modele);
+			// On cherche dans l'espace de nom par défaut (espace de nom du premier élément).
 			$premierType = explode('#', $nomTypes[0], 2);
-			$typeRacine = $premierType[0].'#'.$typeRacine;
+			$typeRacineEssaye = $premierType[0].'#'.$typeRacine;
+			// Sinon on parcourt tous les types: avec un peu de chance un seul espace de nom embarque un tel type, en ce cas, point d'ambiguïté, donc on le choisira.
+			if(isset($this->_modele[$typeRacineEssaye]))
+				$typeRacine = $typeRacineEssaye;
+			else
+			{
+				$typesRacineEssayes = array();
+				foreach($nomTypes as $nomType)
+				{
+					$typeEssaye = explode('#', $nomType, 2);
+					if($typeRacine == $typeEssaye[1])
+						$typesRacineEssayes[$nomType] = true;
+				}
+				$typesRacineEssayes = array_keys($typesRacineEssayes);
+				switch(count($typesRacineEssayes))
+				{
+					case 0: break;
+					case 1: $typeRacine = $typesRacineEssayes[0]; break;
+					default: throw new Exception('Plusieurs types portent le nom '.$typeRacine.': '.implode(', ', $typesRacineEssayes)); break;
+				}
+			}
 		}
+		
+		if(!isset($this->_modele[$typeRacine]))
+			throw new Exception('Type inexistant dans le modèle: '.$typeRacine);
 		
 		$this->_niveauActuel = 0;
 		
