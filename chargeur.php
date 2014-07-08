@@ -97,7 +97,8 @@ class Chargeur
 						$this->_siloteSiNomme($noeud, $element);
 					}
 					break;
-				case 'annotation': return;
+				case 'annotation': $element = new Interne($noeud->localName, $noeud->attributes); break;
+				case 'documentation': $element = new Commentaire($noeud->localName, $noeud->attributes); break;
 				case 'attribute':
 				case 'element':
 					if(($element = $this->_noeudEnRef($noeud, 'type')))
@@ -213,6 +214,7 @@ class Chargeur
 		$element = $r['t'];
 		
 		if(isset($element->contenu))
+		{
 			foreach($element->contenu as $num => $contenu)
 				if($contenu['t'] instanceof Interne)
 				{
@@ -221,6 +223,12 @@ class Chargeur
 						$sousContenu = $contenu['t']->contenu[0];
 						if(!isset($sousContenu['n']) && is_string($sousContenu['t']) || $sousContenu['t'] instanceof Type)
 							$r['t']->contenu[$num]['t'] = $sousContenu['t'];
+					}
+					if($contenu['t']->type == 'annotation')
+					{
+						$r['doc'] = isset($r['doc']) ? $r['doc']."\n".$contenu['doc'] : $contenu['doc'];
+						unset($r['t']->contenu[$num]);
+						$retasser = true;
 					}
 					if($contenu['t']->type == 'extension')
 					{
@@ -231,11 +239,26 @@ class Chargeur
 						print_r($r);exit;
 					}
 				}
+			if(isset($retasser))
+				$element->contenu = array_merge($element->contenu);
+		}
 		if($element instanceof Simple && count(array_diff_key($r, array('t' => 1, 'l' => 1))) == 0 && count($element->contenu) == 1)
 			$r = $element->contenu[0] + $r;
+		if($element instanceof Commentaire)
+		{
+			$r['doc'] = isset($r['doc']) ? $r['doc']."\n".$element->texte : $element->texte;
+			$r['t'] = null;
+		}
 		if($element instanceof Interne)
 			switch($element->type)
 			{
+				case 'annotation':
+					if(count($element->contenu) == 1 && !isset($element->contenu[0]['t']))
+					{
+						$r['doc'] = $element->contenu[0]['doc'];
+						unset($element->contenu);
+					}
+					break;
 				case 'element':
 					// Si notre élément peut être remplacé par son contenu (pas d'attributs en commun si ce n'est le type), on combine.
 					// Ce peut être le résultat d'une compression antérieure (element > complexContent > restriction devenus un simple element, par exemple).
@@ -356,6 +379,14 @@ class Interne
 	public function pondre()
 	{
 		print_r($this);exit;
+	}
+}
+
+class Commentaire extends Type
+{
+	public function texte($texte)
+	{
+		$this->texte = isset($this->texte) ? $this->texte.$texte : $texte;
 	}
 }
 
