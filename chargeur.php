@@ -133,8 +133,13 @@ class Chargeur
 		if(isset($noeud->childNodes))
 			foreach($noeud->childNodes as $fils)
 				if($fils instanceof DomElement)
+				{
 					if(($filsCompile = $this->_compile($fils)))
 						$element->contenu[] = $filsCompile;
+				}
+				else if($fils instanceof DomText)
+					if(method_exists($element, 'texte'))
+						$element->texte($fils->wholeText);
 		
 		if(isset($nouvelEspace))
 			$this->_espaceCible = array_pop($this->_pileEspacesCible);
