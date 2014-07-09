@@ -305,6 +305,7 @@ class Ecrivain
 	public function __construct($modele)
 	{
 		$this->_modele = $modele;
+		$this->embarquerLesSousElements = false;
 	}
 	
 	public function filtre($filtre)
@@ -463,15 +464,35 @@ class Complexe extends Type
 		// Si on est appelés dans le cadre d'un autre, on s'inscrit uniquement comme libellé dans celui-ci, et on se met en file d'attente pour la "vraie" ponte.
 		if(isset($infosInvocation))
 		{
-			parent::pondre($chemin, $infosInvocation, $sortie, $registre);
+			// Nous gérons nous-mêmes la marge (plutôt que de la laisser à parent::), afin que, si on pond à la fois notre titre (via parent::) et notre contenu, la marge englobe les deux.
+			$infosInvocationSansTaille = $infosInvocation;
+			unset($infosInvocationSansTaille['n']);
+			
+			if(isset($infosInvocation['n']))
+				$sortie->commencerMarge($infosInvocation['n']);
+			
+			parent::pondre($chemin, $infosInvocationSansTaille, $sortie, $registre);
 			
 			$nomBloc = isset($infosInvocation['classe']) ? $infosInvocation['classe'] : $chemin;
-			if(!in_array($nomBloc, $registre->resteAFaire))
-				$registre->resteAFaire[] = $nomBloc;
 			if(!isset($registre->_modele[$nomBloc]))
 				$registre->_modele[$nomBloc] = $infosInvocation['t'];
 			$registre->niveau($nomBloc, $registre->_niveauActuel + 1);
+			if($registre->embarquerLesSousElements)
+			{
+				$pseudoListe = new Liste;
+				$pseudoListe->contenu = $this->contenu;
+				$pseudoListe->pondre($chemin, $infosInvocationSansTaille, $sortie, $registre);
+			}
+			else
+			{
+				if(!in_array($nomBloc, $registre->resteAFaire))
+					$registre->resteAFaire[] = $nomBloc;
 			$sortie->lien($nomBloc);
+			}
+			
+			if(isset($infosInvocation['n']))
+				$sortie->finirMarge();
+			
 			return;
 		}
 		
