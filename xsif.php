@@ -247,6 +247,11 @@ class SortieHtml
 	}
 }
 
+class SortieTexte extends SortieHtml
+{
+
+}
+
 class SortieGraphviz extends SortieHtml
 {
 	protected $_attrId = 'port';
@@ -305,6 +310,7 @@ class Ecrivain
 	public function __construct($modele)
 	{
 		$this->_modele = $modele;
+		$this->_classeSortie = 'SortieGraphviz';
 		$this->embarquerLesSousElements = false;
 	}
 	
@@ -314,12 +320,19 @@ class Ecrivain
 			$this->_niveauMax = 0 + $filtre;
 	}
 	
+	public function sortieTexte()
+	{
+		$this->_classeSortie = 'SortieTexte';
+		$this->embarquerLesSousElements = true;
+	}
+	
 	public function ecrire($typeRacine = null, $detaillerLesSimples = false, $cheminSortie = null)
 	{
+		$classeSortie = $this->_classeSortie;
 		if(!isset($cheminSortie))
-			$this->_sortie = new SortieGraphviz;
+			$this->_sortie = new $classeSortie;
 		else
-			$this->_sortie = new SortieGraphviz($cheminSortie);
+			$this->_sortie = new $classeSortie($cheminSortie);
 		
 		$this->detaillerLesSimples = $detaillerLesSimples;
 		
@@ -578,9 +591,11 @@ require_once dirname(__FILE__).'/chargeur.php';
 $sources = array();
 $detailSimples = false;
 $niveaux = null;
+$sortieTexte = null;
 for($i = 0; ++$i < count($argv);)
 	switch($argv[$i])
 	{
+		case '--texte': $sortieTexte = true; break;
 		case '-n': $niveaux = $argv[++$i]; break;
 		case '-r': $racines[] = $argv[++$i]; break;
 		case '-ds': $detailSimples = true; break;
@@ -592,11 +607,18 @@ foreach($sources as $source)
 $modele = $c->charge($source);
 
 $e = new Ecrivain($modele);
+if(isset($sortieTexte))
+{
+	$e->sortieTexte();
+	$suffixe = 'html';
+}
+else
+	$suffixe = 'dot';
 if(isset($niveaux))
 	$e->filtre($niveaux);
 if(!isset($racines))
 	$e->ecrire(null, $detailSimples);
 else foreach($racines as $racine)
-	$e->ecrire($racine, $detailSimples, count($racines) > 1 ? dirname($source).'/'.preg_replace('/[^#]*#/', '', $racine).'.dot' : null);
+	$e->ecrire($racine, $detailSimples, dirname($source).'/'.preg_replace('/[^#]*#/', '', $racine).'.'.$suffixe);
 
 ?>
