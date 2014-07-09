@@ -494,7 +494,9 @@ class Complexe extends Type
 			{
 				$pseudoListe = new Liste;
 				$pseudoListe->contenu = $this->contenu;
+				$sortie->commencerMarge('', true);
 				$pseudoListe->pondre($chemin, $infosInvocationSansTaille, $sortie, $registre);
+				$sortie->finirMarge();
 			}
 			else
 			{
