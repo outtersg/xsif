@@ -175,6 +175,11 @@ class SortieHtml
 		$this->_liens[] = array(count($this->_lignes) - 1, $versBloc); // Ligne actuelle.
 	}
 	
+	public function commentaire($commentaire)
+	{
+		$this->_commentaireLigne = $commentaire;
+	}
+	
 	protected function _commencerLigne()
 	{
 		if(!$this->_ligneOuverte)
@@ -197,6 +202,7 @@ class SortieHtml
  			$this->_ajouter('</tr>'."\n");
 			$this->_ligneOuverte = false;
 			$this->_ligneEcrite = false;
+			unset($this->_commentaireLigne);
 		}
 	}
 	
@@ -447,6 +453,8 @@ class Type
 		if(isset($infosInvocation['n']))
 			$sortie->commencerMarge($infosInvocation['n']);
 		$sortie->ligne($infosInvocation['l'], false, $classeSimple.(isset($infosInvocation['text']) ? $infosInvocation['text'] : '')); // text: Type.EXTension
+		if(isset($infosInvocation['doc']))
+			$sortie->commentaire($infosInvocation['doc']);
 		if(isset($infosInvocation['n']))
 			$sortie->finirMarge();
 	}
