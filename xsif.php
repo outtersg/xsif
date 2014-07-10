@@ -59,15 +59,20 @@ class SortieHtml
 					{
 						border-collapse: collapse;
 					}
-					td
+					th, td
 					{
 						border: 1px solid #7F3F00;
 						padding-left: 0.5em;
 						padding-right: 0.5em;
 					}
+					td
+					{
+						/* Les pointillés étaient pas mal aussi mais Chrome comme Firefox se plantent sur des rowspan avec le collapse (en mettant un pixel sur deux, si le rowspan couvre deux lignes espacées d\'un nombre impair de pixels, le pointillé va remplir tous les pixels, les impairs pour la ligne du haut, les pairs pour celle du bas) */
+						border-left-color: #DFCFA7;
+						border-right-color: #DFCFA7;
+					}
 					table
 					{
-						border: 3px double #7F3F00;
 						background: #FFFFDF;
 					}
 					td i
