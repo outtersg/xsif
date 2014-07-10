@@ -260,7 +260,11 @@ class SortieHtml
 
 class SortieTexte extends SortieHtml
 {
-
+	protected function _insererFinLigne()
+	{
+		$balise = $this->_premiereLigneBlocs[$this->_blocActuel] == count($this->_lignes) - 1 ? 'th' : 'td';
+		$this->_ajouter('<'.$balise.'>'.(isset($this->_commentaireLigne) ? strtr(htmlspecialchars($this->_commentaireLigne), array("\n" => '<br/>')) : '').'</'.$balise.'>');
+	}
 }
 
 class SortieGraphviz extends SortieHtml
