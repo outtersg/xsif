@@ -193,11 +193,16 @@ class SortieHtml
 			// On pond les marges droite pas encore écrite (en HTML, le td rowspan multiple est écrit avec la première ligne qu'il couvre).
 			for($numMarge = count($this->_marges); --$numMarge >= 0 && isset($this->_marges[$numMarge]['contenu']);)
 				$this->_pondreMarge($numMarge);
- 			$this->_ajouter('<td '.$this->_attrId.'="l'.(count($this->_lignes) - 1).'"'.$this->_attrsColDroite.'></td>'); // L'ancre est ajoutée comme dernière colonne invisible de la table, afin de toujours se trouver à droite, même des marges droite.
+			$this->_insererFinLigne();
  			$this->_ajouter('</tr>'."\n");
 			$this->_ligneOuverte = false;
 			$this->_ligneEcrite = false;
 		}
+	}
+	
+	protected function _insererFinLigne()
+	{
+		$this->_ajouter('<td '.$this->_attrId.'="l'.(count($this->_lignes) - 1).'"'.$this->_attrsColDroite.'></td>'); // L'ancre est ajoutée comme dernière colonne invisible de la table, afin de toujours se trouver à droite, même des marges droite.
 	}
 	
 	public function finirBloc()
