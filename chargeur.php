@@ -101,8 +101,12 @@ class Chargeur
 				case 'documentation': $element = new Commentaire($noeud->localName, $noeud->attributes); break;
 				case 'attribute':
 				case 'element':
-					if(($element = $this->_noeudEnRef($noeud, 'type')))
+					if(($elementRef = $this->_noeudEnRef($noeud, 'type')))
+					{
+						$element = new Interne('ref', array());
+						$element->ref = $elementRef;
 						break;
+					}
 					// Sinon on continue en Interne.
 				case 'enumeration':
 				case 'complexContent':
@@ -136,6 +140,8 @@ class Chargeur
 				if($fils instanceof DomElement)
 				{
 					if(($filsCompile = $this->_compile($fils)))
+						if(!isset($element->contenu))
+							$element->contenu = array();
 						$element->contenu[] = $filsCompile;
 				}
 				else if($fils instanceof DomText)
@@ -252,6 +258,10 @@ class Chargeur
 		if($element instanceof Interne)
 			switch($element->type)
 			{
+				case 'ref':
+					if (!isset($element->contenu) || !count($element->contenu))
+						$r['t'] = $element->ref;
+					break;
 				case 'annotation':
 					if(count($element->contenu) == 1 && !isset($element->contenu[0]['t']))
 					{
