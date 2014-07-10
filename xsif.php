@@ -509,11 +509,19 @@ class Complexe extends Type
 			$registre->niveau($nomBloc, $registre->_niveauActuel + 1);
 			if($registre->embarquerLesSousElements)
 			{
+				$niveauActuel = $registre->_niveauActuel;
+				$registre->_niveauActuel = $registre->niveau($nomBloc);
+				
+				if(!isset($registre->_niveauMax) || $registre->niveau($nomBloc) < $registre->_niveauMax)
+				{
 				$pseudoListe = new Liste;
 				$pseudoListe->contenu = $this->contenu;
 				$sortie->commencerMarge('', true);
 				$pseudoListe->pondre($chemin, $infosInvocationSansTaille, $sortie, $registre);
 				$sortie->finirMarge();
+				}
+				
+				$registre->_niveauActuel = $niveauActuel;
 			}
 			else
 			{
