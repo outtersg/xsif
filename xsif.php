@@ -548,7 +548,7 @@ class Complexe extends Type
 		$registre->_niveauActuel = $registre->niveau($chemin);
 		
 		$sortie->commencerBloc($nomClasse, $chemin);
-		$sortie->ligne($nomClasse, true);
+		$sortie->ligne(preg_replace('/^.*\.([^.]*\.[^.]*\.[^.]*)$/', '\1', $nomClasse), true);
 		$pseudoListe = new Liste;
 		$pseudoListe->contenu = $this->contenu;
 		$pseudoListe->pondre($chemin, array(), $sortie, $registre);
