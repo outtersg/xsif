@@ -623,34 +623,36 @@ require_once dirname(__FILE__).'/chargeur.php';
 $sources = array();
 $detailSimples = false;
 $niveaux = null;
-$sortieTexte = null;
+$sorties = array();
 for($i = 0; ++$i < count($argv);)
 	switch($argv[$i])
 	{
-		case '--texte': $sortieTexte = true; break;
+		case '--texte': $sorties[] = 'html'; break;
+		case '--dot': $sorties[] = 'dot'; break;
 		case '-n': $niveaux = $argv[++$i]; break;
 		case '-r': $racines[] = $argv[++$i]; break;
 		case '-ds': $detailSimples = true; break;
 		default: $sources[] = $argv[$i]; break;
 	}
+if(!count($sorties))
+	$sorties[] = 'dot';
 
 $c = new Chargeur;
 foreach($sources as $source)
 $modele = $c->charge($source);
 
-$e = new Ecrivain($modele);
-if(isset($sortieTexte))
+foreach($sorties as $suffixe)
 {
+	$cheminSortie = strtr($source, array('.xsd' => '.'));
+$e = new Ecrivain($modele);
+	if($suffixe == 'html')
 	$e->sortieTexte();
-	$suffixe = 'html';
-}
-else
-	$suffixe = 'dot';
 if(isset($niveaux))
 	$e->filtre($niveaux);
 if(!isset($racines))
-	$e->ecrire(null, $detailSimples);
+		$e->ecrire(null, $detailSimples, $cheminSortie.$suffixe);
 else foreach($racines as $racine)
-	$e->ecrire($racine, $detailSimples, dirname($source).'/'.preg_replace('/[^#]*#/', '', $racine).'.'.$suffixe);
+		$e->ecrire($racine, $detailSimples, $cheminSortie.preg_replace('/[^#]*#/', '', $racine).'.'.$suffixe);
+}
 
 ?>
