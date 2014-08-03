@@ -88,6 +88,7 @@ class Chargeur
 					if($noeud->hasAttributeNS(null, 'schemaLocation'))
 						$this->charge($noeud->getAttributeNS(null, 'schemaLocation'));
 					return;
+				case 'all': // De notre point de vue, un all c'est une sequence (la seule différence est que l'all n'impose pas d'ordre).
 				case 'sequence': $element = new Sequence; break;
 				case 'choice': $element = new Variante; break;
 				case 'group':
