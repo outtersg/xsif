@@ -426,6 +426,9 @@ class Ecrivain
 	{
 		if(isset($arboModele->contenu))
 		{
+			if(isset($arboModele->_enResolution)) return; // Évitons les boucles infinies (Toto inclut un Titi qui peut inclure un Toto, voire Toto inclut un Toto).
+			$arboModele->_enResolution = true;
+			
 			foreach($arboModele->contenu as $cle => $element)
 			{
 				if(is_string($element['t']))
@@ -442,6 +445,8 @@ class Ecrivain
 			
 			if(count($arboModele->contenu) == 1 && $arboModele->contenu[0]['t'] instanceof Sequence)
 				$arboModele->contenu = $arboModele->contenu[0]['t']->contenu;
+			
+			unset($arboModele->_enResolution);
 		}
 	}
 }
@@ -514,6 +519,9 @@ class Complexe extends Type
 			$registre->niveau($nomBloc, $registre->_niveauActuel + 1);
 			if($registre->embarquerLesSousElements)
 			{
+				if(!isset($this->_enPonteEnfants)) // Évitons la récursivité.
+				{
+					$this->_enPonteEnfants = true;
 				$niveauActuel = $registre->_niveauActuel;
 				$registre->_niveauActuel = $registre->niveau($nomBloc);
 				
@@ -527,6 +535,8 @@ class Complexe extends Type
 				}
 				
 				$registre->_niveauActuel = $niveauActuel;
+					unset($this->_enPonteEnfants);
+				}
 			}
 			else
 			{
