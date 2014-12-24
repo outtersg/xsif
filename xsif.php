@@ -435,7 +435,12 @@ class Ecrivain
 				{
 					$arboModele->contenu[$cle]['classe'] = $element['t'];
 					if(!isset($this->_modele[$element['t']]))
+					{
 						$this->_modele[$element['t']] = new Simple($element['t']);
+						$espace = explode('#', $element['t']);
+						if($espace[0] != 'http://www.w3.org/2001/XMLSchema') // Types standard.
+							echo "# Type ".$element['t']." non connu.\n";
+					}
 					$arboModele->contenu[$cle]['t'] = $this->_modele[$element['t']];
 				}
 				$this->_resoudre($arboModele->contenu[$cle]['t']);
