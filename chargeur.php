@@ -36,6 +36,9 @@ class Chargeur
 		$ancienChemin = $this->_cheminActuel;
 		if(isset($ancienChemin))
 			$chemin = dirname($ancienChemin).'/'.$chemin;
+		if (!file_exists($chemin)) {
+			throw new Exception('Impossible de charger '.$chemin);
+		}
 		$chemin = realpath($chemin);
 		
 		// Inutile de refaire un fichier déjà parcouru.
