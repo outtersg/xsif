@@ -233,6 +233,7 @@ class Chargeur
 					}
 					if($contenu['t']->type == 'annotation')
 					{
+						if(isset($contenu['doc']))
 						$r['doc'] = isset($r['doc']) ? $r['doc']."\n".$contenu['doc'] : $contenu['doc'];
 						unset($r['t']->contenu[$num]);
 						$retasser = true;
@@ -253,6 +254,7 @@ class Chargeur
 			$r = $element->contenu[0] + $r;
 		if($element instanceof Commentaire)
 		{
+			if(isset($element->texte))
 			$r['doc'] = isset($r['doc']) ? $r['doc']."\n".$element->texte : $element->texte;
 			$r['t'] = null;
 		}
@@ -266,6 +268,7 @@ class Chargeur
 				case 'annotation':
 					if(count($element->contenu) == 1 && !isset($element->contenu[0]['t']))
 					{
+						if(isset($element->contenu[0]['doc']))
 						$r['doc'] = $element->contenu[0]['doc'];
 						unset($element->contenu);
 					}
