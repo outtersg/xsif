@@ -120,6 +120,8 @@ class Chargeur
 				case 'length':
 				case 'maxInclusive':
 				case 'minInclusive':
+				case 'maxExclusive':
+				case 'minExclusive':
 				case 'totalDigits':
 				case 'fractionDigits':
 					$element = new Interne($noeud->localName, $noeud->attributes);
@@ -321,6 +323,11 @@ class Chargeur
 										$val = $sousElement['t']->attr['value'];
 										$plage[$sousElement['t']->type] = $val;
 										break;
+									case 'maxExclusive':
+									case 'minExclusive':
+										$val = $sousElement['t']->attr['value'];
+										$plage[$sousElement['t']->type] = $val;
+										break;
 									case 'totalDigits':
 									case 'fractionDigits':
 										$val = $sousElement['t']->attr['value'];
@@ -346,12 +353,26 @@ class Chargeur
 						else if(count($plage))
 						{
 							$r['t'] = $r['t']->attr['base'];
-							if(isset($plage['minInclusive']) && isset($plage['maxInclusive']))
-								$r['text'] = '['.$plage['minInclusive'].';'.$plage['maxInclusive'].']';
+							if(isset($plage['minExclusive']))
+							{
+								$min = $plage['minExclusive'];
+								$minExcl = true;
+							}
 							else if(isset($plage['minInclusive']))
-								$r['text'] = '≥'.$plage['minInclusive'];
+								$min = $plage['minInclusive'];
+							if(isset($plage['maxExclusive']))
+							{
+								$max = $plage['maxExclusive'];
+								$maxExcl = true;
+							}
+							else if(isset($plage['maxInclusive']))
+								$max = $plage['maxInclusive'];
+							if(isset($min) && isset($max))
+								$r['text'] = (isset($minExcl) ? ']' : '[').$min.';'.$max.(isset($maxExcl) ? '[' : ']');
+							else if(isset($min))
+								$r['text'] = (isset($minExcl) ? '>' : '≥').$min;
 							else
-								$r['text'] = '≤'.$plage['maxInclusive'];
+								$r['text'] = (isset($maxExcl) ? '<' : '≤').$max;
 						}
 						else if(count($taille))
 						{
