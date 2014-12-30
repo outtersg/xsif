@@ -479,6 +479,58 @@ class Type
 	}
 }
 
+class Service extends Complexe
+{
+	public function pondre($chemin, $infosInvocation, $sortie, $registre)
+	{
+		// Voyons si on n'a pas des fils de type Service.
+		
+		$autresFils = array();
+		foreach($this->contenu as $fils)
+			if($fils['t'] instanceof Service)
+				$fils['t']->pondre($chemin, $infosInvocation, $sortie, $registre);
+			else
+				$autresFils[] = $fils;
+		
+		// Si on a des fils non Service, c'est que nous sommes le service final (généralement le port; on a: Service service -> Service binding -> Service port -> méthodes).
+		
+		if(count($autresFils))
+		{
+			// Zut, pas de place pour des commentaires dans l'en-tête! Et en plus ça met la grouille (une $infosInvocation signifie qu'on est embarqué dans quelque chose de plus gros, et non pas autosuffisant). On s'en débarrasse donc.
+			unset($infosInvocation['doc']);
+			if(isset($infosInvocation) && !count($infosInvocation))
+				$infosInvocation = null;
+			
+			return parent::pondre($chemin, $infosInvocation, $sortie, $registre);
+		}
+	}
+}
+
+class Methode extends Complexe
+{
+	
+}
+
+class ParametresMethode extends Liste
+{
+	public function pondre($chemin, $infosInvocation, $sortie, $registre)
+	{
+		$corrSymboles = array
+		(
+			'input' => '→',
+			'output' => '←',
+		);
+		if(count($this->contenu) != 1 || !isset($corrSymboles[$this->contenu[0]['l']]))
+			throw new Exception('Paramètres méthode (éléments input et output) ininterprétables');
+		
+		$pseudoListe = new Liste;
+		$pseudoListe->contenu = $this->contenu[0]['t']->contenu;
+		foreach($pseudoListe->contenu as & $contenu)
+			$contenu['l'] = $corrSymboles[$this->contenu[0]['l']].(isset($contenu['l']) ? ' '.$contenu['l'] : '');
+		$pseudoListe->pondre($chemin, $infosInvocation, $sortie, $registre);
+	}
+}
+
 class Simple extends Type
 {
 	public function pondre($chemin, $infosInvocation, $sortie, $registre)
@@ -658,7 +710,7 @@ $modele = $c->charge($source);
 
 foreach($sorties as $suffixe)
 {
-	$cheminSortie = strtr($source, array('.xsd' => '.'));
+	$cheminSortie = strtr($source, array('.xsd' => '.', '.wsdl' => '.'));
 $e = new Ecrivain($modele);
 	if($suffixe == 'html')
 	$e->sortieTexte();

@@ -22,6 +22,8 @@
  */
 
 define('XS', 'http://www.w3.org/2001/XMLSchema');
+define('WSDL', 'http://schemas.xmlsoap.org/wsdl/');
+define('SOAP', 'http://schemas.xmlsoap.org/wsdl/soap/');
 
 class Chargeur
 {
@@ -73,19 +75,74 @@ class Chargeur
 	{
 //		echo "=== ".$noeud->tagName." ===\n";
 		
-		if($noeud->namespaceURI == XS)
+		$poubelle = new stdClass;
+		if($noeud->namespaceURI == XS || $noeud->namespaceURI == WSDL || $noeud->namespaceURI == SOAP)
 			switch($noeud->localName)
 			{
+				/* Plutôt orientés WSDL. */
+				case 'service':
+					if(isset($this->_racine) && !($this->_racine instanceof Service))
+						unset($this->_racine);
+					$element = new Service;
+					$this->_siloteSiNomme($noeud, $element);
+					break;
+				case 'address':
+					$element = false;
+					break;
+				case 'port':
+					$element = $this->_noeudEnInterneRef($noeud, 'binding');
+					break;
+				case 'binding':
+					if(($ref = $this->_noeudEnRef($noeud, 'type')))
+					{
+						$element = new Service;
+						$this->_siloteSiNomme($noeud, $element);
+						$element->contenu[] = array('t' => $ref);
+					}
+					$element = false;
+					break;
+				case 'input':
+				case 'output':
+					if(($ref = $this->_noeudEnRef($noeud, 'message')))
+					{
+						$element = new ParametresMethode;
+						$element->contenu[] = array('t' => $ref, 'l' => $noeud->localName);
+					}
+					else
+						$element = new stdClass;
+					break;
+				case 'header':
+				case 'body':
+					$element = false;
+				case 'portType':
+					$element = new Service;
+					$this->_siloteSiNomme($noeud, $element);
+					break;
+				case 'operation':
+					$element = new Methode;
+					break;
+				case 'message':
+					$element = new Simple;
+					$this->_siloteSiNomme($noeud, $element);
+					break;
+				case 'part':
+					$element = $this->_noeudEnInterneRef($noeud, 'element');
+					break;
+				case 'types':
+					$element = $poubelle;
+					break;
+				/* Partagés WSDL / XSD. */
 				case 'schema':
+				case 'definitions':
 					if($noeud->hasAttributeNS(null, 'targetNamespace'))
 					{
 						$nouvelEspace = 1;
 						$this->_pileEspacesCible[] = $this->_espaceCible;
 						$this->_espaceCible = $noeud->getAttributeNS(null, 'targetNamespace');
-						
-						$element = new stdClass;
 					}
+					$element = new stdClass;
 					break;
+				/* Plutôt orientés XSD. */
 				case 'include':
 				case 'import':
 					if($noeud->hasAttributeNS(null, 'schemaLocation'))
@@ -187,6 +244,18 @@ class Chargeur
 		if($max == 1)
 			return '?';
 		return $min.'..'.$max;
+	}
+	
+	protected function _noeudEnInterneRef($noeud, $attrRef)
+	{
+		if(($elementRef = $this->_noeudEnRef($noeud, $attrRef)))
+		{
+			$element = new Interne('ref', array());
+			$element->ref = $elementRef;
+			return $element;
+		}
+		
+		return null;
 	}
 	
 	protected function _noeudEnRef($noeud, $attrRef)
