@@ -141,14 +141,19 @@ class Chargeur
 		if(!isset($element))
 			throw new Exception('Impossible de compiler '.$noeud->localName);
 		
+		if($element === false) // L'élément a souhaité indiquer qu'il était bien pris en compte, mais qu'il doit être ignoré dans le résultat final (ainsi que tous ses enfants).
+			return $element;
+		
 		if(isset($noeud->childNodes))
 			foreach($noeud->childNodes as $fils)
 				if($fils instanceof DomElement)
 				{
 					if(($filsCompile = $this->_compile($fils)))
+					{
 						if(!isset($element->contenu))
 							$element->contenu = array();
 						$element->contenu[] = $filsCompile;
+					}
 				}
 				else if($fils instanceof DomText)
 					if(method_exists($element, 'texte'))
@@ -228,6 +233,14 @@ class Chargeur
 		if(isset($element->contenu))
 		{
 			foreach($element->contenu as $num => $contenu)
+				if(($contenu['t'] instanceof Interne && $contenu['t']->type == 'annotation') || ($contenu['t'] === null && isset($contenu['doc']) && count($contenu) == 2))
+				{
+					if(isset($contenu['doc']))
+					$r['doc'] = isset($r['doc']) ? $r['doc']."\n".$contenu['doc'] : $contenu['doc'];
+					unset($r['t']->contenu[$num]);
+					$retasser = true;
+				}
+				else
 				if($contenu['t'] instanceof Interne)
 				{
 					if($contenu['t']->type == 'element' && $element instanceof Liste && count($contenu['t']->contenu) == 1)
@@ -235,13 +248,6 @@ class Chargeur
 						$sousContenu = $contenu['t']->contenu[0];
 						if(!isset($sousContenu['n']) && is_string($sousContenu['t']) || $sousContenu['t'] instanceof Type)
 							$r['t']->contenu[$num]['t'] = $sousContenu['t'];
-					}
-					if($contenu['t']->type == 'annotation')
-					{
-						if(isset($contenu['doc']))
-						$r['doc'] = isset($r['doc']) ? $r['doc']."\n".$contenu['doc'] : $contenu['doc'];
-						unset($r['t']->contenu[$num]);
-						$retasser = true;
 					}
 					if($contenu['t']->type == 'extension')
 					{
