@@ -126,7 +126,7 @@ class Chargeur
 					$this->_siloteSiNomme($noeud, $element);
 					break;
 				case 'part':
-					$element = $this->_noeudEnInterneRef($noeud, 'element');
+					$element = $this->_noeudEnInterneRef($noeud, 'element', 'e@');
 					break;
 				case 'types':
 					$element = $poubelle;
