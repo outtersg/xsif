@@ -140,7 +140,7 @@ class Chargeur
 						$this->_pileEspacesCible[] = $this->_espaceCible;
 						$this->_espaceCible = $noeud->getAttributeNS(null, 'targetNamespace');
 					}
-					$element = new stdClass;
+					$element = new Interne($noeud->localName, array());
 					break;
 				/* Plutôt orientés XSD. */
 				case 'include':
@@ -295,6 +295,17 @@ class Chargeur
 			if(count($this->_pileEspacesCible) == 1 && !isset($this->_racine))
 				$this->_racine = $classe;
 		}
+	}
+	
+	protected function _exposeElement($nom, $element)
+	{
+		if(is_string($element))
+		{
+			$ref = $element;
+			$element = new Complexe;
+			$element->contenu[] = array('t' => $ref, 'commeExtension' => true);
+		}
+		$this->_types['e@'.$this->_espaceCible.'#'.$nom] = $element;
 	}
 	
 	protected function _resoudreInternes($r)
@@ -474,6 +485,13 @@ class Chargeur
 				case 'complexContent':
 					if(!count($element->attr) && count($element->contenu) == 1 && count($element->contenu[0]) == 1) // contenu[0] == 1 pour être sûr qu'il n'y a que le 't' =>.
 						$r = $element->contenu[0];
+					break;
+				case 'schema':
+					// Les element enfants du schema d'un XSD ont une visibilité globale (par exemple pour utilisation en tant qu'element dans les input d'une méthode SOAP).
+					if(isset($element->contenu))
+						foreach($element->contenu as $contenu)
+							if(isset($contenu['element']))
+								$this->_exposeElement($contenu['l'], $contenu['t']);
 					break;
 			}
 		
