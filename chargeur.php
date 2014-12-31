@@ -248,12 +248,12 @@ class Chargeur
 		return $min.'..'.$max;
 	}
 	
-	protected function _noeudEnInterneRef($noeud, $attrRef)
+	protected function _noeudEnInterneRef($noeud, $attrRef, $prefixe = '')
 	{
 		if(($elementRef = $this->_noeudEnRef($noeud, $attrRef)))
 		{
 			$element = new Interne('ref', array());
-			$element->ref = $elementRef;
+			$element->ref = $prefixe.$elementRef;
 			return $element;
 		}
 		
