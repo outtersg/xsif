@@ -216,9 +216,6 @@ class Chargeur
 					if(method_exists($element, 'texte'))
 						$element->texte($fils->wholeText);
 		
-		if(isset($nouvelEspace))
-			$this->_espaceCible = array_pop($this->_pileEspacesCible);
-		
 		$r = array('t' => $element);
 		
 		if($noeud->hasAttributeNS(null, 'name'))
@@ -229,6 +226,9 @@ class Chargeur
 		
 		if(is_object($element))
 			$r = $this->_resoudreInternes($r);
+		
+		if(isset($nouvelEspace))
+			$this->_espaceCible = array_pop($this->_pileEspacesCible);
 		
 		return $r;
 	}
