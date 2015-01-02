@@ -336,6 +336,11 @@ class Ecrivain
 	
 	public function filtre($filtre)
 	{
+		if($filtre === false)
+		{
+			$this->_niveauMax = null;
+			return;
+		}
 		if(0 + $filtre) // Nombre de niveaux à afficher.
 			$this->_niveauMax = 0 + $filtre;
 	}
