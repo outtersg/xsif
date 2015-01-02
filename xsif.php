@@ -730,6 +730,7 @@ require_once dirname(__FILE__).'/chargeur.php';
 
 $sources = array();
 $detailSimples = false;
+$proroger = false;
 $niveaux = null;
 $sorties = array();
 for($i = 0; ++$i < count($argv);)
@@ -738,6 +739,7 @@ for($i = 0; ++$i < count($argv);)
 		case '--texte': $sorties[] = 'html'; break;
 		case '--dot': $sorties[] = 'dot'; break;
 		case '-n': $niveaux = $argv[++$i]; break;
+		case '-c': $niveaux = $argv[++$i]; $proroger = true; break; // Coupure.
 		case '-r': $racines[] = $argv[++$i]; break;
 		case '-ds': $detailSimples = true; break;
 		default: $sources[] = $argv[$i]; break;
@@ -756,11 +758,20 @@ $e = new Ecrivain($modele);
 	if($suffixe == 'html')
 	$e->sortieTexte();
 if(isset($niveaux))
-	$e->filtre($niveaux);
+	$e->filtre($niveaux, $proroger);
 if(!isset($racines))
 		$e->ecrire(null, $detailSimples, $cheminSortie.$suffixe);
 else foreach($racines as $racine)
 		$e->ecrire($racine, $detailSimples, $cheminSortie.preg_replace('/[^#]*#/', '', $racine).'.'.$suffixe);
+	// Certains types souhaitent faire générer encore plus d'info (par exemple si, trop massifs, ils ont été coupés à un endroit).
+	if(isset($e->proroges))
+	{
+		$proroges = $e->proroges;
+		unset($e->proroges);
+		$e->filtre(false);
+		foreach($proroges as $proroge)
+			$e->ecrire($proroge['type'], $detailSimples, $proroge['chemin']);
+	}
 }
 
 ?>
