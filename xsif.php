@@ -334,7 +334,7 @@ class Ecrivain
 		$this->embarquerLesSousElements = false;
 	}
 	
-	public function filtre($filtre)
+	public function filtre($filtre, $proroger = false)
 	{
 		if($filtre === false)
 		{
@@ -343,6 +343,7 @@ class Ecrivain
 		}
 		if(0 + $filtre) // Nombre de niveaux à afficher.
 			$this->_niveauMax = 0 + $filtre;
+		$this->_proroger = $proroger;
 	}
 	
 	public function sortieTexte()
@@ -354,6 +355,7 @@ class Ecrivain
 	public function ecrire($typeRacine = null, $detaillerLesSimples = false, $cheminSortie = null)
 	{
 		$classeSortie = $this->_classeSortie;
+		$this->_cheminSortie = $cheminSortie;
 		if(!isset($cheminSortie))
 			$this->_sortie = new $classeSortie;
 		else
@@ -457,6 +459,34 @@ class Ecrivain
 				$arboModele->contenu = $arboModele->contenu[0]['t']->contenu;
 			
 			unset($arboModele->_enResolution);
+		}
+	}
+	
+	public function proroger($nomBloc)
+	{
+		if($this->_proroger)
+		{
+			if(isset($this->_cheminSortie))
+			{
+				$suffixe = preg_replace('/^[^.]*/', '', basename($this->_cheminSortie));
+				$racine = preg_replace('/\.[^.]*$/', '', basename($this->_cheminSortie));
+				$ajout = explode('#', $nomBloc, 2);
+				$ajout = $ajout[1];
+				$racineId = $id = $racine.'.'.$ajout;
+				$num = 0;
+				while(isset($this->_proroges[$id]))
+					$id = $racineId.'.'.sprintf('%2.2d', ++$num);
+				$chemin = dirname($this->_cheminSortie).'/'.$id.$suffixe;
+			}
+			else
+			{
+				$id = count($this->proroges);
+				$chemin = null;
+			}
+			$prorogation = array('type' => $nomBloc, 'chemin' => $chemin);
+			$this->proroges[$id] = $prorogation; // À FAIRE: comment éviter la récursivité à ce niveau? Peut-être un compteur persistent dans le type, qui ne serait pas effacé après la ponte? Mais il le faudrait décliné Ecrivain par Ecrivain.
+			// À FAIRE: quand on proroge un sous-élément, il serait bon que l'on ait inclus un lien vers le sous-élément.
+			return $id;
 		}
 	}
 }
@@ -595,6 +625,8 @@ class Complexe extends Type
 				$pseudoListe->pondre($chemin, $infosInvocationSansTaille, $sortie, $registre);
 				$sortie->finirMarge();
 				}
+					else
+						$registre->proroger($nomBloc);
 				
 				$registre->_niveauActuel = $niveauActuel;
 					unset($this->_enPonteEnfants);
@@ -614,7 +646,11 @@ class Complexe extends Type
 		}
 		
 		if(isset($registre->_niveauMax) && $registre->niveau($chemin) >= $registre->_niveauMax)
+		{
+			$nomBloc = isset($infosInvocation['classe']) ? $infosInvocation['classe'] : $chemin;
+			$registre->proroger($nomBloc);
 			return;
+		}
 		
 		$niveauActuel = $registre->_niveauActuel;
 		$registre->_niveauActuel = $registre->niveau($chemin);
