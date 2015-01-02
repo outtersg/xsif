@@ -145,8 +145,9 @@ class Chargeur
 				/* Plutôt orientés XSD. */
 				case 'include':
 				case 'import':
-					if($noeud->hasAttributeNS(null, 'schemaLocation'))
-						$this->charge($noeud->getAttributeNS(null, 'schemaLocation'));
+					foreach(array('schemaLocation', 'location') as $attrEmplacement)
+						if($noeud->hasAttributeNS(null, $attrEmplacement))
+							$this->charge($noeud->getAttributeNS(null, $attrEmplacement));
 					return;
 				case 'all': // De notre point de vue, un all c'est une sequence (la seule différence est que l'all n'impose pas d'ordre).
 				case 'sequence': $element = new Sequence; break;
