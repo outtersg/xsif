@@ -272,6 +272,21 @@ class SortieTexte extends SortieHtml
 	}
 }
 
+class SortieListe extends SortieTexte
+{
+	public function commencer()
+	{
+		echo $this->_chemin."\n";
+		$this->_blocs = array();
+		$this->_lignes = array();
+	}
+	
+	public function _sortir($chaine)
+	{
+	
+	}
+}
+
 class SortieGraphviz extends SortieHtml
 {
 	protected $_attrId = 'port';
@@ -349,6 +364,12 @@ class Ecrivain
 	public function sortieTexte()
 	{
 		$this->_classeSortie = 'SortieTexte';
+		$this->embarquerLesSousElements = true;
+	}
+	
+	public function sortieListe()
+	{
+		$this->_classeSortie = 'SortieListe';
 		$this->embarquerLesSousElements = true;
 	}
 	
@@ -738,6 +759,7 @@ for($i = 0; ++$i < count($argv);)
 	{
 		case '--texte': $sorties[] = 'html'; break;
 		case '--dot': $sorties[] = 'dot'; break;
+		case '-l': $sorties[] = 'liste'; break;
 		case '-n': $niveaux = $argv[++$i]; break;
 		case '-c': $niveaux = $argv[++$i]; $proroger = true; break; // Coupure.
 		case '-r': $racines[] = $argv[++$i]; break;
@@ -757,6 +779,11 @@ foreach($sorties as $suffixe)
 $e = new Ecrivain($modele);
 	if($suffixe == 'html')
 	$e->sortieTexte();
+	else if($suffixe == 'liste')
+	{
+		$e->sortieListe();
+		$suffixe = 'html';
+	}
 if(isset($niveaux))
 	$e->filtre($niveaux, $proroger);
 if(!isset($racines))
