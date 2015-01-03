@@ -152,6 +152,7 @@ class Chargeur
 				case 'all': // De notre point de vue, un all c'est une sequence (la seule différence est que l'all n'impose pas d'ordre).
 				case 'sequence': $element = new Sequence; break;
 				case 'choice': $element = new Variante; break;
+				case 'any': $element = new NImporteQuoi; break;
 				case 'group':
 					if(!($element = $this->_noeudEnRef($noeud, 'ref')))
 					{

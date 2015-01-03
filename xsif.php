@@ -703,6 +703,10 @@ class Liste extends Type
 	}
 }
 
+class NImporteQuoi extends Liste
+{
+}
+
 class Sequence extends Liste
 {
 }
