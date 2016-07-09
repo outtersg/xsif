@@ -471,7 +471,7 @@ class Ecrivain
 					{
 						$this->_modele[$element['t']] = new Simple($element['t']);
 						$espace = explode('#', $element['t']);
-						if($espace[0] != 'http://www.w3.org/2001/XMLSchema') // Types standard.
+						if(!in_array($espace[0], Chargeur::$ESPACES_TYPES_STD)) // Types standard n'ayant pas besoin de reconnaissance.
 							echo "# Type ".$element['t']." non connu.\n";
 					}
 					$arboModele->contenu[$cle]['t'] = $this->_modele[$element['t']];
