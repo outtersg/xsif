@@ -204,7 +204,7 @@ class Chargeur
 			}
 		
 		if(!isset($element))
-			throw new Exception('Impossible de compiler '.$noeud->localName);
+			throw new Exception($this->_cheminActuel.':'.$noeud->getLineNo().': impossible de compiler '.$noeud->localName);
 		
 		if($element === false) // L'élément a souhaité indiquer qu'il était bien pris en compte, mais qu'il doit être ignoré dans le résultat final (ainsi que tous ses enfants).
 			return $element;
