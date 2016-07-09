@@ -309,8 +309,9 @@ class Chargeur
 		{
 			$ref = $element;
 			$element = new Complexe;
-			$element->contenu[] = array('t' => $ref, 'commeExtension' => true);
+			$element->contenu[] = array('t' => $ref, 'commeExtension' => true, 'l' => $nom);
 		}
+		$element->nom = $nom;
 		$this->_types['e@'.$this->_espaceCible.'#'.$nom] = $element;
 	}
 	

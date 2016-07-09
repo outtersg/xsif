@@ -475,6 +475,8 @@ class Ecrivain
 							echo "# Type ".$element['t']." non connu.\n";
 					}
 					$arboModele->contenu[$cle]['t'] = $this->_modele[$element['t']];
+					if(!isset($arboModele->contenu[$cle]['l']) && isset($this->_modele[$element['t']]->nom))
+						$arboModele->contenu[$cle]['l'] = $this->_modele[$element['t']]->nom;
 				}
 				$this->_resoudre($arboModele->contenu[$cle]['t']);
 			}
