@@ -221,7 +221,15 @@ class Chargeur
 						$element = new Interne('ref', array());
 						if($noeud->localName == 'element')
 							$element->element = true;
-						isset($refEl) && $elementRef = 'e@'.$refEl;
+						if(isset($refEl))
+						{
+							$espace = explode('#', $refEl);
+							// Une réf vers un type standard, c'est le type standard lui-même.
+							if(!in_array($espace[0], Chargeur::$ESPACES_TYPES_STD))
+								$elementRef = 'e@'.$refEl;
+							else
+								$elementRef = $refEl;
+						}
 						$element->ref = $elementRef;
 						break;
 					}
