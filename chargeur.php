@@ -469,7 +469,9 @@ class Chargeur
 						$plage = array();
 						$decimaux = array();
 							$exprs = array();
-							foreach($element->contenu as $sousElement)
+						$types = array();
+						$nombre = array();
+							foreach($element->contenu as $numSousElement => $sousElement)
 								if($sousElement['t'] instanceof Interne)
 								switch($sousElement['t']->type)
 								{
@@ -508,8 +510,36 @@ class Chargeur
 										echo "# Élément de restriction non rendu ".$sousElement['t']->type."\n";
 										break 3;
 								}
+							else if($sousElement['t'] == SOAPE.'#arrayType' && isset($sousElement['attr']['arrayType']) && substr($sousElement['attr']['arrayType'], -2) == '[]')
+							{
+								$types[substr($sousElement['attr']['arrayType'], 0, -2)] = true;
+								// Par défaut, un tableau est en *.
+								if(!isset($nombre['minOccurs']))
+									$nombre['minOccurs'] = 0;
+								if(!isset($nombre['maxOccurs']))
+									$nombre['maxOccurs'] = 'unbounded';
+							}
 								else
 									break 2;
+						if(count($types))
+						{
+							if(count($types) > 1)
+							{
+								echo "restriction sur plusieurs types à la fois\n";
+								print_r($r);exit;
+							}
+							foreach($types as $nouveauType => $true) {}
+							$type = $this->_idEnRef($noeud, $nouveauType);
+							if($r['t']->attr['base'] != SOAPE.'#Array')
+							{
+								echo "conversion d'un ".$r['t']->attr['base']." en {$type}[]";
+								print_r($r);exit;
+							}
+							$nouveau = new Sequence;
+							/* À FAIRE: convertir proprement les minOccurs et maxOccurs (combiner éventuellement avec d'autres contraintes plus haut) plutôt que de forcer à "*". */
+							$nouveau->contenu[] = array('t' => $type, 'n' => '*', 'l' => 'item', 'element' => true);
+							$r['t'] = $nouveau;
+						}
 						if(count($enum))
 						{
 							$r['t'] = $r['t']->attr['base'];
