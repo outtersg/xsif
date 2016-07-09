@@ -310,7 +310,14 @@ class Chargeur
 	{
 		if($noeud->hasAttributeNS(null, $attrRef))
 		{
-			$classe = explode(':', $noeud->getAttributeNS(null, $attrRef), 2);
+			$id = $noeud->getAttributeNS(null, $attrRef);
+			return $this->_idEnRef($noeud, $id);
+		}
+	}
+	
+	protected function _idEnRef($noeud, $id)
+	{
+		$classe = explode(':', $id, 2);
 			if(count($classe) == 2)
 			{
 				$espace = $classe[0];
@@ -323,9 +330,6 @@ class Chargeur
 			}
 			$espace = $noeud->lookupNamespaceURI($espace);
 			return "$espace#$classe";
-		}
-		
-		return null;
 	}
 	
 	protected function _siloteSiNomme($noeud, $element)
