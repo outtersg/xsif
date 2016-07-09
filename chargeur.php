@@ -383,6 +383,7 @@ class Chargeur
 					// Ce peut être le résultat d'une compression antérieure (element > complexContent > restriction devenus un simple element, par exemple).
 					if(isset($element->contenu) && count($element->contenu) == 1 && count(array_intersect_key($r, $element->contenu[0]) == 1))
 						$r = $element->contenu[0] + $r;
+					$r['element'] = true;
 					break;
 				case 'extension':
 					if(!isset($element->contenu) || count($element->contenu) == 1)
