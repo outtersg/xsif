@@ -612,9 +612,6 @@ class Complexe extends Type
 {
 	public function pondre($chemin, $infosInvocation, $sortie, $registre)
 	{
-		$nomClasse = explode('#', $chemin, 2);
-		$nomClasse = $nomClasse[1];
-		
 		// Si on est utilisé comme extension d'une autre classe, on lui fournit notre contenu comme s'il était sien.
 		if(isset($infosInvocation) && isset($infosInvocation['commeExtension']))
 		{
@@ -680,6 +677,9 @@ class Complexe extends Type
 			$registre->proroger($nomBloc);
 			return;
 		}
+		
+		$nomClasse = explode('#', $chemin, 2);
+		$nomClasse = $nomClasse[1];
 		
 		$niveauActuel = $registre->_niveauActuel;
 		$registre->_niveauActuel = $registre->niveau($chemin);
