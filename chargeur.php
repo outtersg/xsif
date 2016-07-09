@@ -402,6 +402,7 @@ class Chargeur
 						$taille = array();
 						$plage = array();
 						$decimaux = array();
+							$exprs = array();
 							foreach($element->contenu as $sousElement)
 								if($sousElement['t'] instanceof Interne)
 								switch($sousElement['t']->type)
@@ -433,6 +434,9 @@ class Chargeur
 									case 'fractionDigits':
 										$val = $sousElement['t']->attr['value'];
 										$decimaux[$sousElement['t']->type] = $val;
+										break;
+									case 'pattern':
+										$exprs[] = $sousElement['t']->attr['value'];
 										break;
 									default:
 										break 3;
@@ -486,6 +490,12 @@ class Chargeur
 								$r['text'] = '{'.$taille['minLength'].'+}';
 							else
 								$r['text'] = '{'.$taille['minLength'].'..'.$taille['maxLength'].'}';
+						}
+						if(count($exprs))
+						{
+							if(!is_string($r['t']))
+								$r['t'] = $r['t']->attr['base'];
+							$r['text'] = (isset($r['text']) ? $r['text'].', ' : '').'~= '.implode(', ~= ', $exprs);
 						}
 					}
 					else // Une restriction sans restriction, c'est le type de base, en fait.
