@@ -33,15 +33,55 @@ class Chargeur
 	protected $_types = array();
 	protected $_fichiers = array();
 	
+	public function cheminPropre($chemin)
+	{
+		// Pour une URL, on ne bosse que sur la partie chemin.
+		
+		if(preg_match('#^[a-z]+://[^/]+#', $chemin, $rés))
+		{
+			$préfixe = $rés[0];
+			$chemin = substr($chemin, strlen($préfixe));
+		}
+		else
+			$préfixe = '';
+		
+		// Un explode sur / ne doit pas considérer que // contient un élément de longueur 0.
+		
+		$chemin = preg_replace('#/+#', '/', $chemin);
+		
+		// Idem en début de chemin, on ne veut pas que "/.." soit considéré comme deux éléments de part et d'autre du / (vide, et ..): le .. absorberait alors le vide, ce qui n'a pas de sens.
+		
+		if(substr($chemin, 0, 1) == '/')
+		{
+			$préfixe .= '/';
+			$chemin = substr($chemin, 1);
+		}
+		
+		// En avant.
+		
+		$chemin = explode('/', $chemin);
+		for($i = 0; $i < count($chemin); ++$i)
+			switch($chemin[$i])
+			{
+				case '.': array_splice($chemin, $i, 1); --$i; break;
+				case '..': if($i > 0) { array_splice($chemin, $i - 1, 2); $i -= 2; } break;
+			}
+		
+		return $préfixe.implode('/', $chemin);
+	}
+	
 	public function charge($chemin)
 	{
 		$ancienChemin = $this->_cheminActuel;
-		if(isset($ancienChemin))
+		if(isset($ancienChemin) && !preg_match('#^[a-z]+://#', $chemin) && substr($chemin, 0, 1) != '/')
 			$chemin = dirname($ancienChemin).'/'.$chemin;
-		if (!file_exists($chemin)) {
-			throw new Exception('Impossible de charger '.$chemin);
+		$chemin = $this->cheminPropre($chemin);
+		if (file_exists($chemin)) {
+			$chemin = realpath($chemin);
 		}
-		$chemin = realpath($chemin);
+		
+		if(($contenu = file_get_contents($chemin)) === false)
+			throw new Exception('Impossible de charger '.$chemin);
 		
 		// Inutile de refaire un fichier déjà parcouru.
 		// À FAIRE?: dans le cas d'un include dans un nœud intérieur, faudrait-il réinclure quand même son contenu à la manière d'un <group>?
@@ -52,7 +92,7 @@ class Chargeur
 		$this->_cheminActuel = $chemin;
 		
 		$doc = new DOMDocument();
-		$doc->loadXML(file_get_contents($chemin));
+		$doc->loadXML($contenu);
 		
 		$racine = $doc->documentElement;
 		
