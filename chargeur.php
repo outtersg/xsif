@@ -24,9 +24,18 @@
 define('XS', 'http://www.w3.org/2001/XMLSchema');
 define('WSDL', 'http://schemas.xmlsoap.org/wsdl/');
 define('SOAP', 'http://schemas.xmlsoap.org/wsdl/soap/');
+define('SOAPE', 'http://schemas.xmlsoap.org/soap/encoding/');
 
 class Chargeur
 {
+	// Espaces de nommage standards, qu'on ne prend pas la peine d'aller introspecter.
+	public static $ESPACES_TYPES_STD = array
+	(
+		XS,
+		WSDL,
+		SOAPE,
+	);
+	
 	protected $_cheminActuel;
 	protected $_espaceCible = null;
 	protected $_pileEspacesCible = array();
