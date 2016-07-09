@@ -340,10 +340,12 @@ class Chargeur
 					}
 					if($contenu['t']->type == 'extension')
 					{
+						echo "extension non pris en compte\n";
 						print_r($r);exit;
 					}
 					if($contenu['t']->type == 'complexContent')
 					{
+						echo "complexContent non pris en compte\n";
 						print_r($r);exit;
 					}
 				}
@@ -439,6 +441,7 @@ class Chargeur
 										$exprs[] = $sousElement['t']->attr['value'];
 										break;
 									default:
+										echo "# Élément de restriction non rendu ".$sousElement['t']->type."\n";
 										break 3;
 								}
 								else
@@ -534,6 +537,7 @@ class Interne
 	
 	public function pondre()
 	{
+		echo "Interne non pris en compte\n"; // Normalement tous les internes doivent avoir été résolus au moment de la ponte.
 		print_r($this);exit;
 	}
 }
