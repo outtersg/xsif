@@ -165,11 +165,13 @@ class Chargeur
 				case 'documentation': $element = new Commentaire($noeud->localName, $noeud->attributes); break;
 				case 'attribute':
 				case 'element':
-					if(($elementRef = $this->_noeudEnRef($noeud, 'type')))
+					$refEl = null;
+					if(($elementRef = $this->_noeudEnRef($noeud, 'type')) || ($refEl = $this->_noeudEnRef($noeud, 'ref')))
 					{
 						$element = new Interne('ref', array());
 						if($noeud->localName == 'element')
 							$element->element = true;
+						isset($refEl) && $elementRef = 'e@'.$refEl;
 						$element->ref = $elementRef;
 						break;
 					}
