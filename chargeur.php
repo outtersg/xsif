@@ -127,6 +127,7 @@ class Chargeur
 					break;
 				case 'part':
 					$element = $this->_noeudEnInterneRef($noeud, 'element', 'e@');
+					$element || $element = $this->_noeudEnInterneRef($noeud, 'type');
 					break;
 				case 'types':
 					$element = $poubelle;
