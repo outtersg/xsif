@@ -56,6 +56,10 @@ class SortieHtml
 				<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 				<title>Diagramme</title>
 				<style type="text/css">
+					img
+					{
+						width: 100%;
+					}
 					table, td
 					{
 						border-collapse: collapse;
