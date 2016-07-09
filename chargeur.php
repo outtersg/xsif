@@ -321,6 +321,7 @@ class Chargeur
 		if(isset($element->contenu))
 		{
 			foreach($element->contenu as $num => $contenu)
+			{
 				if(($contenu['t'] instanceof Interne && $contenu['t']->type == 'annotation') || ($contenu['t'] === null && isset($contenu['doc']) && count($contenu) == 2))
 				{
 					if(isset($contenu['doc']))
@@ -346,6 +347,7 @@ class Chargeur
 						print_r($r);exit;
 					}
 				}
+			}
 			if(isset($retasser))
 				$element->contenu = array_merge($element->contenu);
 		}
