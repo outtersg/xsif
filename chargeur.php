@@ -381,7 +381,7 @@ class Chargeur
 				case 'element':
 					// Si notre élément peut être remplacé par son contenu (pas d'attributs en commun si ce n'est le type), on combine.
 					// Ce peut être le résultat d'une compression antérieure (element > complexContent > restriction devenus un simple element, par exemple).
-					if(count($element->contenu) == 1 && count(array_intersect_key($r, $element->contenu[0]) == 1))
+					if(isset($element->contenu) && count($element->contenu) == 1 && count(array_intersect_key($r, $element->contenu[0]) == 1))
 						$r = $element->contenu[0] + $r;
 					break;
 				case 'extension':
