@@ -332,7 +332,7 @@ class Chargeur
 				else
 				if($contenu['t'] instanceof Interne)
 				{
-					if($contenu['t']->type == 'element' && $element instanceof Liste && count($contenu['t']->contenu) == 1)
+					if($contenu['t']->type == 'element' && $element instanceof Liste && isset($contenu['t']->contenu) && count($contenu['t']->contenu) == 1)
 					{
 						$sousContenu = $contenu['t']->contenu[0];
 						if(!isset($sousContenu['n']) && is_string($sousContenu['t']) || $sousContenu['t'] instanceof Type)
