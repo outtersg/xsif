@@ -593,7 +593,7 @@ class Interne
 		$this->attr = array();
 		foreach($attributs as $attr)
 		{
-			if($attr->namespaceURI != XS && $attr->namespaceURI !== null)
+			if(!in_array($attr->namespaceURI, Chargeur::$ESPACES_TYPES_STD) && $attr->namespaceURI !== null)
 				throw new Exception("L'attribut ".$attr->localName." doit appartenir à l'espace XML Schema.");
 			$this->attr[$attr->localName] = $attr->value;
 		}
