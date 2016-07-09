@@ -103,6 +103,7 @@ class Chargeur
 					break;
 				case 'input':
 				case 'output':
+				case 'fault':
 					if(($ref = $this->_noeudEnRef($noeud, 'message')))
 					{
 						$element = new ParametresMethode;

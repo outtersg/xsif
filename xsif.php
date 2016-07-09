@@ -575,6 +575,7 @@ class ParametresMethode extends Liste
 		(
 			'input' => '→',
 			'output' => '←',
+			'fault' => '#',
 		);
 		if(count($this->contenu) != 1 || !isset($corrSymboles[$this->contenu[0]['l']]))
 			throw new Exception('Paramètres méthode (éléments input et output) ininterprétables');
