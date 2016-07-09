@@ -53,6 +53,7 @@ class SortieHtml
 		$this->_sortir('<?xml version="1" encoding="UTF-8"?>
 		<html>
 			<head>
+				<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 				<title>Diagramme</title>
 				<style type="text/css">
 					table, td
