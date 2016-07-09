@@ -290,7 +290,7 @@ class Chargeur
 			$r['n'] = $n;
 		
 		if(is_object($element))
-			$r = $this->_resoudreInternes($r);
+			$r = $this->_resoudreInternes($r, $noeud);
 		
 		if(isset($nouvelEspace))
 			$this->_espaceCible = array_pop($this->_pileEspacesCible);
@@ -376,7 +376,7 @@ class Chargeur
 		$this->_types['e@'.$this->_espaceCible.'#'.$nom] = $element;
 	}
 	
-	protected function _resoudreInternes($r)
+	protected function _resoudreInternes($r, $noeud)
 	{
 		$element = $r['t'];
 		
