@@ -218,7 +218,7 @@ class Chargeur
 					$refEl = null;
 					if(($elementRef = $this->_noeudEnRef($noeud, 'type')) || ($refEl = $this->_noeudEnRef($noeud, 'ref')))
 					{
-						$element = new Interne('ref', array());
+						$element = new Interne('ref', $noeud->attributes);
 						if($noeud->localName == 'element')
 							$element->element = true;
 						if(isset($refEl))
@@ -432,6 +432,8 @@ class Chargeur
 						$r['t'] = $element->ref;
 						if(isset($element->element))
 							$r['element'] = true;
+						if(isset($element->attr))
+							$r['attr'] = $element->attr;
 					}
 					break;
 				case 'annotation':
