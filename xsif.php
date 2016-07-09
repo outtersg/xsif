@@ -766,11 +766,13 @@ $detailSimples = false;
 $proroger = false;
 $niveaux = null;
 $sorties = array();
+$préfixeSortie = null;
 for($i = 0; ++$i < count($argv);)
 	switch($argv[$i])
 	{
 		case '--texte': $sorties[] = 'html'; break;
 		case '--dot': $sorties[] = 'dot'; break;
+		case '-o': $préfixeSortie = $argv[++$i]; break; // Attention, le -o ne marche que si on a un seul fichier en entrée.
 		case '-l': $sorties[] = 'liste'; break;
 		case '-n': $niveaux = $argv[++$i]; break;
 		case '-c': $niveaux = $argv[++$i]; $proroger = true; break; // Coupure.
@@ -788,6 +790,8 @@ $modele = $c->charge($source);
 foreach($sorties as $suffixe)
 {
 	$cheminSortie = strtr($source, array('.xsd' => '.', '.wsdl' => '.'));
+	if(isset($préfixeSortie))
+		$cheminSortie = $préfixeSortie.'.';
 $e = new Ecrivain($modele);
 	if($suffixe == 'html')
 	$e->sortieTexte();
