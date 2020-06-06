@@ -423,13 +423,26 @@ class Chargeur
 			$r['doc'] = isset($r['doc']) ? $r['doc']."\n".$element->texte : $element->texte;
 			$r['t'] = null;
 		}
+		$élémentNonTypé = false;
 		if($element instanceof Interne)
 			switch($element->type)
 			{
+				case 'element':
+					// Si notre élément peut être remplacé par son contenu (pas d'attributs en commun si ce n'est le type), on combine.
+					// Ce peut être le résultat d'une compression antérieure (element > complexContent > restriction devenus un simple element, par exemple).
+					if(isset($element->contenu) && count($element->contenu) == 1 && count(array_intersect_key($r, $element->contenu[0]) == 1))
+					{
+						$r = $element->contenu[0] + $r;
+						break;
+					}
+					else
+						$élémentNonTypé = true;
+					$r['element'] = true;
+					// Et l'on passe pour laisser à 'ref' une chance de récupérer l'entrée, dans le cas où elle est vide et non typée (si elle l'avait été elle aurait été d'emblée transformée en 'ref').
 				case 'ref':
 					if (!isset($element->contenu) || !count($element->contenu))
 					{
-						$r['t'] = $element->ref;
+						$r['t'] = $élémentNonTypé ? XS.'#anySimpleType' : $element->ref; // https://stackoverflow.com/a/29846783/1346819
 						if(isset($element->element))
 							$r['element'] = true;
 						if(isset($element->attr))
@@ -443,13 +456,6 @@ class Chargeur
 						$r['doc'] = $element->contenu[0]['doc'];
 						unset($element->contenu);
 					}
-					break;
-				case 'element':
-					// Si notre élément peut être remplacé par son contenu (pas d'attributs en commun si ce n'est le type), on combine.
-					// Ce peut être le résultat d'une compression antérieure (element > complexContent > restriction devenus un simple element, par exemple).
-					if(isset($element->contenu) && count($element->contenu) == 1 && count(array_intersect_key($r, $element->contenu[0]) == 1))
-						$r = $element->contenu[0] + $r;
-					$r['element'] = true;
 					break;
 				case 'extension':
 					if(!isset($element->contenu) || count($element->contenu) == 1)
