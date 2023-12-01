@@ -42,6 +42,8 @@ class Chargeur
 	protected $_types = array();
 	protected $_fichiers = array();
 	
+	protected $_racine;
+	
 	public function cheminPropre($chemin)
 	{
 		// Pour une URL, on ne bosse que sur la partie chemin.
@@ -623,6 +625,13 @@ class Chargeur
 
 class Interne
 {
+	public $type;
+	public $attr;
+	public $contenu;
+	public $ref;
+	public $element;
+	public $_enResolution;
+	
 	public function __construct($typeXS, $attributs)
 	{
 		$this->type = $typeXS;
@@ -644,6 +653,8 @@ class Interne
 
 class Commentaire extends Type
 {
+	public $texte;
+	
 	public function texte($texte)
 	{
 		$this->texte = isset($this->texte) ? $this->texte.$texte : $texte;

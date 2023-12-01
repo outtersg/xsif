@@ -266,6 +266,20 @@ class SortieHtml
 		else
 		echo $chaine;
 	}
+	
+	protected $_chemin;
+	protected $_s;
+	protected $_blocs;
+	protected $_blocActuel;
+	protected $_contenuBloc;
+	protected $_premiereLigneBlocs;
+	protected $_lignes;
+	protected $_ligneOuverte;
+	protected $_ligneEcrite;
+	protected $_commentaireLigne;
+	protected $_numLigne;
+	protected $_marges;
+	protected $_maxColspan;
 }
 
 class SortieTexte extends SortieHtml
@@ -343,15 +357,24 @@ digraph Schema
 			$this->_sortir('b'.$this->_blocs[$this->_lignes[$lien[0]]].':l'.$lien[0].':e -> b'.$this->_blocs[$lien[1]].':e'.$this->_premiereLigneBlocs[$lien[1]].':w'."\n"); // Toujours d'une ligne vers un bloc.
 		$this->_sortir('}');
 	}
+	
+	protected $_liens;
 }
 
 class Ecrivain
 {
+	public $embarquerLesSousElements = false;
+	public $detaillerLesSimples;
+	public $proroges;
+	public $resteAFaire;
+	public $_modele;
+	public $_niveauActuel;
+	public $_niveauMax;
+	
 	public function __construct($modele)
 	{
 		$this->_modele = $modele;
 		$this->_classeSortie = 'SortieGraphviz';
-		$this->embarquerLesSousElements = false;
 	}
 	
 	public function filtre($filtre, $proroger = false)
@@ -517,11 +540,18 @@ class Ecrivain
 			return $id;
 		}
 	}
+	
+	protected $_classeSortie;
+	protected $_cheminSortie;
+	protected $_sortie;
+	protected $_proroger;
+	protected $_niveaux;
 }
 
 class Type
 {
 	public $contenu;
+	public $_enResolution;
 	
 	public function pondre($chemin, $infosInvocation, $sortie, $registre)
 	{
@@ -597,6 +627,8 @@ class ParametresMethode extends Liste
 
 class Simple extends Type
 {
+	public $contenu;
+	
 	public function pondre($chemin, $infosInvocation, $sortie, $registre)
 	{
 		if($registre->detaillerLesSimples && isset($this->contenu) && count($this->contenu) == 1 && isset($this->contenu[0]['t']) && $this->contenu[0]['t'] instanceof Simple)
@@ -610,6 +642,9 @@ class Simple extends Type
 
 class Complexe extends Type
 {
+	public $nom;
+	public $contenu;
+	
 	public function pondre($chemin, $infosInvocation, $sortie, $registre)
 	{
 		// Si on est utilisé comme extension d'une autre classe, on lui fournit notre contenu comme s'il était sien.
@@ -693,6 +728,8 @@ class Complexe extends Type
 		
 		$registre->_niveauActuel = $niveauActuel;
 	}
+	
+	protected $_enPonteEnfants;
 }
 
 class Liste extends Type
