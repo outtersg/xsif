@@ -141,14 +141,14 @@ class Chargeur
 					$element = false;
 					break;
 				case 'port':
-					$element = $this->_noeudEnInterneRef($noeud, 'binding');
+					$element = $this->_noeudEnInterneRef($noeud, 'binding', 'binding@');
 					break;
 				case 'binding':
 					if(($ref = $this->_noeudEnRef($noeud, 'type')))
 					{
 						$element = new Service;
 						$this->_siloteSiNomme($noeud, $element);
-						$element->contenu[] = array('t' => $ref);
+						$element->contenu[] = array('t' => 'portType@'.$ref);
 					}
 					$element = false;
 					break;
@@ -158,7 +158,7 @@ class Chargeur
 					if(($ref = $this->_noeudEnRef($noeud, 'message')))
 					{
 						$element = new ParametresMethode;
-						$element->contenu[] = array('t' => $ref, 'l' => $noeud->localName);
+						$element->contenu[] = array('t' => 'message@'.$ref, 'l' => $noeud->localName);
 					}
 					else
 						$element = new stdClass;
@@ -358,6 +358,10 @@ class Chargeur
 			$nom = $noeud->getAttributeNS(null, 'name');
 			$espace = $this->_espaceCible;
 			$classe = $espace.'#'.$nom;
+			// Dans l'espace WSDL, un même nom peut être partagé par plusieurs balises; la balise est donc différenciante.
+			// De cet espace seul le part est assimilable à un type XSD.
+			if($noeud->namespaceURI == WSDL)
+				$classe = $noeud->localName.'@'.$classe;
 			$element->contenu = array();
 			$this->_types[$classe] = $element;
 			// Si c'est la première déclaration du fichier racine (la pile ne contient que le schéma du premier XSD), cette déclaration sera notre racine par défaut.
