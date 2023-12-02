@@ -826,7 +826,7 @@ $modele = $c->charge($source);
 
 foreach($sorties as $suffixe)
 {
-	$cheminSortie = strtr($source, array('.xsd' => '.', '.wsdl' => '.'));
+	$cheminSortie = strtr($source, array('.xsd' => '.', '.wsdl' => '.', '.XSD' => '.', '.WSDL' => '.'));
 	if(isset($préfixeSortie))
 		$cheminSortie = $préfixeSortie.'.';
 $e = new Ecrivain($modele);
