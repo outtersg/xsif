@@ -439,6 +439,9 @@ class Chargeur
 					if(isset($element->contenu) && count($element->contenu) == 1 && count(array_intersect_key($r, $element->contenu[0])) == 1)
 					{
 						$r = $element->contenu[0] + $r;
+						if(($public = array_search($element, $this->_types, true)) !== false)
+							$this->_types[$public] = $r['t'];
+						$element = $r['t'];
 						break;
 					}
 					else
