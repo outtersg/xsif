@@ -249,6 +249,8 @@ class Chargeur
 				case 'totalDigits':
 				case 'fractionDigits':
 					$element = new Interne($noeud->localName, $noeud->attributes);
+					// Un <element> (cf. case 'element' sans break ci-dessus) peut être nommé, auquel cas on l'expose.
+					$this->_siloteSiNomme($noeud, $element);
 					break;
 				case 'extension':
 				case 'restriction':
@@ -362,6 +364,9 @@ class Chargeur
 			// De cet espace seul le part est assimilable à un type XSD.
 			if($noeud->namespaceURI == WSDL)
 				$classe = $noeud->localName.'@'.$classe;
+			// Les éléments sont distingués des types par un préfixe e@ (pour la structure <element name="Truc" type="Truc"/>: le type Truc ne réfère évidemment pas à l'élément, mais à un type générique déclaré précédemment).
+			else if($noeud->localName == 'element')
+				$classe = 'e@'.$classe;
 			$element->contenu = array();
 			$this->_types[$classe] = $element;
 			// Si c'est la première déclaration du fichier racine (la pile ne contient que le schéma du premier XSD), cette déclaration sera notre racine par défaut.
