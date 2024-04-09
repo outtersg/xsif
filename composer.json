@@ -1,0 +1,6 @@
+{
+	"name": "gui/xsif",
+	"description": "Xml Schema Intelligible et Formel",
+	"version": "1.0.x-dev",
+	"license": "MIT"
+}
