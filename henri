@@ -1,0 +1,78 @@
+#!/bin/sh
+# Copyright (c) 2024 Guillaume Outters
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+# Html ENRIchi: inclusion des images, ajout d'ancres et de titres dans le HTML généré par xsif.php.
+
+set -e
+
+faire()
+{
+	local fichier="$1" suffixe="$2"
+	local radical="`basename "$fichier" "$suffixe.html"`"
+	local h2="`grep '<th' < "$fichier" | tr -d '\012' | sed -E -e 's#(<[^>]*>)+#, #g' -e 's#^, ##' -e 's#, $##'`"
+	local multi=0
+	case "$h2" in *","*) multi=1 ;; esac
+	
+	awk < "$fichier" > "$fichier.temp" \
+'
+function balance()
+{
+	if(!cumul) return;
+	
+	print cumul;
+	
+	cumul = "";
+}
+/<table/{
+	balance();
+	cumul = $0;
+	next;
+}
+/<th/&&cumul{
+	ancre = $0;
+	gsub(/<[^>]*>/, "", ancre);
+	ancre = "<a name=\""ancre"\"/>";
+	
+	# L'\''ancre est collée avant le titre principal si le fichier ne décrit qu'\''un service, avant chaque service si on est en multi-services.
+	# À FAIRE?: ou alors toutes les ancres pointent sur le titre principal (surplombant l'\''illustration)?
+	if(!'$multi') print ancre;
+	# Le premier service hérite de la lourde tâche de coller tout le prologue commun aux services.
+	if(!deuz)
+	{
+		print "<h2>'"$h2"'</h2>";
+		print "<img src=\"'"$radical.svg"'\"/><br/>";
+		print "<a href=\"'"$radical.pdf"'\">PDF</a> <a href=\"'"$radical.emf"'\">EMF (pour inclusion Word)</a>";
+		deuz = 1;
+	}
+	else
+		print "<br/>";
+	if('$multi') print ancre;
+	
+	balance(); # La <table>.
+}
+cumul{ cumul = cumul"\n"$0; next; }
+{ print; }
+'
+	
+	mv "$fichier.temp" "$fichier"
+}
+
+faire "$@"
