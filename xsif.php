@@ -564,7 +564,20 @@ class Type
 		}
 		if(isset($infosInvocation['n']))
 			$sortie->commencerMarge($infosInvocation['n']);
-		$sortie->ligne($infosInvocation['l'], false, $classeSimple.(isset($infosInvocation['text']) ? $infosInvocation['text'] : '')); // text: Type.EXTension
+		
+		/* NOTE: element et complexType
+		 * Deux possibilités d'embarquer un complexType dans un element:
+		 * - <xsd:element name="Bloc" type="espace:TypeBloc"/><xsd:complexType name="TypeBloc">…</xsd:complexType> <!-- Réutilisable -->
+		 * - <xsd:element name="Bloc"><xsd:complexType>…</xsd:complexType></xsd:element> <!-- Dédié -->
+		 * Notre pondre() n'est invoquée avec des infosInvocation contenant le Bloc que dans le premier cas,
+		 * mais le second fait tout de même figurer le nom à la fois par la classe et l'attr.ref.
+		 */
+		/* À FAIRE?: le Bloc ne devrait-il pas faire partie des infos d'invocation? Ou alors le type être fusionné avec l'élément sous conditions de dédicace? */
+		$nomÉlément =
+			isset($infosInvocation['l']) ? $infosInvocation['l']
+			: ((isset($infosInvocation['classe']) && (($posDièse = strrpos($infosInvocation['classe'], '#')) !== false) ? substr($infosInvocation['classe'], $posDièse + 1) : null))
+		;
+		$sortie->ligne($nomÉlément, false, $classeSimple.(isset($infosInvocation['text']) ? $infosInvocation['text'] : '')); // text: Type.EXTension
 		if(isset($infosInvocation['doc']))
 			$sortie->commentaire($infosInvocation['doc']);
 		if(isset($infosInvocation['n']))
