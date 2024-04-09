@@ -589,16 +589,50 @@ class Service extends Complexe
 {
 	public function pondre($chemin, $infosInvocation, $sortie, $registre)
 	{
+		/* NOTE: téléscopage volontaire
+		 * Une structure exploitant la densité maximale permise par le WSDL a cette tête (en notant chaque niveau sous la forme "ClassePHP baliseSOAP"):
+		 * - Service service
+		 *   - Service binding
+		 *     - Service port (défini par Service portType)
+		 *       - Methode operation
+		 *       - Methode operation
+		 *     - Service port
+		 *       - Méthode operation
+		 *   - Service binding
+		 *     - Service port
+		 *       - Methode operation
+		 * Cependant bien souvent 1 service expose 1 binding qui possède 1 port.
+		 * Pour éviter la prolifération visuelle, on souhaitera donc fusionner les niveaux successifs en 1..1;
+		 * bien souvent seul le portType contient la structure riche, le binding n'apportant rien d'un point de vue fonctionnel.
+		 * En outre on ne pond qu'à partir du niveau binding / port, le service n'étant qu'un contenant sans info.
+		 */
+		
 		// Voyons si on n'a pas des fils de type Service.
 		
 		$autresFils = array();
+		$nServices = 0;
 		foreach($this->contenu as $fils)
 			if($fils['t'] instanceof Service)
-				$fils['t']->pondre($chemin, $infosInvocation, $sortie, $registre);
+				++$nServices;
+		foreach($this->contenu as $fils)
+			if($fils['t'] instanceof Service)
+			{
+				// Un fils unique prend le nom de son père, car il n'y a pas d'intérêt à savoir que c'est Père junior (ou Père_portType, ou Père_HTTP);
+				// il ne s'inscrira sous son nom propre que pour se distinguer de ses frères.
+				if($nServices < 2)
+					$cheminFils = $chemin;
+				else
+				{
+					$cheminFils = isset($fils['l']) ? $fils['l'] : $fils['classe'];
+					if(strpos($cheminFils, '#') === false)
+						$cheminFils = preg_replace('/#.*/', '#'.$cheminFils, $chemin);
+				}
+				$fils['t']->pondre($cheminFils, $infosInvocation, $sortie, $registre);
+			}
 			else
 				$autresFils[] = $fils;
 		
-		// Si on a des fils non Service, c'est que nous sommes le service final (généralement le port; on a: Service service -> Service binding -> Service port -> méthodes).
+		// Si on a des fils non Service, c'est que nous sommes le service final, donc on pond.
 		
 		if(count($autresFils))
 		{
