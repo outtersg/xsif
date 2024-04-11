@@ -793,10 +793,27 @@ class Liste extends Type
 		
 		if(isset($infosInvocation['n']))
 			$sortie->commencerMarge($infosInvocation['n']);
+		// En priorité ceux qui indiquent une priorité, eh!
+		$contenu = $this->contenu; // Par peur des effets de bord du tri du tableau sur notre lecture pour déterminer l'ordre.
+		uksort($contenu, array($this, 'tripote'));
+		$this->contenu = $contenu; // Allez que les suivants bénéficient de notre tri.
 		foreach($this->contenu as $fils)
 			$fils['t']->pondre($chemin.'.'.(isset($fils['l']) ? $fils['l'] : get_class($fils['t'])), $fils, $sortie, $registre);
 		if(isset($infosInvocation['n']))
 			$sortie->finirMarge();
+	}
+	
+	/**
+	 * TRI par POsition TEstée
+	 * Chaque élément du tableau peut déclarer une priorité intentionnelle, mais c'est nous qui tranchons entre deux se disputant la même prio (par stabilité du tri).
+	 */
+	public function tripote($x, $y)
+	{
+		$xa = isset($this->contenu[$x]['attr']['#prio']);
+		$ya = isset($this->contenu[$y]['attr']['#prio']);
+		if(($comp = $ya - $xa)) return $comp;
+		if($xa && $ya && ($comp = $this->contenu[$x]['attr']['#prio'] - $this->contenu[$y]['attr']['#prio'])) return $comp;
+		return $x - $y;
 	}
 }
 
