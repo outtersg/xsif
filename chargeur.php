@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2014 Guillaume Outters
+ * Copyright (c) 2014-2016,2020,2023-2024 Guillaume Outters
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
