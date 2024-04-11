@@ -86,6 +86,12 @@ class SortieHtml
 						font-size: 80%;
 						color: #BF5F00;
 					}
+					.attr
+					{
+						font-style: italic;
+						color: #9F9F9F;
+						background: #FFFFF7;
+					}
 				</style>
 			</head>
 		<body>'."\n");
@@ -167,6 +173,8 @@ class SortieHtml
 			$this->_lignes[count($this->_lignes)] = $this->_blocActuel;
 			$chaineId = ' '.$this->_attrId.'="e'.$id.'"';
 		}
+		else if(is_numeric($enTete))
+			$chaineId = $enTete;
 		else
 			$chaineId = '';
 		$this->_ligne($chaine, $chaineId, $supplement);
@@ -176,6 +184,13 @@ class SortieHtml
 	
 	public function _ligne($chaine, $chaineIdSiEntete, $supplement = null)
 	{
+		if(is_numeric($chaineIdSiEntete))
+		{
+			$balise = 'td';
+			$chaineIdSiEntete = ' class="attr"';
+			$chaine = '· '.$chaine;
+		}
+		else
 		$balise = $chaineIdSiEntete ? 'th' : 'td';
 		$this->_ajouter('<'.$balise.' colspan="@'.count($this->_marges).'"'.$chaineIdSiEntete.'>'.htmlspecialchars($chaine).($supplement ? '<i>'.htmlspecialchars($supplement).'</i>' : '').'</'.$balise.'>');
 	}
@@ -332,14 +347,21 @@ digraph Schema
 	
 	public function _ligne($chaine, $chaineIdSiEntete, $supplement = null)
 	{
+		$attrsTd = '';
 		$chaineTitre = htmlspecialchars($chaine);
+		if(is_numeric($chaineIdSiEntete) && $chaineIdSiEntete < 0)
+		{
+			$chaineTitre = '<font color="#9F9F9F"><i>· '.$chaineTitre.'</i></font>';
+			$chaineIdSiEntete = '';
+			$attrsTd .= ' bgcolor="#FFFFF7"';
+		}
 		if($chaineIdSiEntete)
 		{
 			$chaineTitre = '<font color="#FFFFFF"><b>&nbsp;&nbsp;&nbsp;'.$chaineTitre.'&nbsp;&nbsp;&nbsp;</b></font>';
 			$attrsTd = $chaineIdSiEntete.' bgcolor="#7F3F00"';
 		}
 		else
-			$attrsTd = ' align="left"';
+			$attrsTd .= ' align="left"';
 		$this->_ajouter('<td colspan="@'.count($this->_marges).'"'.$attrsTd.'>'.$chaineTitre.($supplement ? '&nbsp;<font point-size="9.6" color="#BF5F00"><i>'.htmlspecialchars($supplement).'</i></font>' : '').'</td>');
 	}
 	
@@ -580,7 +602,7 @@ class Type
 		$sortie->ligne
 		(
 			$nomÉlément,
-			false,
+			isset($infosInvocation['attr']['#prio']) ? $infosInvocation['attr']['#prio'] : false,
 			$classeSimple.(isset($infosInvocation['text']) ? $infosInvocation['text'] : '') // text: Type.EXTension
 		);
 		if(isset($infosInvocation['doc']))
