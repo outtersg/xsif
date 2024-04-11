@@ -238,6 +238,7 @@ class Chargeur
 					// Sinon on continue en Interne.
 				case 'enumeration':
 				case 'complexContent':
+					/* À FAIRE: le complexContent peut être mixed="true": incluant un mélange de textes et balises façon HTML? */
 				case 'pattern':
 				case 'maxLength':
 				case 'minLength':
@@ -622,6 +623,10 @@ class Chargeur
 						$r['t'] = $r['t']->attr['base'];
 					break;
 				case 'complexContent':
+					// Les attributs parasites à valeur par défaut sautent.
+					/* À FAIRE?: à un niveau plus haut? */
+					if(isset($element->attr['mixed']) && $element->attr['mixed'] === 'false')
+						unset($element->attr['mixed']);
 					if(!count($element->attr) && count($element->contenu) == 1 && count($element->contenu[0]) == 1) // contenu[0] == 1 pour être sûr qu'il n'y a que le 't' =>.
 						$r = $element->contenu[0];
 					break;
