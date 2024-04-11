@@ -206,6 +206,11 @@ class Chargeur
 				case 'sequence': $element = new Sequence; break;
 				case 'choice': $element = new Variante; break;
 				case 'any': $element = new NImporteQuoi; break;
+				case 'anyAttribute':
+					$element = new Interne('ref', array());
+					$element->ref = XS.'#string';
+					$element->attr['name'] = '*';
+					break;
 				case 'group':
 					if(!($element = $this->_noeudEnRef($noeud, 'ref')))
 					{
@@ -271,7 +276,7 @@ class Chargeur
 		if($element === false) // L'élément a souhaité indiquer qu'il était bien pris en compte, mais qu'il doit être ignoré dans le résultat final (ainsi que tous ses enfants).
 			return $element;
 		
-		if(in_array($noeud->localName, array('attribute')) && !isset($element->attr['#prio']))
+		if(in_array($noeud->localName, array('attribute', 'anyAttribute')) && !isset($element->attr['#prio']))
 			$element->attr['#prio'] = -1;
 		
 		if(isset($noeud->childNodes))
