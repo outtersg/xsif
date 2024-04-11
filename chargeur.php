@@ -270,6 +270,9 @@ class Chargeur
 		if($element === false) // L'élément a souhaité indiquer qu'il était bien pris en compte, mais qu'il doit être ignoré dans le résultat final (ainsi que tous ses enfants).
 			return $element;
 		
+		if(in_array($noeud->localName, array('attribute')) && !isset($element->attr['#prio']))
+			$element->attr['#prio'] = -1;
+		
 		if(isset($noeud->childNodes))
 			foreach($noeud->childNodes as $fils)
 				if($fils instanceof DomElement)
