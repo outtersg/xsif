@@ -577,7 +577,12 @@ class Type
 			isset($infosInvocation['l']) ? $infosInvocation['l']
 			: ((isset($infosInvocation['classe']) && (($posDièse = strrpos($infosInvocation['classe'], '#')) !== false) ? substr($infosInvocation['classe'], $posDièse + 1) : null))
 		;
-		$sortie->ligne($nomÉlément, false, $classeSimple.(isset($infosInvocation['text']) ? $infosInvocation['text'] : '')); // text: Type.EXTension
+		$sortie->ligne
+		(
+			$nomÉlément,
+			false,
+			$classeSimple.(isset($infosInvocation['text']) ? $infosInvocation['text'] : '') // text: Type.EXTension
+		);
 		if(isset($infosInvocation['doc']))
 			$sortie->commentaire($infosInvocation['doc']);
 		if(isset($infosInvocation['n']))
