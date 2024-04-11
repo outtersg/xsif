@@ -24,6 +24,7 @@
 define('XS', 'http://www.w3.org/2001/XMLSchema');
 define('WSDL', 'http://schemas.xmlsoap.org/wsdl/');
 define('SOAP', 'http://schemas.xmlsoap.org/wsdl/soap/');
+define('SOAP12', 'http://schemas.xmlsoap.org/wsdl/soap12/');
 define('SOAPE', 'http://schemas.xmlsoap.org/soap/encoding/');
 
 class Chargeur
@@ -33,6 +34,8 @@ class Chargeur
 	(
 		XS,
 		WSDL,
+		SOAP,
+		SOAP12,
 		SOAPE,
 	);
 	
@@ -127,7 +130,7 @@ class Chargeur
 //		echo "=== ".$noeud->tagName." ===\n";
 		
 		$poubelle = new stdClass;
-		if($noeud->namespaceURI == XS || $noeud->namespaceURI == WSDL || $noeud->namespaceURI == SOAP)
+		if(in_array($noeud->namespaceURI, Chargeur::$ESPACES_TYPES_STD))
 			switch($noeud->localName)
 			{
 				/* Plutôt orientés WSDL. */

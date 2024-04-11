@@ -633,6 +633,7 @@ class Service extends Complexe
 		 * bien souvent seul le portType contient la structure riche, le binding n'apportant rien d'un point de vue fonctionnel.
 		 * En outre on ne pond qu'à partir du niveau binding / port, le service n'étant qu'un contenant sans info.
 		 */
+		/* À FAIRE: si deux bindings utilisent le même port (possible?), ne représenter ce dernier qu'une fois. */
 		
 		// Voyons si on n'a pas des fils de type Service.
 		
