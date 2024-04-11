@@ -639,6 +639,9 @@ class Chargeur
 					break;
 			}
 		
+		if(!isset($r['l']) && isset($r['attr']['name']))
+			$r['l'] = $r['attr']['name'];
+		
 		return $r;
 	}
 }
