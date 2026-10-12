@@ -58,7 +58,7 @@ class SortieHtml
 				<style type="text/css">
 					img
 					{
-						width: 100%;
+						max-width: 100%;
 					}
 					table, td
 					{
