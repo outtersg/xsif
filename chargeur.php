@@ -26,6 +26,7 @@ define('WSDL', 'http://schemas.xmlsoap.org/wsdl/');
 define('SOAP', 'http://schemas.xmlsoap.org/wsdl/soap/');
 define('SOAP12', 'http://schemas.xmlsoap.org/wsdl/soap12/');
 define('SOAPE', 'http://schemas.xmlsoap.org/soap/encoding/');
+define('HTTP', 'http://schemas.xmlsoap.org/wsdl/http/');
 
 class Chargeur
 {
@@ -37,6 +38,7 @@ class Chargeur
 		SOAP,
 		SOAP12,
 		SOAPE,
+		HTTP,
 	);
 	
 	protected $_cheminActuel;
