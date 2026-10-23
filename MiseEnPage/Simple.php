@@ -103,6 +103,14 @@ class Simple
 		/* À FAIRE */
 	}
 	
+	/**
+	 * Renvoie les coordonnées du nœud pour le client actuel.
+	 */
+	public function pos($nœud)
+	{
+		if(isset($nœud->pos[$this->_client])) return $nœud->pos[$this->_client];
+	}
+	
 	/** Quel module est en train de nous demander une mise en page? */
 	protected $_client;
 	
