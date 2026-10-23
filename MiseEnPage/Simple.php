@@ -52,18 +52,18 @@ class Simple
 	
 	public function placer($nœud)
 	{
-		if(isset($nœud->pos[$this->_client]['fait'])) return $nœud->pos[$this->_client]['fait'] < 0 ? null : $nœud->pos[$this->_client];
+		if(isset($this->pos($nœud)->fait)) return $this->pos($nœud)->fait < 0 ? null : $nœud->pos[$this->_client];
 		
 		// On se marque en cours de constitution, pour éviter les boucles infinies.
-		$nœud->pos[$this->_client]['fait'] = -1;
+		$this->pos($nœud)->fait = -1;
 		
 		$col = 0; // Colonne la plus à gauche possible.
 		$lignes = []; // Lignes de nos prédécesseurs: on essaiera de se mettre sur l'une d'elles.
 		foreach($nœud->prédécesseurs as $p)
 		{
 			if(!($pp = $this->placer($p))) continue; // Si notre prédécesseur ne renvoie aucun placement, c'est qu'il est lui-même en cours de placement.
-			if($col < $pp['col'] + 1) $col = $pp['col'] + 1;
-			$lignes[$pp['ligne']] = true;
+			if($col < $pp->col + 1) $col = $pp->col + 1;
+			$lignes[$pp->ligne] = true;
 		}
 		
 		// Si personne ne nous veut à sa droite, on commence une nouvelle ligne!
@@ -92,9 +92,9 @@ class Simple
 		if($col < count($this->_lignes[$lIdéale]))
 			$col = count($this->_lignes[$lIdéale]);
 		
-		$nœud->pos[$this->_client]['fait'] = 1;
-		$nœud->pos[$this->_client]['col'] = $col;
-		$nœud->pos[$this->_client]['ligne'] = $lIdéale;
+		$this->pos($nœud)->fait = 1;
+		$this->pos($nœud)->col = $col;
+		$this->pos($nœud)->ligne = $lIdéale;
 		
 		// On matérialise les trous, pour simplifier le parcours plus tard (pouvoir reposer sur les count() pour savoir combien de colonnes par ligne).
 		while(count($this->_lignes[$lIdéale]) < $col - 1)
@@ -115,11 +115,11 @@ class Simple
 		{
 			$hMax = 0;
 			foreach($l as $n)
-				if(isset($this->pos($n)['h']) && $this->pos($n)['h'] > $hMax)
-					$hMax = $this->pos($n)['h'];
+				if(isset($this->pos($n)->h) && $this->pos($n)->h > $hMax)
+					$hMax = $this->pos($n)->h;
 			if(!$hMax) $hMax = $this->tailleParDéfaut;
 			foreach($l as $n)
-				$this->pos($n)['y'] = $y + (isset($n->pos[$this->_client]['h']) ? ($hMax - $this->pos($n)['h']) / 2 : 0);
+				$this->pos($n)->y = $y + (isset($this->pos($n)->h) ? ($hMax - $this->pos($n)->h) / 2 : 0);
 			$y += $hMax + $this->marge;
 			
 			if($nCols < count($l)) $nCols = count($l);
@@ -144,10 +144,10 @@ class Simple
 					$xMax = 0;
 					foreach($avant as $nav)
 					{
-						if(!isset($this->pos($nav)['x'])) continue; // Un prédécesseur pas encore placé, car boucle entre nous. Il doit être sur une colonne postérieure.
-						if(($x = $this->pos($nav)['x'] + (isset($this->pos($nav)['l']) ? $this->pos($nav)['l'] : $this->_tailleParDéfaut)) > $xMax) $xMax = $x;
+						if(!isset($this->pos($nav)->x)) continue; // Un prédécesseur pas encore placé, car boucle entre nous. Il doit être sur une colonne postérieure.
+						if(($x = $this->pos($nav)->x + (isset($this->pos($nav)->l) ? $this->pos($nav)->l : $this->tailleParDéfaut)) > $xMax) $xMax = $x;
 					}
-					$this->pos($l[$c])['x'] = $xMax + $this->marge; // On ajoute la marge: même sur la première colonne, ça aère, avec de l'espace à gauche.
+					$this->pos($l[$c])->x = $xMax + $this->marge; // On ajoute la marge: même sur la première colonne, ça aère, avec de l'espace à gauche.
 				}
 		
 		/* À FAIRE: une fois la ligne constituée, on peut rejouer sur les espaces pour répartir régulièrement les blocs. */
@@ -158,7 +158,9 @@ class Simple
 	 */
 	public function pos($nœud)
 	{
-		if(isset($nœud->pos[$this->_client])) return $nœud->pos[$this->_client];
+		if(!isset($nœud->pos[$this->_client]))
+			$nœud->pos[$this->_client] = new \stdClass;
+		return $nœud->pos[$this->_client];
 	}
 	
 	/** Quel module est en train de nous demander une mise en page? */
