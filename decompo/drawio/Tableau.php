@@ -54,32 +54,66 @@
         </mxCell>
 <!-- T 1 colonne -->
         <?php
-        	$o = $this->d[0];
         	$this->_id = 10;
         	$idt = ++$this->_id;
         	$y = 16;
         	$hLigne = 16;
+		$largeurColonnes = [ null, null ];
+		// Si les largeurs de colonne ne sont pas fixées, on approxime au nombre de caractères maximal, multiplié par un facteur, dans une certaine limite.
+		$lCols = [];
+		foreach($brut as $ligne)
+		{
+			$col = -1;
+			foreach(is_array($ligne) ? $ligne : [ $ligne ] as $case)
+			{
+				++$col;
+				if(!isset($lCols[$col])) $lCols[$col] = 0;
+				if(strlen($case) > $lCols[$col]) $lCols[$col] = strlen($case);
+				/* À FAIRE: les cases qui occupent plusieurs colonnes ne compte pas. */
+			}
+		}
+		$lTableau = 0;
+		foreach($lCols as $col => $l)
+		{
+			if(isset($largeurColonnes[$col]))
+				$lCols[$col] = $largeurColonnes[$col] > 0 ? $largeurColonnes[$col] : -$largeurColonnes[$col] * $hLigne;
+			else
+			{
+				$lCols[$col] *= $hLigne * 0.5; /* À FAIRE: décoder en dur cette largeur d'1/2 hauteur par caractère. */
+				if($lCols[$col] > 120) $lCols[$col] = 120; /* À FAIRE: décoder en dur. */
+			}
+			$lTableau += $lCols[$col];
+		}
         ?>
         <mxCell id="xsif-<?php echo $idt; ?>" parent="1" style="shape=table;startSize=<?php echo $y; ?>;container=1;collapsible=0;childLayout=tableLayout;fixedHeader=1;tableRender=collapsed;fillColor=#dae8fc;strokeColor=#6c8ebf;rounded=1;roundedPerimeter=1;<?php echo $police; ?>" value="Table" vertex="1">
-          <mxGeometry height="<?php echo $y + count($o->corresp) * $hLigne; ?>" width="60" x="270" y="110" as="geometry" />
+					<mxGeometry height="<?php echo $y + count($brut) * $hLigne; ?>" width="<?php echo $lTableau; ?>" x="270" y="110" as="geometry" />
         </mxCell>
         <?php
-        	foreach($o->corresp as $de => $vers)
+		foreach($brut as $ligne)
         	{
         		$ide = ++$this->_id; // ID Extérieur
-        		$idi = ++$this->_id; // ID Intérieur
         ?>
         <mxCell id="xsif-<?php echo $ide; ?>" parent="xsif-<?php echo $idt; ?>" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fixedHeader=1;" value="" vertex="1">
-          <mxGeometry height="<?php echo $hLigne; ?>" width="60" y="<?php echo $y; ?>" as="geometry" />
+					<mxGeometry height="<?php echo $hLigne; ?>" width="<?php echo $lTableau; ?>" y="<?php echo $y; ?>" as="geometry" />
         </mxCell>
-        <mxCell id="xsif-<?php echo $idi; ?>" parent="xsif-<?php echo $ide; ?>" style="shape=partialRectangle;connectable=0;strokeColor=#6c8ebf;overflow=hidden;fillColor=#dae8fc;pointerEvents=1;html=1;align=left;<?php echo $police; ?>" value="<?php echo htmlentities(htmlentities($de)); ?>" vertex="1">
-          <mxGeometry height="<?php echo $hLigne; ?>" width="60" as="geometry">
-            <mxRectangle height="<?php echo $hLigne; ?>" width="60" as="alternateBounds" />
+			<?php
+			$x = 0;
+			$col = -1;
+			foreach(is_array($ligne) ? $ligne : [ $ligne ] as $case)
+			{
+				++$col;
+        		$idi = ++$this->_id; // ID Intérieur
+        ?>
+        <mxCell id="xsif-<?php echo $idi; ?>" parent="xsif-<?php echo $ide; ?>" style="shape=partialRectangle;connectable=0;strokeColor=#6c8ebf;overflow=hidden;fillColor=#dae8fc;pointerEvents=1;html=1;align=left;<?php echo $police; ?>" value="<?php echo htmlentities(htmlentities($case)); ?>" vertex="1">
+          <mxGeometry height="<?php echo $hLigne; ?>" width="<?php echo $lCols[$col]; ?>" <?php if($x) echo 'x="'.$x.'" '; ?>as="geometry">
+            <mxRectangle height="<?php echo $hLigne; ?>" width="<?php echo $lCols[$col]; ?>" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
         <?php
-        		$y += $hLigne;
+				$x += $lCols[$col];
         	}
+			$y += $hLigne;
+		}
         ?>
         <!--
         <mxCell id="xsif-15" parent="xsif-11" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fixedHeader=1;" value="" vertex="1">

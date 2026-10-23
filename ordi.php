@@ -47,6 +47,7 @@ class Écrivain
 	
 	public function écrire()
 	{
+		$brut = $this->d[0]->corresp;
 		include dirname(__FILE__).'/decompo/drawio/Tableau.php';
 	}
 	
