@@ -8,51 +8,6 @@
         <mxCell id="xsif-40" edge="1" parent="1" source="xsif-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;strokeColor=#FF00FF;" target="xsif-37">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-<!-- T 2 colonnes -->
-        <!-- en-tête -->
-        <mxCell id="xsif-1" parent="1" style="shape=table;startSize=30;container=1;collapsible=0;childLayout=tableLayout;fixedHeader=1;tableRender=collapsed;fillColor=#dae8fc;strokeColor=#6c8ebf;rounded=1;roundedPerimeter=1;" value="Table" vertex="1">
-          <mxGeometry height="79" width="120" x="270" y="340" as="geometry" />
-        </mxCell>
-        <mxCell id="xsif-2" parent="xsif-1" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fixedHeader=1;" value="" vertex="1">
-          <mxGeometry height="16" width="120" y="30" as="geometry" />
-        </mxCell>
-        <mxCell id="xsif-3" parent="xsif-2" style="shape=partialRectangle;connectable=0;strokeColor=#6c8ebf;overflow=hidden;fillColor=#dae8fc;pointerEvents=1;html=1;align=left;" value="Les oiseaux &amp;lt;= éléphants" vertex="1">
-          <mxGeometry height="16" width="60" as="geometry">
-            <mxRectangle height="16" width="60" as="alternateBounds" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="xsif-4" parent="xsif-2" style="shape=partialRectangle;connectable=0;strokeColor=#6c8ebf;overflow=hidden;fillColor=#dae8fc;pointerEvents=1;html=1;align=left;" value="Un rien" vertex="1">
-          <mxGeometry height="16" width="60" x="60" as="geometry">
-            <mxRectangle height="16" width="60" as="alternateBounds" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="xsif-5" parent="xsif-1" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fixedHeader=1;" value="" vertex="1">
-          <mxGeometry height="17" width="120" y="46" as="geometry" />
-        </mxCell>
-        <mxCell id="xsif-6" parent="xsif-5" style="shape=partialRectangle;connectable=0;strokeColor=#6c8ebf;overflow=hidden;fillColor=#dae8fc;pointerEvents=1;html=1;align=left;" value="Là non plus" vertex="1">
-          <mxGeometry height="17" width="60" as="geometry">
-            <mxRectangle height="17" width="60" as="alternateBounds" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="xsif-7" parent="xsif-5" style="shape=partialRectangle;connectable=0;strokeColor=#6c8ebf;overflow=hidden;fillColor=#dae8fc;pointerEvents=1;html=1;align=left;" value="Tout va bien" vertex="1">
-          <mxGeometry height="17" width="60" x="60" as="geometry">
-            <mxRectangle height="17" width="60" as="alternateBounds" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="xsif-8" parent="xsif-1" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fixedHeader=1;" value="" vertex="1">
-          <mxGeometry height="16" width="120" y="63" as="geometry" />
-        </mxCell>
-        <mxCell id="xsif-9" parent="xsif-8" style="shape=partialRectangle;connectable=0;strokeColor=#6c8ebf;overflow=hidden;fillColor=#dae8fc;pointerEvents=1;html=1;align=left;" value="Oups" vertex="1">
-          <mxGeometry height="16" width="60" as="geometry">
-            <mxRectangle height="16" width="60" as="alternateBounds" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="xsif-10" parent="xsif-8" style="shape=partialRectangle;connectable=0;strokeColor=#6c8ebf;overflow=hidden;fillColor=#dae8fc;pointerEvents=1;html=1;align=left;" value="Dernière case" vertex="1">
-          <mxGeometry height="16" width="60" x="60" as="geometry">
-            <mxRectangle height="16" width="60" as="alternateBounds" />
-          </mxGeometry>
-        </mxCell>
-<!-- T 1 colonne -->
         <?php
         	$this->_id = 10;
         	$idt = ++$this->_id;
@@ -115,24 +70,6 @@
 			$y += $hLigne;
 		}
         ?>
-        <!--
-        <mxCell id="xsif-15" parent="xsif-11" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fixedHeader=1;" value="" vertex="1">
-          <mxGeometry height="17" width="60" y="46" as="geometry" />
-        </mxCell>
-        <mxCell id="xsif-16" parent="xsif-15" style="shape=partialRectangle;connectable=0;strokeColor=#6c8ebf;overflow=hidden;fillColor=#dae8fc;pointerEvents=1;html=1;align=left;" value="Là non plus" vertex="1">
-          <mxGeometry height="17" width="60" as="geometry">
-            <mxRectangle height="17" width="60" as="alternateBounds" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="xsif-18" parent="xsif-11" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fixedHeader=1;" value="" vertex="1">
-          <mxGeometry height="16" width="60" y="63" as="geometry" />
-        </mxCell>
-        <mxCell id="xsif-19" parent="xsif-18" style="shape=partialRectangle;connectable=0;strokeColor=#6c8ebf;overflow=hidden;fillColor=#dae8fc;pointerEvents=1;html=1;align=left;" value="Argh" vertex="1">
-          <mxGeometry height="16" width="60" as="geometry">
-            <mxRectangle height="16" width="60" as="alternateBounds" />
-          </mxGeometry>
-        </mxCell>
-        -->
 <!-- Suite -->
         <mxCell id="xsif-21" parent="1" style="shape=table;startSize=16;container=1;collapsible=0;childLayout=tableLayout;fixedHeader=1;tableRender=collapsed;rounded=0;swimlaneLine=1;" value="Table" vertex="1">
           <mxGeometry height="64" width="60" x="384" y="125" as="geometry" />
