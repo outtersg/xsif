@@ -70,6 +70,9 @@ class DrawIo
 				default:
 					fprintf(STDERR, "# Je ne sais pas traiter les blocs de type %s\n", get_class($bloc));
 			}
+		foreach($modèle as $bloc)
+			if(isset($this->_p->pos($bloc)->aff))
+				call_user_func($this->_p->pos($bloc)->aff, $bloc);
 		
 		$this->sortirDessin();
 		$this->sortirFichier();
@@ -162,7 +165,18 @@ class DrawIo
 			$lTableau += $lCols[$col];
 		}
 		$hTotale = $y + count($brut) * $hLigne;
+		
 		$coord = $this->_p->pos($tableau);
+		$coord->aff = [ $this, 'affTableau' ];
+		$coord->vars = [ $lCols, $lTableau, $hTotale, $hLigne, $idt, $y ];
+	}
+	
+	public function affTableau($tableau)
+	{
+		$brut = $tableau->d;
+		$coord = $this->_p->pos($tableau);
+		list($lCols, $lTableau, $hTotale, $hLigne, $idt, $y) = $coord->vars;
+		
 		$this->_sortir(<<<TERMINE
 			<mxCell id="xsif-$idt" parent="1" style="shape=table;startSize=$y;container=1;collapsible=0;childLayout=tableLayout;fixedHeader=1;tableRender=collapsed;fillColor=#dae8fc;strokeColor=#6c8ebf;rounded=1;roundedPerimeter=1;{$this->police}" value="Table" vertex="1">
 					<mxGeometry height="$hTotale" width="$lTableau" x="{$coord->x}" y="{$coord->y}" as="geometry" />
