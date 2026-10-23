@@ -32,7 +32,14 @@ class DrawIo
 		$this->_id = 1;
 		
 		foreach($modèle as $bloc)
-			$this->tableau($bloc);
+			switch(get_class($bloc))
+			{
+				case 'Gui\\Xsif\\Modele\\Diagramme\\Tableau':
+					$this->tableau($bloc);
+					break;
+				default:
+					fprintf(STDERR, "# Je ne sais pas traiter les blocs de type %s\n", get_class($bloc));
+			}
 		
 		$this->sortirDessin();
 		$this->sortirFichier();
@@ -87,7 +94,7 @@ class DrawIo
 	
 	/*- Nœuds ----------------------------------------------------------------*/
 	
-	public function tableau($brut)
+	public function tableau($tableau)
 	{
         /*
         <mxCell id="xsif-40" edge="1" parent="1" source="xsif-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;strokeColor=#FF00FF;" target="xsif-37">
@@ -100,6 +107,7 @@ class DrawIo
 		$largeurColonnes = [ null, null ];
 		// Si les largeurs de colonne ne sont pas fixées, on approxime au nombre de caractères maximal, multiplié par un facteur, dans une certaine limite.
 		$lCols = [];
+		$brut = $tableau->d;
 		foreach($brut as $ligne)
 		{
 			$col = -1;

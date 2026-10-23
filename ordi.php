@@ -25,19 +25,27 @@
  * Organigrammes Représentés sous Draw.Io
  */
 
+require_once dirname(__FILE__).'/Modele/Diagramme/Tableau.php';
+
 $modèle =
 [
+	new Gui\Xsif\Modele\Diagramme\Tableau
+	(
 	[
 	'Les oiseaux < les éléph' => 'idem',
 	'ouille' => 'Là non plus',
 	'Oups' => 'Oups',
 	'et "pas plus haut que le verre"' => 'pour les guillemets',
 	],
+	),
+	new Gui\Xsif\Modele\Diagramme\Tableau
+	(
 	[
 		[ 'Les oiseaux <= éléphants', 'Un rien' ],
 		[ 'Là non plus', 'Tout va bien' ],
 		[ 'Oups', 'Dernière case' ],
 	],
+	),
 ];
 
 require_once dirname(__FILE__).'/decompo/drawio/DrawIo.php';
