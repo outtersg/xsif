@@ -9,6 +9,9 @@ class Nœud
 	public $d;
 	public $prédécesseurs = [];
 	
+	/** Coordonnées. Chaque module est libre de gérer comme il veut tout le fatras qu'il met à une clé qui lui est propre. */
+	public $pos = [];
+	
 	public function __construct($donnée)
 	{
 		$this->d = $donnée;
