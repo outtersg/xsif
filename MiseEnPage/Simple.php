@@ -24,6 +24,8 @@
 namespace Gui\Xsif\MiseEnPage;
 
 /* À FAIRE: une MiseEnPage qui passe par GraphViz dont c'est le boulot? */
+/* À FAIRE: distinguer x et y d'axe principal et axe secondaire, pour permettre des graphes haut - bas plutôt que gauche - droite. */
+/* À FAIRE: en cas de boucle, préserver l'ordre de déclaration; là le 1er nœud interroge le 2nd, qui dit attendre le 1er et donc se calcule en 1er. Il faudrait que ce soit le 1er qui finisse de se calculer. */
 
 class Simple
 {
