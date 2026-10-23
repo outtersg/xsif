@@ -1,15 +1,99 @@
-<mxfile host="app.diagrams.net">
-	<?php $police = 'fontFamily=Lato;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DLato;'; ?>
-  <diagram name="Page-1" id="hgOAppBo4JsTc-_X_mI3">
-    <mxGraphModel dx="1414" dy="793" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
-      <root>
-        <mxCell id="0" />
-        <mxCell id="1" parent="0"/>
+<?php
+
+class DrawIo
+{
+	const P_STANDARD = 0;
+	const P_WEB = 1;
+	const P_GOOGLE = 2;
+	
+	protected $police;
+	/** Données à pondre. */
+	protected $d;
+	
+	/** Dernier identifiant de nœud attribué. */
+	protected $_id;
+	/** Sortie */
+	protected $_s;
+	
+	public function police($police, $type = self::P_STANDARD)
+	{
+		switch($type)
+		{
+			case self::P_GOOGLE: $this->police = 'fontFamily='.urlencode($police).';fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3D'.urlencode($police).';'; break;
+		}
+	}
+	
+	public function pondreFichier($modèle)
+	{
+		$this->d = $modèle;
+		
+		$this->entrerFichier();
+		$this->entrerDessin();
+		$this->_id = 1;
+		
+		foreach($modèle as $bloc)
+			$this->tableau($bloc);
+		
+		$this->sortirDessin();
+		$this->sortirFichier();
+	}
+	
+	public function _sortir($chaine)
+	{
+		if(isset($this->_s))
+			fwrite($this->_s, $chaine);
+		else
+			echo $chaine;
+	}
+	
+	/*- Fichier --------------------------------------------------------------*/
+	
+	public function entrerFichier()
+	{
+		$this->_sortir(<<<TERMINE
+			<mxfile host="app.diagrams.net">
+			  <diagram name="Page-1" id="hgOAppBo4JsTc-_X_mI3">
+		TERMINE);
+	}
+	
+	public function sortirFichier()
+	{
+		$this->_sortir(<<<TERMINE
+			  </diagram>
+			</mxfile>
+		TERMINE);
+	}
+	
+	/*- Dessin ---------------------------------------------------------------*/
+	
+	public function entrerDessin()
+	{
+		/* À FAIRE: connaître les dimensions de page. */
+		$this->_sortir(<<<TERMINE
+			<mxGraphModel dx="1414" dy="793" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+				<root>
+					<mxCell id="0" />
+					<mxCell id="1" parent="0"/>
+		TERMINE);
+	}
+	
+	public function sortirDessin()
+	{
+		$this->_sortir(<<<TERMINE
+				</root>
+			</mxGraphModel>
+		TERMINE);
+	}
+	
+	/*- Nœuds ----------------------------------------------------------------*/
+	
+	public function tableau($brut)
+	{
+        /*
         <mxCell id="xsif-40" edge="1" parent="1" source="xsif-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;strokeColor=#FF00FF;" target="xsif-37">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <?php
-        	$this->_id = 10;
+        */
         	$idt = ++$this->_id;
         	$y = 16;
         	$hLigne = 16;
@@ -39,37 +123,41 @@
 			}
 			$lTableau += $lCols[$col];
 		}
-        ?>
-        <mxCell id="xsif-<?php echo $idt; ?>" parent="1" style="shape=table;startSize=<?php echo $y; ?>;container=1;collapsible=0;childLayout=tableLayout;fixedHeader=1;tableRender=collapsed;fillColor=#dae8fc;strokeColor=#6c8ebf;rounded=1;roundedPerimeter=1;<?php echo $police; ?>" value="Table" vertex="1">
-					<mxGeometry height="<?php echo $y + count($brut) * $hLigne; ?>" width="<?php echo $lTableau; ?>" x="270" y="110" as="geometry" />
-        </mxCell>
-        <?php
+		$hTotale = $y + count($brut) * $hLigne;
+		$this->_sortir(<<<TERMINE
+			<mxCell id="xsif-$idt" parent="1" style="shape=table;startSize=$y;container=1;collapsible=0;childLayout=tableLayout;fixedHeader=1;tableRender=collapsed;fillColor=#dae8fc;strokeColor=#6c8ebf;rounded=1;roundedPerimeter=1;{$this->police}" value="Table" vertex="1">
+					<mxGeometry height="$hTotale" width="$lTableau" x="270" y="110" as="geometry" />
+			</mxCell>
+		TERMINE);
 		foreach($brut as $ligne)
         	{
         		$ide = ++$this->_id; // ID Extérieur
-        ?>
-        <mxCell id="xsif-<?php echo $ide; ?>" parent="xsif-<?php echo $idt; ?>" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fixedHeader=1;" value="" vertex="1">
-					<mxGeometry height="<?php echo $hLigne; ?>" width="<?php echo $lTableau; ?>" y="<?php echo $y; ?>" as="geometry" />
-        </mxCell>
-			<?php
+			$this->_sortir(<<<TERMINE
+				<mxCell id="xsif-$ide" parent="xsif-$idt" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fixedHeader=1;" value="" vertex="1">
+					<mxGeometry height="$hLigne" width="$lTableau" y="$y" as="geometry" />
+				</mxCell>
+			TERMINE);
 			$x = 0;
 			$col = -1;
 			foreach(is_array($ligne) ? $ligne : [ $ligne ] as $case)
 			{
 				++$col;
         		$idi = ++$this->_id; // ID Intérieur
-        ?>
-        <mxCell id="xsif-<?php echo $idi; ?>" parent="xsif-<?php echo $ide; ?>" style="shape=partialRectangle;connectable=0;strokeColor=#6c8ebf;overflow=hidden;fillColor=#dae8fc;pointerEvents=1;html=1;align=left;<?php echo $police; ?>" value="<?php echo htmlentities(htmlentities($case)); ?>" vertex="1">
-          <mxGeometry height="<?php echo $hLigne; ?>" width="<?php echo $lCols[$col]; ?>" <?php if($x) echo 'x="'.$x.'" '; ?>as="geometry">
-            <mxRectangle height="<?php echo $hLigne; ?>" width="<?php echo $lCols[$col]; ?>" as="alternateBounds" />
-          </mxGeometry>
-        </mxCell>
-        <?php
+        		$case = htmlentities(htmlentities($case));
+        		$xCond = $x ? ' x="'.$x.'"' : '';
+				$this->_sortir(<<<TERMINE
+					<mxCell id="xsif-$idi" parent="xsif-$ide" style="shape=partialRectangle;connectable=0;strokeColor=#6c8ebf;overflow=hidden;fillColor=#dae8fc;pointerEvents=1;html=1;align=left;{$this->police}" value="$case" vertex="1">
+						<mxGeometry height="$hLigne" width="{$lCols[$col]}"$xCond as="geometry">
+							<mxRectangle height="$hLigne" width="{$lCols[$col]}" as="alternateBounds" />
+						</mxGeometry>
+					</mxCell>
+			TERMINE);
 				$x += $lCols[$col];
         	}
 			$y += $hLigne;
 		}
-        ?>
+	}
+/*
 <!-- Suite -->
         <mxCell id="xsif-21" parent="1" style="shape=table;startSize=16;container=1;collapsible=0;childLayout=tableLayout;fixedHeader=1;tableRender=collapsed;rounded=0;swimlaneLine=1;" value="Table" vertex="1">
           <mxGeometry height="64" width="60" x="384" y="125" as="geometry" />
@@ -127,7 +215,7 @@
         <mxCell id="xsif-39" edge="1" parent="1" source="xsif-37" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;defaultLabelBackgroundColor=page;endArrow=none;endFill=0;strokeColor=#7F7F7F;" target="xsif-38">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-      </root>
-    </mxGraphModel>
-  </diagram>
-</mxfile>
+*/
+}
+
+?>

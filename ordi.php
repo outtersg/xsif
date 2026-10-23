@@ -25,49 +25,25 @@
  * Organigrammes Représentés sous Draw.Io
  */
 
-class Sortie
-{
-	public function _sortir($chaine)
-	{
-		if(isset($this->_s))
-			fwrite($this->_s, $chaine);
-		else
-			echo $chaine;
-	}
-	
-	protected $_s;
-}
-
-class Écrivain
-{
-	public function __construct($modèle)
-	{
-		$this->d = $modèle;
-	}
-	
-	public function écrire()
-	{
-		$brut = $this->d[0]->corresp;
-		include dirname(__FILE__).'/decompo/drawio/Tableau.php';
-	}
-	
-	/** Dernier identifiant de nœud attribué. */
-	protected $_id = 0;
-	/** Données à pondre. */
-	protected $d;
-}
-
-$corresp = new \stdClass;
-$corresp->corresp =
+$modèle =
 [
+	[
 	'Les oiseaux < les éléph' => 'idem',
 	'ouille' => 'Là non plus',
 	'Oups' => 'Oups',
 	'et "pas plus haut que le verre"' => 'pour les guillemets',
+	],
+	[
+		[ 'Les oiseaux <= éléphants', 'Un rien' ],
+		[ 'Là non plus', 'Tout va bien' ],
+		[ 'Oups', 'Dernière case' ],
+	],
 ];
-$modèle = [ $corresp ];
 
-$e = new Écrivain($modèle);
-$e->écrire();
+require_once dirname(__FILE__).'/decompo/drawio/DrawIo.php';
+
+$e = new DrawIo();
+$e->police('Lato', DrawIo::P_GOOGLE);
+$e->pondreFichier($modèle);
 
 ?>
