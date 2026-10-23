@@ -27,6 +27,12 @@ class DrawIo
 	{
 		$this->d = $modèle;
 		
+		require_once dirname(__FILE__).'/../../MiseEnPage/Simple.php';
+		$placeur = new Gui\Xsif\MiseEnPage\Simple();
+		$placeur->marge = 30;
+		$placeur->tailleParDéfaut = 100;
+		$tailleDessin = $placeur->disposer($modèle, get_class($this));
+		
 		$this->entrerFichier();
 		$this->entrerDessin();
 		$this->_id = 1;
