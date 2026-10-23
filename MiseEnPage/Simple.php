@@ -43,8 +43,7 @@ class Simple
 		foreach($modèle as $n)
 			$this->placer($n);
 		
-		foreach($modèle as $n)
-			$this->caler($n);
+		$this->caler();
 		
 		/* À FAIRE: calcul et renvoi du plan de travail résultant. */
 	}
@@ -95,12 +94,61 @@ class Simple
 		$nœud->pos[$this->_client]['col'] = $col;
 		$nœud->pos[$this->_client]['ligne'] = $lIdéale;
 		
+		// On matérialise les trous, pour simplifier le parcours plus tard (pouvoir reposer sur les count() pour savoir combien de colonnes par ligne).
+		while(count($this->_lignes[$lIdéale]) < $col - 1)
+			$this->_lignes[$lIdéale][] = null;
+		$this->_lignes[$lIdéale][] = $nœud;
+		
 		return $nœud->pos[$this->_client];
 	}
 	
-	public function caler($nœud)
+	public function caler()
 	{
-		/* À FAIRE */
+		// Pour les ordonnées, pas compliqué, chaque ligne son couloir.
+		// Tout au plus aligne-t-on verticalement ceux qui ont donné une taille.
+		
+		$nCols = 0;
+		$y = $this->marge;
+		foreach($this->_lignes as $l)
+		{
+			$hMax = 0;
+			foreach($l as $n)
+				if(isset($this->pos($n)['h']) && $this->pos($n)['h'] > $hMax)
+					$hMax = $this->pos($n)['h'];
+			if(!$hMax) $hMax = $this->tailleParDéfaut;
+			foreach($l as $n)
+				$this->pos($n)['y'] = $y + (isset($n->pos[$this->_client]['h']) ? ($hMax - $this->pos($n)['h']) / 2 : 0);
+			$y += $hMax + $this->marge;
+			
+			if($nCols < count($l)) $nCols = count($l);
+		}
+		
+		// Pour les abcisses, on tasse au maximum à gauche, tant que ça ne bouscule ni celui à notre gauche sur notre ligne, ni nos prédécesseurs des autres lignes.
+		// On doit donc avancer colonne par colonne, et non ligne par ligne, car notre bloc l 2 c 3 peut être dépendant d'un l 5 c 4.
+		
+		for($c = -1; ++$c < $nCols;)
+			foreach($this->_lignes as $l)
+				if(isset($l[$c]))
+				{
+					// Qu'est-ce qui est avant nous?
+					$avant = $l[$c]->prédécesseurs;
+					for($cp = $c; --$cp >= 0;)
+						if(isset($l[$cp]))
+						{
+							$avant[] = $l[$cp];
+							break;
+						}
+					// Recherche de l'abcisse max.
+					$xMax = 0;
+					foreach($avant as $nav)
+					{
+						if(!isset($this->pos($nav)['x'])) continue; // Un prédécesseur pas encore placé, car boucle entre nous. Il doit être sur une colonne postérieure.
+						if(($x = $this->pos($nav)['x'] + (isset($this->pos($nav)['l']) ? $this->pos($nav)['l'] : $this->_tailleParDéfaut)) > $xMax) $xMax = $x;
+					}
+					$this->pos($l[$c])['x'] = $xMax + $this->marge; // On ajoute la marge: même sur la première colonne, ça aère, avec de l'espace à gauche.
+				}
+		
+		/* À FAIRE: une fois la ligne constituée, on peut rejouer sur les espaces pour répartir régulièrement les blocs. */
 	}
 	
 	/**
