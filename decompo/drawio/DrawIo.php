@@ -33,6 +33,8 @@ class DrawIo
 	
 	/** Dernier identifiant de nœud attribué. */
 	protected $_id;
+	/** Placeur */
+	protected $_p;
 	/** Sortie */
 	protected $_s;
 	
@@ -53,6 +55,7 @@ class DrawIo
 		$placeur->marge = 30;
 		$placeur->tailleParDéfaut = 100;
 		$tailleDessin = $placeur->disposer($modèle, get_class($this));
+		$this->_p = $placeur;
 		
 		$this->entrerFichier();
 		$this->entrerDessin();
@@ -159,9 +162,10 @@ class DrawIo
 			$lTableau += $lCols[$col];
 		}
 		$hTotale = $y + count($brut) * $hLigne;
+		$coord = $this->_p->pos($tableau);
 		$this->_sortir(<<<TERMINE
 			<mxCell id="xsif-$idt" parent="1" style="shape=table;startSize=$y;container=1;collapsible=0;childLayout=tableLayout;fixedHeader=1;tableRender=collapsed;fillColor=#dae8fc;strokeColor=#6c8ebf;rounded=1;roundedPerimeter=1;{$this->police}" value="Table" vertex="1">
-					<mxGeometry height="$hTotale" width="$lTableau" x="270" y="110" as="geometry" />
+					<mxGeometry height="$hTotale" width="$lTableau" x="{$coord->x}" y="{$coord->y}" as="geometry" />
 			</mxCell>
 		TERMINE);
 		foreach($brut as $ligne)
