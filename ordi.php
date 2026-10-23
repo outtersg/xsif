@@ -49,6 +49,10 @@ $modèle =
 ];
 $modèle[] = clone $modèle[0];
 $modèle[2]->prédécesseurs[] = $modèle[1];
+// Et on introduit une boucle de dépendances:
+$modèle[] = clone $modèle[1];
+$modèle[3]->prédécesseurs[] = $modèle[2];
+$modèle[1]->prédécesseurs[] = $modèle[3];
 
 require_once dirname(__FILE__).'/decompo/drawio/DrawIo.php';
 
