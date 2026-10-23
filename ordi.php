@@ -47,6 +47,8 @@ $modèle =
 	],
 	),
 ];
+$modèle[] = clone $modèle[0];
+$modèle[2]->prédécesseurs[] = $modèle[1];
 
 require_once dirname(__FILE__).'/decompo/drawio/DrawIo.php';
 
