@@ -53,6 +53,8 @@ $modèle[2]->prédécesseurs[] = $modèle[1];
 $modèle[] = clone $modèle[1];
 $modèle[3]->prédécesseurs[] = $modèle[2];
 $modèle[1]->prédécesseurs[] = $modèle[3];
+foreach($modèle as $id => $nœud)
+	$nœud->d[] = is_array(array_first($nœud->d)) ? [ 'id', $id ] : 'ID '.$id;
 
 require_once dirname(__FILE__).'/decompo/drawio/DrawIo.php';
 
