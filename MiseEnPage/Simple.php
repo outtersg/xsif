@@ -163,6 +163,19 @@ class Simple
 		return $nœud->pos[$this->_client];
 	}
 	
+	/**
+	 * Récupère un identifiant pour le client actuel (l'appelant de notre fonction publique qui appelle cette fonction privée).
+	 * L'identifiant est son nom de classe.
+	 */
+	protected function _idClient()
+	{
+		if(isset($this->_client))
+			return $this->_client;
+		
+		$pile = debug_backtrace(1);
+		return $pile[2]['class'];
+	}
+	
 	/** Quel module est en train de nous demander une mise en page? */
 	protected $_client;
 	
