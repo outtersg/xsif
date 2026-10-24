@@ -34,10 +34,10 @@ class Simple
 	
 	public function disposer($modèle, $client = null)
 	{
-		if(!isset($this->_client))
+		if(!isset($this->_client) || $client)
 		{
-			$marqueBlanche = true;
-			$this->_client = $this->_idClient();
+			$marqueBlanche = isset($this->_client) ? $this->_client : false;
+			$this->_client = isset($client) ? $client : $this->_idClient();
 		}
 		
 		$this->_x = $this->_y = 0;
@@ -53,7 +53,10 @@ class Simple
 		/* À FAIRE: calcul et renvoi du plan de travail résultant. */
 		
 		if($marqueBlanche)
+			if($marqueBlanche === false)
 			unset($this->_client);
+			else
+				$this->_client = $marqueBlanche;
 	}
 	
 	public function placer($nœud)
