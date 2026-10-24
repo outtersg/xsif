@@ -32,10 +32,13 @@ class Simple
 	public $marge = 1;
 	public $tailleParDéfaut = 3;
 	
-	public function disposer($modèle, $client)
+	public function disposer($modèle, $client = null)
 	{
-		$this->_client = $client;
-		/* À FAIRE: si $client est null, récupérer la classe de notre appelant. */
+		if(!isset($this->_client))
+		{
+			$marqueBlanche = true;
+			$this->_client = $this->_idClient();
+		}
 		
 		$this->_x = $this->_y = 0;
 		$this->_lignes = [];
@@ -48,6 +51,9 @@ class Simple
 		$this->caler();
 		
 		/* À FAIRE: calcul et renvoi du plan de travail résultant. */
+		
+		if($marqueBlanche)
+			unset($this->_client);
 	}
 	
 	public function placer($nœud)
@@ -158,9 +164,11 @@ class Simple
 	 */
 	public function pos($nœud)
 	{
-		if(!isset($nœud->pos[$this->_client]))
-			$nœud->pos[$this->_client] = new \stdClass;
-		return $nœud->pos[$this->_client];
+		$idClient = $this->_idClient();
+		
+		if(!isset($nœud->pos[$idClient]))
+			$nœud->pos[$idClient] = new \stdClass;
+		return $nœud->pos[$idClient];
 	}
 	
 	/**
