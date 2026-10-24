@@ -25,7 +25,6 @@ namespace Gui\Xsif\MiseEnPage;
 
 /* À FAIRE: une MiseEnPage qui passe par GraphViz dont c'est le boulot? */
 /* À FAIRE: distinguer x et y d'axe principal et axe secondaire, pour permettre des graphes haut - bas plutôt que gauche - droite. */
-/* À FAIRE: en cas de boucle, préserver l'ordre de déclaration; là le 1er nœud interroge le 2nd, qui dit attendre le 1er et donc se calcule en 1er. Il faudrait que ce soit le 1er qui finisse de se calculer. */
 
 class Simple
 {
@@ -59,9 +58,14 @@ class Simple
 				$this->_client = $marqueBlanche;
 	}
 	
+	/**
+	 * Placement relatif d'un nœud.
+	 * 
+	 * @return stdClass|Nœud La position avec ses membres .ligne et .col renseignés s'ils ont pu être calculés, sinon un Nœud en cours de calcul qui nous bloque en récursivité.
+	 */
 	public function placer($nœud)
 	{
-		if(isset($this->pos($nœud)->fait)) return $this->pos($nœud)->fait < 0 ? null : $nœud->pos[$this->_client];
+		if(isset($this->pos($nœud)->fait)) return $this->pos($nœud)->fait < 0 ? $nœud : $this->pos($nœud);
 		
 		// On se marque en cours de constitution, pour éviter les boucles infinies.
 		$this->pos($nœud)->fait = -1;
@@ -70,7 +74,14 @@ class Simple
 		$lignes = []; // Lignes de nos prédécesseurs: on essaiera de se mettre sur l'une d'elles.
 		foreach($nœud->prédécesseurs as $p)
 		{
-			if(!($pp = $this->placer($p))) continue; // Si notre prédécesseur ne renvoie aucun placement, c'est qu'il est lui-même en cours de placement.
+			// Cassage de récursivité:
+			// Si en guise de placement notre prédécesseur renvoie un Nœud plutôt qu'un placement, c'est qu'il est bloqué par le nœud en question.
+			// - si c'est le nœud qu'on est en train de placer, alors c'est que nous sommes le premier d'une boucle de dépendances: on se place en ignorant ce prédécesseur qui est aussi notre successeur.
+			// - sinon c'est que nous sommes éléments d'une boucle de dépendances, mais que nous n'en sommes pas la tête: on sort.
+			if(!($pp = $this->placer($p)) || $pp === $nœud) continue;
+			if(!isset($pp->fait) && isset($pp->pos)) { unset($this->pos($nœud)->fait); return $pp; } // Un Nœud nous bloque, mais ce n'est pas nous. On le remonte, et pour notre part on attend d'être rappelé ultérieurement.
+			
+			// Là normalement $pp est la position du prédécesseur.
 			if($col < $pp->col + 1) $col = $pp->col + 1;
 			$lignes[$pp->ligne] = true;
 		}
