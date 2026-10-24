@@ -52,7 +52,7 @@ class DrawIo
 		
 		require_once dirname(__FILE__).'/../../MiseEnPage/Simple.php';
 		$placeur = new Gui\Xsif\MiseEnPage\Simple();
-		$placeur->marge = 30;
+		$placeur->marge = 40;
 		$placeur->tailleParDéfaut = 100;
 		$this->_p = $placeur;
 		
