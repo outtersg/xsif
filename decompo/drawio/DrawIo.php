@@ -54,7 +54,6 @@ class DrawIo
 		$placeur = new Gui\Xsif\MiseEnPage\Simple();
 		$placeur->marge = 30;
 		$placeur->tailleParDéfaut = 100;
-		$tailleDessin = $placeur->disposer($modèle, get_class($this));
 		$this->_p = $placeur;
 		
 		$this->entrerFichier();
@@ -70,6 +69,9 @@ class DrawIo
 				default:
 					fprintf(STDERR, "# Je ne sais pas traiter les blocs de type %s\n", get_class($bloc));
 			}
+		
+		$tailleDessin = $placeur->disposer($modèle);
+		
 		foreach($modèle as $bloc)
 			if(isset($this->_p->pos($bloc)->aff))
 				call_user_func($this->_p->pos($bloc)->aff, $bloc);
@@ -169,6 +171,8 @@ class DrawIo
 		$coord = $this->_p->pos($tableau);
 		$coord->aff = [ $this, 'affTableau' ];
 		$coord->vars = [ $lCols, $lTableau, $hTotale, $hLigne, $idt, $y ];
+		$coord->l = $lTableau;
+		$coord->h = $hTotale;
 	}
 	
 	public function affTableau($tableau)
