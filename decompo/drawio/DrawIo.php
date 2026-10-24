@@ -131,11 +131,6 @@ class DrawIo
 	
 	public function tableau($tableau)
 	{
-        /*
-        <mxCell id="xsif-40" edge="1" parent="1" source="xsif-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;strokeColor=#FF00FF;" target="xsif-37">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        */
         	$idt = ++$this->_id;
         	$y = 16;
         	$hLigne = 16;
@@ -216,6 +211,18 @@ class DrawIo
         	}
 			$y += $hLigne;
 		}
+	}
+	
+	public function affLien($de, $vers)
+	{
+		$id = ++$this->_id;
+		$c0 = $this->_p->pos($de);
+		$c1 = $this->_p->pos($vers);
+		$this->_sortir(<<<TERMINE
+			<mxCell id="xsif-$id" edge="1" parent="1" source="xsif-{$c0->id}" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;strokeColor=#000000;libavoidRouting=1;" target="xsif-{$c1->id}">
+				<mxGeometry relative="1" as="geometry" />
+			</mxCell>
+		TERMINE);
 	}
 /*
 <!-- Suite -->
