@@ -76,6 +76,10 @@ class DrawIo
 			if(isset($this->_p->pos($bloc)->aff))
 				call_user_func($this->_p->pos($bloc)->aff, $bloc);
 		
+		foreach($modèle as $bloc)
+			foreach($bloc->prédécesseurs as $p)
+				$this->affLien($p, $bloc);
+		
 		$this->sortirDessin();
 		$this->sortirFichier();
 	}
