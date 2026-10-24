@@ -169,25 +169,34 @@ class DrawIo
 		
 		$coord = $this->_p->pos($tableau);
 		$coord->aff = [ $this, 'affTableau' ];
-		$coord->vars = [ $lCols, $lTableau, $hTotale, $hLigne, $idt, $y ];
+		$coord->vars = [ $lCols, $lTableau, $hTotale, $y, $hLigne, $idt, ++$this->_id, $y ];
 		$coord->l = $lTableau;
 		$coord->h = $hTotale;
+		$coord->id = $this->_id; // En fait l'identifiant de la case de titre.
 	}
 	
 	public function affTableau($tableau)
 	{
 		$brut = $tableau->d;
 		$coord = $this->_p->pos($tableau);
-		list($lCols, $lTableau, $hTotale, $hLigne, $idt, $y) = $coord->vars;
+		list($lCols, $lTableau, $hTotale, $hTitre, $hLigne, $idt, $idtt, $y) = $coord->vars;
 		
 		$this->_sortir(<<<TERMINE
 			<mxCell id="xsif-$idt" parent="1" style="shape=table;startSize=$y;container=1;collapsible=0;childLayout=tableLayout;fixedHeader=1;tableRender=collapsed;fillColor=#dae8fc;strokeColor=#6c8ebf;rounded=1;roundedPerimeter=1;{$this->police}" value="Table" vertex="1">
 					<mxGeometry height="$hTotale" width="$lTableau" x="{$coord->x}" y="{$coord->y}" as="geometry" />
 			</mxCell>
+			<mxCell id="xsif-$idtt" parent="xsif-$idt" style="points=[[0,0.5],[1,0.5]];">
+				<mxGeometry height="$hTitre" width="$lTableau" as="geometry" />
+			</mxCell>
 		TERMINE);
+		/* À FAIRE: la technique de la case dédiée titre (pour pouvoir faire arriver les flèches au centre du titre) pose problème.
+		 * sans le vertex="1", on est plutôt pas mal, sauf que graphiquement app.diagrams.net ne les voit pas, et ne permet pas de faire y arriver une flèche manuellement (celle qu'on a posée depuis nous est cependant bien rendue); et au déplacement du tableau, la flèche qu'on a déposée ne suit pas en temps réel, seulement une fois le bloc posé.
+		 * avec le vertex="1", c'est plus gênant: il est matérialisé par un rectangle blanc, masquant le titre; et certes au déplacement la flèche suit, par contre dès qu'on arrête le déplacement, considérant cette case virtuelle comme une ligne du tableau, il explose tout le tableau.
+		 * Dans les deux cas le libavoidRouting=1 est vain, car la propriété n'évite pas tous les nœuds, seulement celui de départ et d'arrivée, et comme là on part du titre plutôt que du tableau entier, le lien piétine allègrement les autres cases du tableau.
+		 */
 		foreach($brut as $numLigne => $ligne)
         	{
-        	$coord->id =
+			$coord->ids[$numLigne] =
         		$ide = ++$this->_id; // ID Extérieur
         	$coord->ids = [];
 			$this->_sortir(<<<TERMINE
@@ -200,7 +209,6 @@ class DrawIo
 			foreach(is_array($ligne) ? $ligne : [ $ligne ] as $numCol => $case)
 			{
 				++$col;
-				$coord->ids[$numLigne][$numCol] =
         		$idi = ++$this->_id; // ID Intérieur
         		$case = htmlentities(htmlentities($case));
         		$xCond = $x ? ' x="'.$x.'"' : '';
