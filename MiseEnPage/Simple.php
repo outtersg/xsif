@@ -25,6 +25,7 @@ namespace Gui\Xsif\MiseEnPage;
 
 /* À FAIRE: une MiseEnPage qui passe par GraphViz dont c'est le boulot? */
 /* À FAIRE: distinguer x et y d'axe principal et axe secondaire, pour permettre des graphes haut - bas plutôt que gauche - droite. */
+/* À FAIRE: conteneurs. Calculer récursivement leur contenu, en remontant au conteneur la dépendance envers des nœuds extérieurs au conteneur? Notons qu'une page, c'est un conteneur. */
 
 class Simple
 {
