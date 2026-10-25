@@ -269,9 +269,8 @@ class DrawIo
 		$id = ++$this->_id;
 		$c0 = $this->_p->pos($de);
 		$c1 = $this->_p->pos($vers);
-		/* À FAIRE: se brancher sur affAccroches avec un mode particulier pour dire qu'on ne veut pas tout le tableau, mais juste un des points, par ex. le point ouest. */
 		$this->_sortir(<<<TERMINE
-			<mxCell id="xsif-$id" edge="1" parent="1" source="xsif-{$c0->id}" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;strokeColor=#000000;libavoidRouting=1;" target="xsif-{$c1->id}">
+			<mxCell id="xsif-$id" edge="1" parent="1" source="xsif-{$c0->id}" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;{$this->affAccroches($de, 'E', 'exit')}{$this->affAccroches($de, 'O', 'entry')}defaultLabelBackgroundColor=page;strokeColor=#000000;libavoidRouting=1;" target="xsif-{$c1->id}">
 				<mxGeometry relative="1" as="geometry" />
 			</mxCell>
 		TERMINE);
