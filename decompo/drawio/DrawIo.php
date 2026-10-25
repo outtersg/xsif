@@ -169,10 +169,22 @@ class DrawIo
 		
 		$coord = $this->_p->pos($tableau);
 		$coord->aff = [ $this, 'affTableau' ];
-		$coord->vars = [ $lCols, $lTableau, $hTotale, $y, $hLigne, $idt, ++$this->_id, $y ];
+		$coord->vars = [ $lCols, $lTableau, $hTotale, $y, $hLigne, $idt, $idt, $y ];
 		$coord->l = $lTableau;
 		$coord->h = $hTotale;
-		$coord->id = $this->_id; // En fait l'identifiant de la case de titre.
+		$coord->id = $this->_id;
+		// Demi-en-tête: relativement à la hauteur totale du tableau, combien mesure une demi-hauteur d'en-tête? Cf. la note un peu plus loin sur le pourquoi.
+		// Inconvénient: si on ajoute des lignes au tableau, cette mesure n'est plus valable.
+		$demiEnTête = ($y / 2) / $hTotale;
+		$coord->accroches = [ [ 0, $demiEnTête ], [ 1, $demiEnTête ] ];
+		
+	}
+	
+	public function affAccroches($nœud)
+	{
+		$coord = $this->_p->pos($nœud);
+		if(!isset($coord->accroches)) return '';
+		return 'points=['.implode(',', array_map(function($l) { return '['.implode(',', $l).']'; }, $coord->accroches)).'];';
 	}
 	
 	public function affTableau($tableau)
@@ -182,14 +194,17 @@ class DrawIo
 		list($lCols, $lTableau, $hTotale, $hTitre, $hLigne, $idt, $idtt, $y) = $coord->vars;
 		
 		$this->_sortir(<<<TERMINE
-			<mxCell id="xsif-$idt" parent="1" style="shape=table;startSize=$y;container=1;collapsible=0;childLayout=tableLayout;fixedHeader=1;tableRender=collapsed;fillColor=#dae8fc;strokeColor=#6c8ebf;rounded=1;roundedPerimeter=1;{$this->police}" value="Table" vertex="1">
+			<mxCell id="xsif-$idt" parent="1" style="shape=table;startSize=$y;container=1;collapsible=0;childLayout=tableLayout;fixedHeader=1;{$this->affAccroches($tableau)}tableRender=collapsed;fillColor=#dae8fc;strokeColor=#6c8ebf;rounded=1;roundedPerimeter=1;{$this->police}" value="Table" vertex="1">
 					<mxGeometry height="$hTotale" width="$lTableau" x="{$coord->x}" y="{$coord->y}" as="geometry" />
 			</mxCell>
+		TERMINE);
+		/* NOTE: tentative initiale pour faire arriver les flèches pile dans le titre
+		 * Le titre du tableau n'est pas matérialisé en tant que tel, le titre est juste le libellé du tableau, collé en haut, et c'est le startSize / le y de la première ligne qui permettent de lui préserver de l'espace. Dans les coordonnées relatives du tableau (où faire arriver les liens), 0,5 indique donc le milieu du tableau, pas le milieu du titre.
+		 * J'ai essayé de coller un sous-nœud au tableau pour représenter le titre:
 			<mxCell id="xsif-$idtt" parent="xsif-$idt" style="points=[[0,0.5],[1,0.5]];">
 				<mxGeometry height="$hTitre" width="$lTableau" as="geometry" />
 			</mxCell>
-		TERMINE);
-		/* À FAIRE: la technique de la case dédiée titre (pour pouvoir faire arriver les flèches au centre du titre) pose problème.
+		 * mais cela pose pas mal de soucis:
 		 * sans le vertex="1", on est plutôt pas mal, sauf que graphiquement app.diagrams.net ne les voit pas, et ne permet pas de faire y arriver une flèche manuellement (celle qu'on a posée depuis nous est cependant bien rendue); et au déplacement du tableau, la flèche qu'on a déposée ne suit pas en temps réel, seulement une fois le bloc posé.
 		 * avec le vertex="1", c'est plus gênant: il est matérialisé par un rectangle blanc, masquant le titre; et certes au déplacement la flèche suit, par contre dès qu'on arrête le déplacement, considérant cette case virtuelle comme une ligne du tableau, il explose tout le tableau.
 		 * Dans les deux cas le libavoidRouting=1 est vain, car la propriété n'évite pas tous les nœuds, seulement celui de départ et d'arrivée, et comme là on part du titre plutôt que du tableau entier, le lien piétine allègrement les autres cases du tableau.
@@ -230,6 +245,7 @@ class DrawIo
 		$id = ++$this->_id;
 		$c0 = $this->_p->pos($de);
 		$c1 = $this->_p->pos($vers);
+		/* À FAIRE: se brancher sur affAccroches avec un mode particulier pour dire qu'on ne veut pas tout le tableau, mais juste un des points, par ex. le point ouest. */
 		$this->_sortir(<<<TERMINE
 			<mxCell id="xsif-$id" edge="1" parent="1" source="xsif-{$c0->id}" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;defaultLabelBackgroundColor=page;strokeColor=#000000;libavoidRouting=1;" target="xsif-{$c1->id}">
 				<mxGeometry relative="1" as="geometry" />
