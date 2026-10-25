@@ -173,10 +173,7 @@ class DrawIo
 		$coord->l = $lTableau;
 		$coord->h = $hTotale;
 		$coord->id = $this->_id;
-		// Demi-en-tête: relativement à la hauteur totale du tableau, combien mesure une demi-hauteur d'en-tête? Cf. la note un peu plus loin sur le pourquoi.
-		// Inconvénient: si on ajoute des lignes au tableau, cette mesure n'est plus valable.
-		$demiEnTête = ($y / 2) / $hTotale;
-		$coord->accroches = [ 'O' => [ 0, $demiEnTête ], 'E' => [ 1, $demiEnTête ], 'N' => [ 0, 0.5 ], 'S' => [ 1, 0.5 ] ];
+		$coord->accroches = [ 'O' => [ 0, 0, 0, 0, $y / 2 ], 'E' => [ 1, 0, 0, 0, $y / 2 ], 'N' => [ 0, 0.5 ], 'S' => [ 1, 0.5 ] ];
 		
 	}
 	
@@ -222,17 +219,6 @@ class DrawIo
 					<mxGeometry height="$hTotale" width="$lTableau" x="{$coord->x}" y="{$coord->y}" as="geometry" />
 			</mxCell>
 		TERMINE);
-		/* NOTE: tentative initiale pour faire arriver les flèches pile dans le titre
-		 * Le titre du tableau n'est pas matérialisé en tant que tel, le titre est juste le libellé du tableau, collé en haut, et c'est le startSize / le y de la première ligne qui permettent de lui préserver de l'espace. Dans les coordonnées relatives du tableau (où faire arriver les liens), 0,5 indique donc le milieu du tableau, pas le milieu du titre.
-		 * J'ai essayé de coller un sous-nœud au tableau pour représenter le titre:
-			<mxCell id="xsif-$idtt" parent="xsif-$idt" style="points=[[0,0.5],[1,0.5]];">
-				<mxGeometry height="$hTitre" width="$lTableau" as="geometry" />
-			</mxCell>
-		 * mais cela pose pas mal de soucis:
-		 * sans le vertex="1", on est plutôt pas mal, sauf que graphiquement app.diagrams.net ne les voit pas, et ne permet pas de faire y arriver une flèche manuellement (celle qu'on a posée depuis nous est cependant bien rendue); et au déplacement du tableau, la flèche qu'on a déposée ne suit pas en temps réel, seulement une fois le bloc posé.
-		 * avec le vertex="1", c'est plus gênant: il est matérialisé par un rectangle blanc, masquant le titre; et certes au déplacement la flèche suit, par contre dès qu'on arrête le déplacement, considérant cette case virtuelle comme une ligne du tableau, il explose tout le tableau.
-		 * Dans les deux cas le libavoidRouting=1 est vain, car la propriété n'évite pas tous les nœuds, seulement celui de départ et d'arrivée, et comme là on part du titre plutôt que du tableau entier, le lien piétine allègrement les autres cases du tableau.
-		 */
 		foreach($brut as $numLigne => $ligne)
         	{
 			$coord->ids[$numLigne] =
