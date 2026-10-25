@@ -205,9 +205,9 @@ class DrawIo
 			(isset($coord->accroches[$point]) && ($point = $coord->accroches[$point]))
 		)
 		{
-			$clés = [ 'x', 'y' ];
+			$clés = [ 'x', 'y', 'perimeter', 'dx', 'dy' ];
 			$valeurs = $point + [ null, null ];
-			return implode('', array_map(function($clé, $valeur) use($préfixe) { return $valeur || in_array($clé, [ 'x' ]) ? $préfixe.ucfirst($clé).'='.$valeur.';' : ''; }, $clés, $valeurs));
+			return implode('', array_map(function($clé, $valeur) use($préfixe) { return $valeur || in_array($clé, [ 'x', 'y' ]) ? $préfixe.ucfirst($clé).'='.$valeur.';' : ''; }, $clés, $valeurs));
 		}
 	}
 	
