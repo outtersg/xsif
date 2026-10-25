@@ -176,7 +176,7 @@ class DrawIo
 		// Demi-en-tête: relativement à la hauteur totale du tableau, combien mesure une demi-hauteur d'en-tête? Cf. la note un peu plus loin sur le pourquoi.
 		// Inconvénient: si on ajoute des lignes au tableau, cette mesure n'est plus valable.
 		$demiEnTête = ($y / 2) / $hTotale;
-		$coord->accroches = [ [ 0, $demiEnTête ], [ 1, $demiEnTête ] ];
+		$coord->accroches = [ 'O' => [ 0, $demiEnTête ], 'E' => [ 1, $demiEnTête ], 'N' => [ 0, 0.5 ], 'S' => [ 1, 0.5 ] ];
 		
 	}
 	
