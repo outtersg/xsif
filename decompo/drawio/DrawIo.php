@@ -256,7 +256,7 @@ class DrawIo
 		$c0 = $this->_p->pos($de);
 		$c1 = $this->_p->pos($vers);
 		$this->_sortir(<<<TERMINE
-			<mxCell id="xsif-$id" edge="1" parent="1" source="xsif-{$c0->id}" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;{$this->affAccroches($de, 'E', 'exit')}{$this->affAccroches($vers, 'O', 'entry')}defaultLabelBackgroundColor=page;strokeColor=#000000;libavoidRouting=1;" target="xsif-{$c1->id}">
+			<mxCell id="xsif-$id" edge="1" parent="1" source="xsif-{$c0->id}" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;{$this->affAccroches($de, 'E', 'exit')}{$this->affAccroches($vers, 'O', 'entry')}defaultLabelBackgroundColor=page;strokeColor=#000000;" target="xsif-{$c1->id}">
 				<mxGeometry relative="1" as="geometry" />
 			</mxCell>
 		TERMINE);
