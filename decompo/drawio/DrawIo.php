@@ -180,11 +180,35 @@ class DrawIo
 		
 	}
 	
-	public function affAccroches($nœud)
+	/**
+	 * Renvoie le code pour les points d'accroche à un nœud.
+	 * Deux modes:
+	 * - soit la liste complète des points d'accroche, façon "points=[[x,y],[x,y]]"
+	 * - soit, si $point est précisé, un seul des points d'accroche. Normalisation: points cardinaux (N, NNE, NE, ENE, E, etc.)
+	 * 
+	 * @param $nœud
+	 * @param $point Index du point unique dont on veut les coordonnées
+	 * @param $préfixe Préfixe sous lequel sortir la liste (ex.: si $préfixe = "entry", la liste sera sortie sous la forme "entryX=…;entryY=…;etc."
+	 * 
+	 * @return string Chaîne à coller dans le style du nœud rendu.
+	 */
+	public function affAccroches($nœud, $point = null, $préfixe = null)
 	{
 		$coord = $this->_p->pos($nœud);
+		/* À FAIRE: accroches par défaut. */
 		if(!isset($coord->accroches)) return '';
+		if(!isset($point))
 		return 'points=['.implode(',', array_map(function($l) { return '['.implode(',', $l).']'; }, $coord->accroches)).'];';
+		
+		if
+		(
+			(isset($coord->accroches[$point]) && ($point = $coord->accroches[$point]))
+		)
+		{
+			$clés = [ 'x', 'y' ];
+			$valeurs = $point + [ null, null ];
+			return implode('', array_map(function($clé, $valeur) use($préfixe) { return $valeur || in_array($clé, [ 'x' ]) ? $préfixe.ucfirst($clé).'='.$valeur.';' : ''; }, $clés, $valeurs));
+		}
 	}
 	
 	public function affTableau($tableau)
