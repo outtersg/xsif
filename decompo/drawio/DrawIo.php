@@ -252,6 +252,8 @@ class DrawIo
 	
 	public function affLien($de, $vers)
 	{
+		/* À FAIRE: styles de lien. */
+		
 		$id = ++$this->_id;
 		$c0 = $this->_p->pos($de);
 		$c1 = $this->_p->pos($vers);
