@@ -93,15 +93,43 @@ class Talend
 			],
 		];
 		
+		$tableaux = [];
+		
 		foreach($nœud->childNodes as $fils)
 			if($fils->localName == 'elementParameter')
+			{
+				// Les tableaux: Talend pousse successivement toutes les cases, à nous de comprendre qu'on passe à la ligne suivante quand on revient au même nom de champ.
+				if($fils->getAttributeNS(null, 'field') == 'TABLE')
+				{
+					$tableaux[$nomT = $fils->getAttributeNS(null, 'name')] = [];
+					$t = [];
+					foreach($fils->childNodes as $petitFils)
+					{
+						if(!method_exists($petitFils, 'getAttributeNS')) continue; // Un peu de blanc?
+						$col = $petitFils->getAttributeNS(null, 'elementRef');
+						if(array_key_exists($col, $t))
+						{
+							$tableaux[$nomT][] = $t;
+							$t = [];
+						}
+						$t[$col] = $petitFils->getAttributeNS(null, 'value');
+					}
+					if(count($t))
+						$tableaux[$nomT][] = $t;
+					continue;
+				}
+				
+				// Les champs texte: on veut une correspondance mentionnée dans $corresp.
 				if(isset($corresp[$type = $fils->getAttributeNS(null, 'field')]) && isset($corresp[$type][$champ = $fils->getAttributeNS(null, 'name')]))
 					$r[$corresp[$type][$champ]] = $fils->getAttributeNS(null, 'value');
+			}
 		
 		if(!isset($r['nom']))
 			$r['nom'] = $r['id'];
 		else
 			$r['nom'] .= ' ('.$r['id'].')';
+		
+		$r += $tableaux;
 		
 		/* À FAIRE: posX et posY pour une idée de la position relative des éléments (à reproduire en sortie si on n'a pas d'idée). */
 		
