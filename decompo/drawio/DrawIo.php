@@ -219,11 +219,11 @@ class DrawIo
 					<mxGeometry height="$hTotale" width="$lTableau" x="{$coord->x}" y="{$coord->y}" as="geometry" />
 			</mxCell>
 		TERMINE);
+		$coord->ids = [];
 		foreach($brut as $numLigne => $ligne)
         	{
 			$coord->ids[$numLigne] =
         		$ide = ++$this->_id; // ID Extérieur
-        	$coord->ids = [];
 			$this->_sortir(<<<TERMINE
 				<mxCell id="xsif-$ide" parent="xsif-$idt" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fixedHeader=1;" value="" vertex="1">
 					<mxGeometry height="$hLigne" width="$lTableau" y="$y" as="geometry" />
