@@ -174,7 +174,17 @@ class DrawIo
 		$coord->h = $hTotale;
 		$coord->id = $this->_id;
 		$coord->accroches = [ 'O' => [ 0, 0, 0, 0, $y / 2 ], 'E' => [ 1, 0, 0, 0, $y / 2 ], 'N' => [ 0, 0.5 ], 'S' => [ 1, 0.5 ] ];
+		$coord->sous = [ $this, 'sousTableau' ];
+	}
+	
+	public function sousTableau($tableau, $coord, $sous)
+	{
+		$r = new \stdClass;
+		if(is_int($sous) && !isset($coord->ids[$sous]))
+			$sous = array_keys($coord->ids)[$sous];
+		$r->id = $coord->ids[$sous];
 		
+		return $r;
 	}
 	
 	/**
