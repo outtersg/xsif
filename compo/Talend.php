@@ -85,8 +85,11 @@ class Talend
 		[
 			'TEXT' =>
 			[
+				/* Génériques */
 				'UNIQUE_NAME' => 'id',
 				'LABEL' => 'nom',
+				/* Correspondances */
+				'LOOP_QUERY' => 'exprItér',
 			],
 		];
 		
