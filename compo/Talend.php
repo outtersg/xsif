@@ -136,6 +136,13 @@ class Talend
 		return $r;
 	}
 	
+	protected function _déchaîne($chaîne)
+	{
+		/* À FAIRE: \" */
+		$chaîne = preg_replace_callback('/"[^"]*"\+?|[^"]+\+?/', function($x) { $x = $x[0]; return substr($x, 0, 1) == '"' ? substr($x, 1, -1) : '${'.$x.'}'; }, $chaîne);
+		return $chaîne;
+	}
+	
 	protected function _compilerNœud_tExtractXMLField($nœud, $r)
 	{
 		/* À FAIRE: mode alternatif tableau deux colonnes (plutôt que deux tableaux). */
