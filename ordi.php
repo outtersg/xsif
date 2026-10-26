@@ -25,39 +25,12 @@
  * Organigrammes Représentés sous Draw.Io
  */
 
-require_once dirname(__FILE__).'/Modele/Diagramme/Tableau.php';
+/* À FAIRE: auto-détection du type d'entrée (ou -t <type> pour aider). */
 
-$modèle =
-[
-	new Gui\Xsif\Modele\Diagramme\Tableau
-	(
-	[
-	'Les oiseaux < les éléph' => 'idem',
-	'ouille' => 'Là non plus',
-	'Oups' => 'Oups',
-	'et "pas plus haut que le verre"' => 'pour les guillemets',
-	],
-	),
-	new Gui\Xsif\Modele\Diagramme\Tableau
-	(
-	[
-		[ 'Les oiseaux <= éléphants', 'Un rien' ],
-		[ 'Là non plus', 'Tout va bien' ],
-		[ 'Oups', 'Dernière case' ],
-	],
-	),
-];
-$modèle[] = clone $modèle[0];
-$modèle[2]->prédécesseurs[] = $modèle[1];
-// Et on introduit une boucle de dépendances:
-$modèle[] = clone $modèle[1];
-$modèle[3]->prédécesseurs[] = $modèle[2];
-$modèle[1]->prédécesseurs[] = $modèle[3];
-foreach($modèle as $id => $nœud)
-	$nœud->d[] = is_array(array_first($nœud->d)) ? [ 'id', $id ] : 'ID '.$id;
-$modèle[2]->depuis = [];
-for($i = -1; ++$i < 4;)
-	$modèle[2]->depuis[] = [ $modèle[1], $i, $i, 'pointillé' ];
+require_once dirname(__FILE__).'/compo/Talend.php';
+
+$compo = new Talend();
+$modèle = $compo->charger($argv[1]);
 
 require_once dirname(__FILE__).'/decompo/drawio/DrawIo.php';
 
