@@ -107,6 +107,12 @@ class Talend
 	
 	protected function _compilerNœud_tExtractXMLField($nœud, $r)
 	{
+		/* À FAIRE: mode alternatif tableau deux colonnes (plutôt que deux tableaux). */
+		/* À FAIRE: LOOP_QUERY_BASE != "" */
+		/* À FAIRE: XML_TEXT != "" */
+		/* À FAIRE: XML_PREFIX != "" */
+		/* À FAIRE: FLOW, REJECT, CHECK */
+		
 		print_r($r);
 		return $r;
 	}
