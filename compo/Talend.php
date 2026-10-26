@@ -164,10 +164,15 @@ class Talend
 			$tRés[] = $l['SCHEMA_COLUMN'];
 		}
 		
-		$tTransfo = new Tableau($tTransfo);
-		$tRés = new Tableau($tRés);
-		print_r([$tTransfo, $tRés]);
-		return $r;
+		$oTransfo = new Tableau('XMLPath '.$this->_déchaîne($r['nom']."\n".$r['exprItér']), $tTransfo);
+		/* À FAIRE: le nom du tableau "donnée" se trouve dans le <connection> qui sort de ce nœud. */
+		$oRés = new Tableau($tRés);
+		$oRés->prédécesseurs[] = $oTransfo;
+		foreach($tTransfo as $clé => $trou)
+			$oRés->depuis[] = [ $oTransfo, $clé, $clé, 'champ' ];
+		
+		$this->_nœuds[$r['id']] = $oTransfo;
+		$this->_nœuds[$r['id'].'.d'] = $oRés;
 	}
 	
 	protected function _compilerNœud_tWriteJSONField($nœud, $r)
