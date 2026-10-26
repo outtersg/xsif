@@ -155,7 +155,18 @@ class Talend
 		/* À FAIRE: XML_PREFIX != "" */
 		/* À FAIRE: FLOW, REJECT, CHECK */
 		
-		print_r($r);
+		$tTransfo = [];
+		$tRés = [];
+		
+		foreach($r['MAPPING'] as $l)
+		{
+			$tTransfo[] = $this->_déchaîne($l['QUERY']);
+			$tRés[] = $l['SCHEMA_COLUMN'];
+		}
+		
+		$tTransfo = new Tableau($tTransfo);
+		$tRés = new Tableau($tRés);
+		print_r([$tTransfo, $tRés]);
 		return $r;
 	}
 	
