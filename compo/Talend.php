@@ -21,6 +21,10 @@
  * SOFTWARE.
  */
 
+require_once dirname(__FILE__).'/../Modele/Diagramme/Tableau.php';
+
+use Gui\Xsif\Modele\Diagramme\Tableau;
+
 class Talend
 {
 	public function charger($fichier)
