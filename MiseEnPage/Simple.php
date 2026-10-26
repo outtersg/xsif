@@ -181,9 +181,16 @@ class Simple
 	{
 		$idClient = $this->_idClient();
 		
+		if(is_array($nœud)) { $sous = $nœud[1]; $nœud = $nœud[0]; }
 		if(!isset($nœud->pos[$idClient]))
 			$nœud->pos[$idClient] = new \stdClass;
-		return $nœud->pos[$idClient];
+		$r = $nœud->pos[$idClient];
+		if(isset($sous))
+			if(!isset($r->sous))
+				fprintf(STDERR, '# Impossible de récupérer le sous-nœud '.$sous."\n");
+			else
+				$r = call_user_func($r->sous, $nœud, $r, $sous);
+		return $r;
 	}
 	
 	/**
