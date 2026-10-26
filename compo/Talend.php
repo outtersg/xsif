@@ -36,6 +36,8 @@ class Talend
 		$racine = $doc->documentElement;
 		
 		$this->_compiler($racine);
+		
+		return $this->_nœuds;
 	}
 	
 	protected function _compiler($nœud)
@@ -177,7 +179,7 @@ class Talend
 	
 	protected function _compilerNœud_tWriteJSONField($nœud, $r)
 	{
-		return $r;
+		//return $r;
 	}
 	
 	protected $_nœuds;
