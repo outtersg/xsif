@@ -55,6 +55,9 @@ $modèle[3]->prédécesseurs[] = $modèle[2];
 $modèle[1]->prédécesseurs[] = $modèle[3];
 foreach($modèle as $id => $nœud)
 	$nœud->d[] = is_array(array_first($nœud->d)) ? [ 'id', $id ] : 'ID '.$id;
+$modèle[2]->depuis = [];
+for($i = -1; ++$i < 4;)
+	$modèle[2]->depuis[] = [ $modèle[1], $i, $i, 'pointillé' ];
 
 require_once dirname(__FILE__).'/decompo/drawio/DrawIo.php';
 
