@@ -109,6 +109,7 @@ class DrawIo
 				foreach($bloc->depuis as $depuis)
 				{
 					$vers = $bloc;
+					$style = null;
 					if(is_array($depuis))
 					{
 						$de = $depuis[0];
@@ -116,11 +117,12 @@ class DrawIo
 							$de = [ $de, $depuis[1] ];
 						if(isset($depuis[2]))
 							$vers = [ $vers, $depuis[2] ];
-						/* À FAIRE: style. */
+						if(isset($depuis[3]))
+							$style = $depuis[3];
 					}
 					else
 						$de = $depuis;
-					$this->affLien($de, $vers);
+					$this->affLien($de, $vers, $style);
 				}
 		}
 		
@@ -304,15 +306,13 @@ class DrawIo
 		}
 	}
 	
-	public function affLien($de, $vers)
+	public function affLien($de, $vers, $style = null)
 	{
-		/* À FAIRE: styles de lien. */
-		
 		$id = ++$this->_id;
 		$c0 = $this->_p->pos($de);
 		$c1 = $this->_p->pos($vers);
 		$this->_sortir(<<<TERMINE
-			<mxCell id="xsif-$id" edge="1" parent="1" source="xsif-{$c0->id}" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;{$this->affAccroches($de, 'E', 'exit')}{$this->affAccroches($vers, 'O', 'entry')}defaultLabelBackgroundColor=page;strokeColor=#000000;" target="xsif-{$c1->id}">
+			<mxCell id="xsif-$id" edge="1" parent="1" source="xsif-{$c0->id}" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;{$this->affAccroches($de, 'E', 'exit')}{$this->affAccroches($vers, 'O', 'entry')}defaultLabelBackgroundColor=page;{$this->style($style, 'Lien')}" target="xsif-{$c1->id}">
 				<mxGeometry relative="1" as="geometry" />
 			</mxCell>
 		TERMINE);
