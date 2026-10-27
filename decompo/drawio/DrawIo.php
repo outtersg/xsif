@@ -70,6 +70,14 @@ class DrawIo
 				'roundedPerimeter' => false,
 			],
 		],
+		'global' =>
+		[
+			'' =>
+			[
+				'strokeColor' => '#007FFF',
+				'fontColor' => '#007FFF',
+			],
+		],
 	];
 	
 	protected $police;
