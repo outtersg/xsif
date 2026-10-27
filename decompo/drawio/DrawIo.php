@@ -313,6 +313,7 @@ class DrawIo
 		$coord->ids = [];
 		foreach($brut as $numLigne => $ligne)
         	{
+        	if(!is_array($ligne)) $ligne = [ $ligne ];
 			$coord->ids[$numLigne] =
         		$ide = ++$this->_id; // ID Extérieur
 			$this->_sortir(<<<TERMINE
@@ -328,14 +329,19 @@ class DrawIo
         		$idi = ++$this->_id; // ID Intérieur
         		$case = isset($case) ? htmlentities(htmlentities($case)) : '';
         		$xCond = $x ? ' x="'.$x.'"' : '';
+        		$lCol = $lCols[$col];
+        		// Si on est en colspan implicite (dernière colonne de la ligne mais encore de la place après nous), on s'octroie en plus la largeur des suivants.
+        		if($col == count($ligne) - 1 && count($ligne) < count($lCols))
+        			for($colErre = count($lCols); --$colErre > $col;)
+        				$lCol += $lCols[$colErre];
 				$this->_sortir(<<<TERMINE
 					<mxCell id="xsif-$idi" parent="xsif-$ide" style="shape=partialRectangle;connectable=0;strokeColor=inherit;overflow=hidden;pointerEvents=1;html=1;align=left;{$this->police}" value="$case" vertex="1">
-						<mxGeometry height="$hLigne" width="{$lCols[$col]}"$xCond as="geometry">
-							<mxRectangle height="$hLigne" width="{$lCols[$col]}" as="alternateBounds" />
+						<mxGeometry height="$hLigne" width="{$lCol}"$xCond as="geometry">
+							<mxRectangle height="$hLigne" width="{$lCol}" as="alternateBounds" />
 						</mxGeometry>
 					</mxCell>
 			TERMINE);
-				$x += $lCols[$col];
+				$x += $lCol;
         	}
 			$y += $hLigne;
 		}
