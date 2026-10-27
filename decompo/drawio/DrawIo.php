@@ -38,6 +38,13 @@ class DrawIo
 			[
 				'strokeColor' => '#000000',
 			],
+			'Tableau' =>
+			[
+				'fillColor' => '#dae8fc',
+				'strokeColor' => '#6c8ebf',
+				'rounded' => 1,
+				'roundedPerimeter' => 1,
+			],
 		],
 		/* Attribut: pas un nœud complet. */
 		'attr' =>
@@ -48,6 +55,17 @@ class DrawIo
 				// Quand on colle une palanquée de liens depuis les attributs d'un nœud, ils vont avoir tendance à se chevaucher. On atténue ce chevauchement en optant pour des courbes plutôt que des angles droits.
 				'curved' => 1,
 				'curveGeometry' => 1,
+			],
+		],
+		/* Donnée brute, et non flux de travail. */
+		'd' =>
+		[
+			'Tableau' =>
+			[
+				'fillColor' => 'white',
+				'strokeColor' => '#000000',
+				'rounded' => false,
+				'roundedPerimeter' => false,
 			],
 		],
 	];
@@ -271,7 +289,7 @@ class DrawIo
 		list($lCols, $lTableau, $hTotale, $hTitre, $hLigne, $idt, $idtt, $y) = $coord->vars;
 		
 		$this->_sortir(<<<TERMINE
-			<mxCell id="xsif-$idt" parent="1" style="shape=table;startSize=$y;container=1;collapsible=0;childLayout=tableLayout;fixedHeader=1;{$this->affAccroches($tableau)}tableRender=collapsed;fillColor=#dae8fc;strokeColor=#6c8ebf;rounded=1;roundedPerimeter=1;{$this->police}" value="Table" vertex="1">
+			<mxCell id="xsif-$idt" parent="1" style="shape=table;startSize=$y;container=1;collapsible=0;childLayout=tableLayout;fixedHeader=1;{$this->affAccroches($tableau)}tableRender=collapsed;{$this->style(isset($tableau->style) ? $tableau->style : '', $tableau)}{$this->police}" value="Table" vertex="1">
 					<mxGeometry height="$hTotale" width="$lTableau" x="{$coord->x}" y="{$coord->y}" as="geometry" />
 			</mxCell>
 		TERMINE);
