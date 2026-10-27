@@ -169,6 +169,7 @@ class Talend
 		$oTransfo = new Tableau('XMLPath '.$this->_déchaîne($r['nom']."\n".$r['exprItér']), $tTransfo);
 		/* À FAIRE: le nom du tableau "donnée" se trouve dans le <connection> qui sort de ce nœud. */
 		$oRés = new Tableau($tRés);
+		$oRés->style = 'd';
 		$oRés->prédécesseurs[] = $oTransfo;
 		foreach($tTransfo as $clé => $trou)
 			$oRés->depuis[] = [ $oTransfo, $clé, $clé, 'attr' ];
