@@ -328,11 +328,11 @@ class DrawIo
 			</mxCell>
 		TERMINE);
 		$coord->ids = [];
+		$iLigne = 0;
 		foreach($brut as $numLigne => $ligne)
         	{
         	if(!is_array($ligne)) $ligne = [ $ligne ];
-			$coord->ids[$numLigne] =
-        		$ide = ++$this->_id; // ID Extérieur
+			$coord->ids[$numLigne] = $ide = $idt.'['.$iLigne.']';
 			$this->_sortir(<<<TERMINE
 				<mxCell id="xsif-$ide" parent="xsif-$idt" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fixedHeader=1;" value="" vertex="1">
 					<mxGeometry height="$hLigne" width="$lTableau" y="$y" as="geometry" />
@@ -343,7 +343,7 @@ class DrawIo
 			foreach(is_array($ligne) ? $ligne : [ $ligne ] as $numCol => $case)
 			{
 				++$col;
-        		$idi = ++$this->_id; // ID Intérieur
+				$idi = $ide.'['.$col.']';
         		$case = isset($case) ? htmlentities(htmlentities($case)) : '';
         		$xCond = $x ? ' x="'.$x.'"' : '';
         		$lCol = $lCols[$col];
@@ -361,6 +361,7 @@ class DrawIo
 				$x += $lCol;
         	}
 			$y += $hLigne;
+			++$iLigne;
 		}
 	}
 	
