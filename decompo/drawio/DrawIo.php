@@ -21,6 +21,8 @@
  * SOFTWARE.
  */
 
+/* À FAIRE?: font en inherit? */
+
 class DrawIo
 {
 	const P_STANDARD = 0;
@@ -199,6 +201,8 @@ class DrawIo
 	
 	public function tableau($tableau)
 	{
+		/* À FAIRE: titre multi-lignes */
+		
         	$idt = ++$this->_id;
         	$y = 16;
         	$hLigne = 16;
@@ -284,6 +288,8 @@ class DrawIo
 	
 	public function affTableau($tableau)
 	{
+		/* À FAIRE: titre de table */
+		
 		$brut = $tableau->d;
 		$coord = $this->_p->pos($tableau);
 		list($lCols, $lTableau, $hTotale, $hTitre, $hLigne, $idt, $idtt, $y) = $coord->vars;
