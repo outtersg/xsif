@@ -292,6 +292,35 @@ class DrawIo
 			</mxCell>
 		TERMINE);
 	}
+	
+	public function style($style, $classe = null, $départ = [])
+	{
+		$classes = [];
+		if(isset($classe))
+		{
+			/* À FAIRE: itérer sur les classes parentes. */
+			/* À FAIRE?: gérer aussi les traits. */
+			if(is_object($classe))
+				$classe = get_class($classe);
+			$classe = strtr($classe, '\\', '/');
+			$classes[$classe] = true;
+			$classes[basename($classe)] = true;
+		}
+		$classes[''] = true;
+		$styles = [];
+		if(isset($style))
+			$styles[$style] = true;
+		$styles[''] = true;
+		
+		foreach($classes as $classe => $trou)
+			foreach($styles as $style => $trou)
+				if(isset($this->styles[$style][$classe]))
+					$départ += $this->styles[$style][$classe];
+		$r = '';
+		foreach($départ as $clé => $val)
+			$r .= $clé.'='.$val.';';
+		return $r;
+	}
 /*
 <!-- Suite -->
         <mxCell id="xsif-21" parent="1" style="shape=table;startSize=16;container=1;collapsible=0;childLayout=tableLayout;fixedHeader=1;tableRender=collapsed;rounded=0;swimlaneLine=1;" value="Table" vertex="1">
