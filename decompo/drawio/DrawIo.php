@@ -294,7 +294,7 @@ class DrawIo
         		$case = htmlentities(htmlentities($case));
         		$xCond = $x ? ' x="'.$x.'"' : '';
 				$this->_sortir(<<<TERMINE
-					<mxCell id="xsif-$idi" parent="xsif-$ide" style="shape=partialRectangle;connectable=0;strokeColor=#6c8ebf;overflow=hidden;fillColor=#dae8fc;pointerEvents=1;html=1;align=left;{$this->police}" value="$case" vertex="1">
+					<mxCell id="xsif-$idi" parent="xsif-$ide" style="shape=partialRectangle;connectable=0;strokeColor=inherit;overflow=hidden;pointerEvents=1;html=1;align=left;{$this->police}" value="$case" vertex="1">
 						<mxGeometry height="$hLigne" width="{$lCols[$col]}"$xCond as="geometry">
 							<mxRectangle height="$hLigne" width="{$lCols[$col]}" as="alternateBounds" />
 						</mxGeometry>
