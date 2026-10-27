@@ -346,19 +346,40 @@ class DrawIo
 				$idi = $ide.'['.$col.']';
         		$case = isset($case) ? htmlentities(htmlentities($case)) : '';
         		$xCond = $x ? ' x="'.$x.'"' : '';
+				$lColErre =
         		$lCol = $lCols[$col];
         		// Si on est en colspan implicite (dernière colonne de la ligne mais encore de la place après nous), on s'octroie en plus la largeur des suivants.
-        		if($col == count($ligne) - 1 && count($ligne) < count($lCols))
+				if($col == count($ligne) - 1 && ($étendue = count($lCols) - count($ligne)))
+				{
+					$étendue = 'colspan='.($étendue + 1).';'; // On couvre notre case + celles disparues.
         			for($colErre = count($lCols); --$colErre > $col;)
-        				$lCol += $lCols[$colErre];
+						$lColErre += $lCols[$colErre];
+				}
+				else
+					$étendue = '';
 				$this->_sortir(<<<TERMINE
-					<mxCell id="xsif-$idi" parent="xsif-$ide" style="shape=partialRectangle;connectable=0;strokeColor=inherit;overflow=hidden;pointerEvents=1;html=1;align=left;{$this->police}" value="$case" vertex="1">
-						<mxGeometry height="$hLigne" width="{$lCol}"$xCond as="geometry">
+					<mxCell id="xsif-$idi" parent="xsif-$ide" style="shape=partialRectangle;connectable=0;strokeColor=inherit;overflow=hidden;pointerEvents=1;html=1;align=left;$étendue{$this->police}" value="$case" vertex="1">
+						<mxGeometry height="$hLigne" width="{$lColErre}"$xCond as="geometry">
 							<mxRectangle height="$hLigne" width="{$lCol}" as="alternateBounds" />
 						</mxGeometry>
 					</mxCell>
 			TERMINE);
 				$x += $lCol;
+				// Sur la première ligne au moins, toutes les colonnes doivent être présentes, même celles masquées par une première colonne en colspan.
+				// En effet, draw.io se sert de cette première ligne comme modèle non seulement pour ajouter de nouvelles lignes au tableau,
+				// mais aussi lorsqu'on duplique le tableau pour le recréer de zéro:
+				// si la première ligne de la source est incomplète, la copie finit avec une seule colonne.
+				if($étendue && $iLigne == 0)
+					while(++$col < count($lCols))
+					{
+						$lCol = $lCols[$col];
+						$this->_sortir(<<<TERMINE
+							<mxCell id="xsif-{$ide}[$col]" parent="xsif-$ide" style="shape=partialRectangle;connectable=0;strokeColor=inherit;overflow=hidden;pointerEvents=1;html=1;align=left;" value="" vertex="1" visible="0">
+								<mxGeometry height="$hLigne" width="{$lCol}" x="$x" as="geometry"/>
+							</mxCell>
+						TERMINE);
+						$x += $lCol;
+					}
         	}
 			$y += $hLigne;
 			++$iLigne;
