@@ -180,7 +180,31 @@ class Talend
 	
 	protected function _compilerNœud_tWriteJSONField($nœud, $r)
 	{
-		//return $r;
+		/* À FAIRE: exploiter les ORDER pour savoir dans quel ordre afficher les lignes. */
+		/* À FAIRE: à quoi sert la LOOP? Est-ce un attribut clé primaire? */
+		
+		/* À FAIRE?: valider la cohérence de l'arbo? Pour le moment on fait confiance au producteur (Talend) pour fournir les bons ORDER qui classent les sous-éléments JSON sous leur contenant. */
+		$oSrc = new Tableau('→ JSON '.$this->_déchaîne($r['nom']));
+		$oDst = new Tableau();
+		$oDst->prédécesseurs = [ $oSrc ];
+		$oDst->style = 'd';
+		$tout = array_merge($r['LOOP'], $r['ROOT']);
+		foreach($tout as $posSource => $l)
+		{
+			$oDst->d[$l['ORDER']] = $l['PATH'];
+			if(isset($l['COLUMN']) && $l['COLUMN'])
+			{
+				$oSrc->d[$posSource] = $l['COLUMN'];
+				$oDst->depuis[] = [ $oSrc, $posSource, $l['ORDER'], 'attr' ];
+			}
+		}
+		
+		ksort($oDst->d);
+		
+		$this->_nœuds[$r['id']] = $oSrc;
+		$this->_nœuds[$r['id'].'.d'] = $oDst;
+		
+		/* À FAIRE: nom du tableau données à piocher dans la <connection> qui part du $nœud. */
 	}
 	
 	protected $_nœuds;
