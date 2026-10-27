@@ -21,8 +21,10 @@
  * SOFTWARE.
  */
 
+require_once dirname(__FILE__).'/../Modele/Diagramme/Forme.php';
 require_once dirname(__FILE__).'/../Modele/Diagramme/Tableau.php';
 
+use Gui\Xsif\Modele\Diagramme\Forme;
 use Gui\Xsif\Modele\Diagramme\Tableau;
 
 class Talend
@@ -96,6 +98,10 @@ class Talend
 				'LABEL' => 'nom',
 				/* Correspondances */
 				'LOOP_QUERY' => 'exprItér',
+			],
+			'CHECK' =>
+			[
+				'DEFAULT_MAP' => 'GlobalMap',
 			],
 		];
 		
@@ -216,6 +222,21 @@ class Talend
 		$this->_nœuds[$r['id'].'.d'] = $oDst;
 		
 		/* À FAIRE: nom du tableau données à piocher dans la <connection> qui part du $nœud. */
+	}
+	
+	protected function _compilerNœud_tFlowToIterate($nœud, $r)
+	{
+		if(!isset($r['GlobalMap']) || $r['GlobalMap'] !== 'true')
+		{
+			fprintf(STDERR, "# Je ne sais pas ingérer un tFlowToIterate sans DEFAULT_MAP.\n");
+			return;
+		}
+		
+		$o = new Forme('GM');
+		$o->forme = 'nuage';
+		$o->style = 'global';
+		
+		$this->_nœuds[$r['id']] = $o;
 	}
 	
 	protected $_nœuds;
