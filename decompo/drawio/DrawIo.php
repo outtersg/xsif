@@ -356,6 +356,30 @@ class DrawIo
 		}
 	}
 	
+	public function calcForme($forme)
+	{
+		$coord = $this->_p->pos($forme);
+		$coord->h = 50;
+		$coord->l = 50;
+	}
+	
+	public function affForme($forme)
+	{
+		$corresp =
+		[
+			'nuage' => 'cloud',
+		];
+		$coord = $this->_p->pos($forme);
+		$ff = $forme->forme;
+		if(isset($corresp[$ff])) $ff = $corresp[$ff];
+		$id = ++$this->_id;
+		$this->_sortir(<<<TERMINE
+			<mxCell id="$id" parent="1" style="ellipse;shape={$ff};whiteSpace=wrap;html=1;perimeter={$ff}Perimeter;{$this->style($forme->style, $forme)}" value="{$forme->titre}" vertex="1">
+				<mxGeometry height="{$coord->h}" width="{$coord->l}" x="{$coord->x}" y="{$coord->y}" as="geometry"/>
+			</mxCell>
+		TERMINE);
+	}
+	
 	public function affLien($de, $vers, $style = null)
 	{
 		$id = ++$this->_id;
