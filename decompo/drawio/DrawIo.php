@@ -210,15 +210,25 @@ class DrawIo
 		// Si les largeurs de colonne ne sont pas fixées, on approxime au nombre de caractères maximal, multiplié par un facteur, dans une certaine limite.
 		$lCols = [];
 		$brut = $tableau->d;
+		$nCols = 0;
+		foreach($brut as $clé => $ligne)
+		{
+			if(!is_array($ligne))
+				$brut[$clé] = ($ligne = [ $ligne ]);
+			if($nCols < count($ligne))
+				$nCols = count($ligne);
+		}
 		foreach($brut as $ligne)
 		{
 			$col = -1;
-			foreach(is_array($ligne) ? $ligne : [ $ligne ] as $case)
+			// Si c'est une ligne qui n'a pas toutes ses cases, on ne la compte pas.
+			/* À FAIRE: être un peu plus subtils, et a posteriori, s'assurer qu'elle tient dans ses successeurs, sinon agrandir la dernière colonne. */
+			if(count($ligne) < $nCols) continue;
+			foreach($ligne as $case)
 			{
 				++$col;
 				if(!isset($lCols[$col])) $lCols[$col] = 0;
 				if(isset($case) && strlen($case) > $lCols[$col]) $lCols[$col] = strlen($case);
-				/* À FAIRE: les cases qui occupent plusieurs colonnes ne compte pas. */
 			}
 		}
 		$lTableau = 0;
