@@ -367,6 +367,8 @@ class DrawIo
 		TERMINE);
 	}
 	
+	/*- Utilitaires ----------------------------------------------------------*/
+	
 	public function style($style, $classe = null, $départ = [])
 	{
 		$classes = [];
