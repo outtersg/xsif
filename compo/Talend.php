@@ -171,7 +171,7 @@ class Talend
 		$oRés = new Tableau($tRés);
 		$oRés->prédécesseurs[] = $oTransfo;
 		foreach($tTransfo as $clé => $trou)
-			$oRés->depuis[] = [ $oTransfo, $clé, $clé, 'champ' ];
+			$oRés->depuis[] = [ $oTransfo, $clé, $clé, 'attr' ];
 		
 		$this->_nœuds[$r['id']] = $oTransfo;
 		$this->_nœuds[$r['id'].'.d'] = $oRés;
