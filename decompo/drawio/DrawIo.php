@@ -106,12 +106,20 @@ class DrawIo
 		$this->_id = 1;
 		
 		foreach($modèle as $bloc)
-			switch(get_class($bloc))
+		{
+			$fonction = preg_split('/[\\\\_]/', get_class($bloc));
+			/* À FAIRE: un cache d'après les noms de fonction ici présents. */
+			while(count($fonction))
 			{
-				case 'Gui\\Xsif\\Modele\\Diagramme\\Tableau':
-					$this->tableau($bloc);
+				$f = 'calc'.implode('', $fonction);
+				if(method_exists($this, $f))
+				{
+					$this->$f($bloc);
 					break;
-				default:
+				}
+				array_shift($fonction);
+			}
+			if(!count($fonction))
 					fprintf(STDERR, "# Je ne sais pas traiter les blocs de type %s\n", get_class($bloc));
 			}
 		
@@ -199,7 +207,7 @@ class DrawIo
 	
 	/*- Nœuds ----------------------------------------------------------------*/
 	
-	public function tableau($tableau)
+	public function calcTableau($tableau)
 	{
 		/* À FAIRE: titre multi-lignes */
 		
