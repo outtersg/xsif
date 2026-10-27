@@ -27,6 +27,31 @@ class DrawIo
 	const P_WEB = 1;
 	const P_GOOGLE = 2;
 	
+	/**
+	 * Stylage par défaut, sous forme d'un tableau { style: { classe: { propriété: … } }
+	 */
+	public $styles =
+	[
+		'' =>
+		[
+			'' =>
+			[
+				'strokeColor' => '#000000',
+			],
+		],
+		/* Attribut: pas un nœud complet. */
+		'attr' =>
+		[
+			'Lien' =>
+			[
+				'strokeColor' => '#bfbfbf',
+				// Quand on colle une palanquée de liens depuis les attributs d'un nœud, ils vont avoir tendance à se chevaucher. On atténue ce chevauchement en optant pour des courbes plutôt que des angles droits.
+				'curved' => 1,
+				'curveGeometry' => 1,
+			],
+		],
+	];
+	
 	protected $police;
 	/** Données à pondre. */
 	protected $d;
