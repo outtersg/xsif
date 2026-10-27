@@ -230,6 +230,7 @@ class DrawIo
 			{
 				$lCols[$col] *= $hLigne * 0.5; /* À FAIRE: décoder en dur cette largeur d'1/2 hauteur par caractère. */
 				if($lCols[$col] > 120) $lCols[$col] = 120; /* À FAIRE: décoder en dur. */
+				if($lCols[$col] < $hLigne) $lCols[$col] = $hLigne;
 			}
 			$lTableau += $lCols[$col];
 		}
