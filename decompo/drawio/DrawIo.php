@@ -111,9 +111,11 @@ class DrawIo
 			/* À FAIRE: un cache d'après les noms de fonction ici présents. */
 			while(count($fonction))
 			{
-				$f = 'calc'.implode('', $fonction);
+				$f = 'calc'.($rf = implode('', $fonction));
 				if(method_exists($this, $f))
 				{
+					if(method_exists($this, $fa = 'aff'.$rf))
+						$this->_p->pos($bloc)->aff = [ $this, $fa ];
 					$this->$f($bloc);
 					break;
 				}
@@ -255,7 +257,6 @@ class DrawIo
 		$hTotale = $y + count($brut) * $hLigne;
 		
 		$coord = $this->_p->pos($tableau);
-		$coord->aff = [ $this, 'affTableau' ];
 		$coord->vars = [ $lCols, $lTableau, $hTotale, $y, $hLigne, $idt, $idt, $y ];
 		$coord->l = $lTableau;
 		$coord->h = $hTotale;
