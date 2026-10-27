@@ -343,6 +343,7 @@ class DrawIo
 					$départ += $this->styles[$style][$classe];
 		$r = '';
 		foreach($départ as $clé => $val)
+			if($val !== false && isset($val))
 			$r .= $clé.'='.$val.';';
 		return $r;
 	}
