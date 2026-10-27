@@ -217,7 +217,7 @@ class DrawIo
 			{
 				++$col;
 				if(!isset($lCols[$col])) $lCols[$col] = 0;
-				if(strlen($case) > $lCols[$col]) $lCols[$col] = strlen($case);
+				if(isset($case) && strlen($case) > $lCols[$col]) $lCols[$col] = strlen($case);
 				/* À FAIRE: les cases qui occupent plusieurs colonnes ne compte pas. */
 			}
 		}
@@ -315,7 +315,7 @@ class DrawIo
 			{
 				++$col;
         		$idi = ++$this->_id; // ID Intérieur
-        		$case = htmlentities(htmlentities($case));
+        		$case = isset($case) ? htmlentities(htmlentities($case)) : '';
         		$xCond = $x ? ' x="'.$x.'"' : '';
 				$this->_sortir(<<<TERMINE
 					<mxCell id="xsif-$idi" parent="xsif-$ide" style="shape=partialRectangle;connectable=0;strokeColor=inherit;overflow=hidden;pointerEvents=1;html=1;align=left;{$this->police}" value="$case" vertex="1">
