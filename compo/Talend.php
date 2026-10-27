@@ -201,6 +201,17 @@ class Talend
 		
 		ksort($oDst->d);
 		
+		// Création de l'arborescence.
+		$pile = [];
+		foreach($oDst->d as $clé => $chemin)
+		{
+			while(count($pile) && substr($chemin, 0, strlen($pile[0])) != $pile[0])
+				array_shift($pile);
+			$oDst->d[$clé] = array_fill(0, count($pile), null);
+			$oDst->d[$clé][] = count($pile) ? ltrim(substr($chemin, strlen($pile[0])), '/') : $chemin;
+			array_unshift($pile, $chemin);
+		}
+		
 		$this->_nœuds[$r['id']] = $oSrc;
 		$this->_nœuds[$r['id'].'.d'] = $oDst;
 		
