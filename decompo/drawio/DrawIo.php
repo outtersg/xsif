@@ -332,6 +332,9 @@ class DrawIo
 			</mxCell>
 		TERMINE);
 		$coord->ids = [];
+		$brutal = []; // $brut ALigné sur des indices à 0.
+		foreach($brut as $ligne)
+			$brutal[] = is_array($ligne) ? array_values($ligne) : [ $ligne ];
 		$iLigne = 0;
 		foreach($brut as $numLigne => $ligne)
         	{
@@ -362,8 +365,15 @@ class DrawIo
 				else
 					$étendue = '';
 				$bords = '';
-				if(!strlen($case) && array_key_exists($col + 1, $ligne) && !isset($ligne[$col + 1]))
+				if(!strlen($case))
+				{
+					if(array_key_exists($col + 1, $brutal[$iLigne]) && !isset($brutal[$iLigne][$col + 1]))
 					$bords .= 'right=0;';
+					if(isset($brutal[$iLigne - 1]) && array_key_exists($col, $brutal[$iLigne - 1]) && !isset($brutal[$iLigne - 1][$col]))
+						$bords .= 'top=0;';
+					if(isset($brutal[$iLigne + 1]) && array_key_exists($col, $brutal[$iLigne + 1]) && !isset($brutal[$iLigne + 1][$col]))
+						$bords .= 'bottom=0;';
+				}
 				$this->_sortir(<<<TERMINE
 					<mxCell id="xsif-$idi" parent="xsif-$ide" style="shape=partialRectangle;connectable=0;strokeColor=inherit;overflow=hidden;pointerEvents=1;html=1;align=left;$étendue{$this->police}fillColor=inherit;$bords" value="$case" vertex="1">
 						<mxGeometry height="$hLigne" width="{$lColErre}"$xCond as="geometry">
