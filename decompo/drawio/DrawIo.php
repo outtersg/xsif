@@ -21,8 +21,6 @@
  * SOFTWARE.
  */
 
-/* À FAIRE?: font en inherit? */
-
 class DrawIo
 {
 	const P_STANDARD = 0;
@@ -39,6 +37,7 @@ class DrawIo
 			'' =>
 			[
 				'strokeColor' => '#000000',
+				'fontFamily' => 'inherit',
 			],
 			'Tableau' =>
 			[
@@ -204,7 +203,7 @@ class DrawIo
 			<mxGraphModel dx="1414" dy="793" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
 				<root>
 					<mxCell id="0" />
-					<mxCell id="1" parent="0"/>
+					<mxCell id="1" parent="0" style="{$this->police}"/>
 		TERMINE);
 	}
 	
@@ -323,7 +322,7 @@ class DrawIo
 		
 		$titre = isset($tableau->titre) ? strtr(htmlentities($tableau->titre), [ "\n" => '&#xA;' ]) : '';
 		$this->_sortir(<<<TERMINE
-			<mxCell id="xsif-$idt" parent="1" style="shape=table;startSize=$y;container=1;collapsible=0;childLayout=tableLayout;fixedHeader=1;{$this->affAccroches($tableau)}tableRender=collapsed;{$this->style(isset($tableau->style) ? $tableau->style : '', $tableau)}{$this->police}overflow=hidden;" value="$titre" vertex="1">
+			<mxCell id="xsif-$idt" parent="1" style="shape=table;startSize=$y;container=1;collapsible=0;childLayout=tableLayout;fixedHeader=1;{$this->affAccroches($tableau)}tableRender=collapsed;{$this->style(isset($tableau->style) ? $tableau->style : '', $tableau)}overflow=hidden;" value="$titre" vertex="1">
 					<mxGeometry height="$hTotale" width="$lTableau" x="{$coord->x}" y="{$coord->y}" as="geometry" />
 			</mxCell>
 		TERMINE);
@@ -337,7 +336,7 @@ class DrawIo
         	if(!is_array($ligne)) $ligne = [ $ligne ];
 			$coord->ids[$numLigne] = $ide = $idt.'['.$iLigne.']';
 			$this->_sortir(<<<TERMINE
-				<mxCell id="xsif-$ide" parent="xsif-$idt" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fixedHeader=1;fillColor=inherit;" value="" vertex="1">
+				<mxCell id="xsif-$ide" parent="xsif-$idt" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fixedHeader=1;fontFamily=inherit;fillColor=inherit;" value="" vertex="1">
 					<mxGeometry height="$hLigne" width="$lTableau" y="$y" as="geometry" />
 				</mxCell>
 			TERMINE);
@@ -368,7 +367,7 @@ class DrawIo
 							$bords .= $direction.'=0;';
 				}
 				$this->_sortir(<<<TERMINE
-					<mxCell id="xsif-$idi" parent="xsif-$ide" style="shape=partialRectangle;connectable=0;strokeColor=inherit;overflow=hidden;pointerEvents=1;html=1;align=left;$étendue{$this->police}fillColor=inherit;$bords" value="$case" vertex="1">
+					<mxCell id="xsif-$idi" parent="xsif-$ide" style="shape=partialRectangle;connectable=0;strokeColor=inherit;overflow=hidden;pointerEvents=1;html=1;align=left;fontFamily=inherit;fillColor=inherit;$étendue$bords" value="$case" vertex="1">
 						<mxGeometry height="$hLigne" width="{$lColErre}"$xCond as="geometry">
 							<mxRectangle height="$hLigne" width="{$lCol}" as="alternateBounds" />
 						</mxGeometry>
