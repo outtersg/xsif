@@ -224,6 +224,8 @@ class DrawIo
 		
         	$idt = ++$this->_id;
         	$y = 16;
+		if(isset($tableau->titre))
+			$y *= (1 + substr_count($tableau->titre, "\n"));
         	$hLigne = 16;
 		$largeurColonnes = [ null, null ];
 		// Si les largeurs de colonne ne sont pas fixées, on approxime au nombre de caractères maximal, multiplié par un facteur, dans une certaine limite.
@@ -323,7 +325,7 @@ class DrawIo
 		$coord = $this->_p->pos($tableau);
 		list($lCols, $lTableau, $hTotale, $hTitre, $hLigne, $idt, $idtt, $y) = $coord->vars;
 		
-		$titre = isset($tableau->titre) ? htmlentities($tableau->titre) : '';
+		$titre = isset($tableau->titre) ? strtr(htmlentities($tableau->titre), [ "\n" => '&#xA;' ]) : '';
 		$this->_sortir(<<<TERMINE
 			<mxCell id="xsif-$idt" parent="1" style="shape=table;startSize=$y;container=1;collapsible=0;childLayout=tableLayout;fixedHeader=1;{$this->affAccroches($tableau)}tableRender=collapsed;{$this->style(isset($tableau->style) ? $tableau->style : '', $tableau)}{$this->police}overflow=hidden;" value="$titre" vertex="1">
 					<mxGeometry height="$hTotale" width="$lTableau" x="{$coord->x}" y="{$coord->y}" as="geometry" />
