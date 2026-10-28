@@ -334,7 +334,7 @@ class DrawIo
         	if(!is_array($ligne)) $ligne = [ $ligne ];
 			$coord->ids[$numLigne] = $ide = $idt.'['.$iLigne.']';
 			$this->_sortir(<<<TERMINE
-				<mxCell id="xsif-$ide" parent="xsif-$idt" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;collapsible=0;dropTarget=0;fillColor=none;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fixedHeader=1;" value="" vertex="1">
+				<mxCell id="xsif-$ide" parent="xsif-$idt" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fixedHeader=1;fillColor=inherit;" value="" vertex="1">
 					<mxGeometry height="$hLigne" width="$lTableau" y="$y" as="geometry" />
 				</mxCell>
 			TERMINE);
@@ -358,7 +358,7 @@ class DrawIo
 				else
 					$étendue = '';
 				$this->_sortir(<<<TERMINE
-					<mxCell id="xsif-$idi" parent="xsif-$ide" style="shape=partialRectangle;connectable=0;strokeColor=inherit;overflow=hidden;pointerEvents=1;html=1;align=left;$étendue{$this->police}" value="$case" vertex="1">
+					<mxCell id="xsif-$idi" parent="xsif-$ide" style="shape=partialRectangle;connectable=0;strokeColor=inherit;overflow=hidden;pointerEvents=1;html=1;align=left;$étendue{$this->police}fillColor=inherit;" value="$case" vertex="1">
 						<mxGeometry height="$hLigne" width="{$lColErre}"$xCond as="geometry">
 							<mxRectangle height="$hLigne" width="{$lCol}" as="alternateBounds" />
 						</mxGeometry>
