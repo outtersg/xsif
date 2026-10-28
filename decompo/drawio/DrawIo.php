@@ -220,8 +220,6 @@ class DrawIo
 	
 	public function calcTableau($tableau)
 	{
-		/* À FAIRE: titre multi-lignes */
-		
         	$idt = ++$this->_id;
         	$y = 16;
 		if(isset($tableau->titre))
@@ -319,8 +317,6 @@ class DrawIo
 	
 	public function affTableau($tableau)
 	{
-		/* À FAIRE: titre de table */
-		
 		$brut = $tableau->d;
 		$coord = $this->_p->pos($tableau);
 		list($lCols, $lTableau, $hTotale, $hTitre, $hLigne, $idt, $idtt, $y) = $coord->vars;
