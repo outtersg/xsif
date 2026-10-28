@@ -172,7 +172,7 @@ class Talend
 			$tRés[] = $l['SCHEMA_COLUMN'];
 		}
 		
-		$oTransfo = new Tableau('XMLPath '.$this->_déchaîne($r['nom']."\n".$r['exprItér']), $tTransfo);
+		$oTransfo = new Tableau('XMLPath '.$r['nom']."\n".$this->_déchaîne($r['exprItér']), $tTransfo);
 		/* À FAIRE: le nom du tableau "donnée" se trouve dans le <connection> qui sort de ce nœud. */
 		$oRés = new Tableau($tRés);
 		$oRés->style = 'd';
