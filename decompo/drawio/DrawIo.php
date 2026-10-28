@@ -361,8 +361,11 @@ class DrawIo
 				}
 				else
 					$étendue = '';
+				$bords = '';
+				if(!strlen($case) && array_key_exists($col + 1, $ligne) && !isset($ligne[$col + 1]))
+					$bords .= 'right=0;';
 				$this->_sortir(<<<TERMINE
-					<mxCell id="xsif-$idi" parent="xsif-$ide" style="shape=partialRectangle;connectable=0;strokeColor=inherit;overflow=hidden;pointerEvents=1;html=1;align=left;$étendue{$this->police}fillColor=inherit;" value="$case" vertex="1">
+					<mxCell id="xsif-$idi" parent="xsif-$ide" style="shape=partialRectangle;connectable=0;strokeColor=inherit;overflow=hidden;pointerEvents=1;html=1;align=left;$étendue{$this->police}fillColor=inherit;$bords" value="$case" vertex="1">
 						<mxGeometry height="$hLigne" width="{$lColErre}"$xCond as="geometry">
 							<mxRectangle height="$hLigne" width="{$lCol}" as="alternateBounds" />
 						</mxGeometry>
