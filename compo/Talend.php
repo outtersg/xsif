@@ -27,6 +27,9 @@ require_once dirname(__FILE__).'/../Modele/Diagramme/Tableau.php';
 use Gui\Xsif\Modele\Diagramme\Forme;
 use Gui\Xsif\Modele\Diagramme\Tableau;
 
+/* À FAIRE: les différentes <metadata connector="…">: la sortie nominale a souvent pour nom l'identifiant du nœud, mais il existe aussi le REJECT, etc. */
+/* À FAIRE: les liens conditionnés. */
+
 class Talend
 {
 	public function charger($fichier)
@@ -55,6 +58,9 @@ class Talend
 			case 'node':
 				if(($nœud = $this->_compilerNœud($nœud)))
 					$this->_nœuds[] = $nœud;
+				break;
+			case 'connection':
+				$this->_compilerLien($nœud);
 				break;
 			case '': break; // Texte?
 			default:
@@ -237,6 +243,33 @@ class Talend
 		$o->style = 'global';
 		
 		$this->_nœuds[$r['id']] = $o;
+	}
+	
+	protected function _compilerLien($lien)
+	{
+		if(!($type = $lien->getAttributeNS(null, 'connectorName'))) { fprintf(STDERR, "# <connection> sans connectorName.\n"); return; }
+		
+		$infos = $this->_infosNœud($lien);
+		$infos['type'] = $type;
+		
+		switch($type)
+		{
+			case 'FLOW':
+				break;
+			default:
+				fprintf(STDERR, "# Je ne sais pas gérer les nœuds %s.\n", $type);
+				return;
+		}
+		
+		$de = $lien->getAttributeNS(null, 'source');
+		$vers = $lien->getAttributeNS(null, 'target');
+		
+		if(!isset($this->_nœuds[$de])) { fprintf(STDERR, "# Lien depuis le nœud inconnu %s\n", $de); return; }
+		$oDe = $this->_nœuds[$de];
+		if(!isset($this->_nœuds[$vers])) { fprintf(STDERR, "# Lien depuis le nœud inconnu %s\n", $vers); return; }
+		$oVers = $this->_nœuds[$vers];
+		
+		$oVers->prédécesseurs[] = $oDe;
 	}
 	
 	protected $_nœuds;
