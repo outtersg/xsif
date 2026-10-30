@@ -92,6 +92,8 @@ class Jet
 			{
 				$ouv = '{'; $fer = '}'; $clés = true; $d = get_object_vars($objet);
 			}
+			if($this->enJson && !count($d)) // Si on a un tableau vide, on ferme immédiatement.
+				$ouv .= $fer.$sépSuivant;
 			$l[] = $descr.$ouv;
 			$this->c[] = $l;
 			$this->v[] = null;
@@ -100,7 +102,7 @@ class Jet
 			foreach($d as $clé => $val)
 				$this->_charger($niveau + 1, $clés ? $clé : null, $val, $clé != $der ? ',' : '');
 			/* À FAIRE: en cas de tableau JSON lorsque !$this->enJson, on distingue mal le côté tableau: mieux vaudrait réintroduire quelque chose qui ressemble à un truc itérable. */
-			if($this->enJson)
+			if($this->enJson && count($d))
 			{
 				$l[count($l) - 1] = $fer.$sépSuivant;
 				$this->c[] = $l;
