@@ -265,7 +265,7 @@ class Talend
 		$vers = $lien->getAttributeNS(null, 'target');
 		
 		if(!isset($this->_nœuds[$de])) { fprintf(STDERR, "# Lien depuis le nœud inconnu %s\n", $de); return; }
-		$oDe = $this->_nœuds[$de];
+		$oDe = $this->_nœuds[$de.(isset($this->_nœuds[$de.'.d']) ? '.d' : '')];
 		if(!isset($this->_nœuds[$vers])) { fprintf(STDERR, "# Lien depuis le nœud inconnu %s\n", $vers); return; }
 		$oVers = $this->_nœuds[$vers];
 		
