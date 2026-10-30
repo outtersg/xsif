@@ -240,8 +240,15 @@ class Talend
 		$o = new Forme('GM');
 		$o->forme = 'nuage';
 		$o->style = 'global';
+		$o->notifPrédécesseur = [ $this, '_notif_tFlowToIterate' ];
 		
 		$this->_nœuds[$r['id']] = $o;
+	}
+	
+	protected function _notif_tFlowToIterate($oDe, $oVers)
+	{
+		if(isset($oDe->titre))
+			$oVers->depuis[] = [ $oDe, null, null, null, $oDe->titre.'.*' ];
 	}
 	
 	protected function _compilerLien($lien)
