@@ -27,7 +27,6 @@
  * 2. Un JSON d'exemple mettant dans chaque attribut le chemin de sa source
  * 3. Deux JSON, les mentions uniques retrouvées de part et d'autre indiquent quoi est reversé où.
  */
-/* À FAIRE: un format vrai JSON, en ajoutant les } et ] fermantes et les , qui permettent de copier-coller le contenu du tableau pour avoir un JSON complet valide. */
 
 require_once dirname(__FILE__).'/Modele/Diagramme/Tableau.php';
 
@@ -36,6 +35,8 @@ use Gui\Xsif\Modele\Diagramme\Tableau;
 /** JSON en Tableau */
 class Jet
 {
+	public $enJson = true;
+	
 	public function chargerFichier($chemin)
 	{
 		return $this->charger(json_decode(file_get_contents($chemin)));
@@ -62,13 +63,12 @@ class Jet
 		return $t;
 	}
 	
-	public function _charger($niveau, $champ, $objet)
+	public function _charger($niveau, $champ, $objet, $sépSuivant = '')
 	{
-		/* À FAIRE: un mode déguillemetté, sur les noms de champ et les v[]. */
 		$l = [];
 		for($i = $niveau; --$i >= 0;)
 			$l[] = null;
-		$descr = isset($champ) ? '"'.$champ.'": ' : '';
+		$descr = isset($champ) ? ($this->enJson ? '"'.$champ.'"' : $champ).': ' : '';
 		
 		if(is_object($objet) || is_array($objet))
 		{
@@ -83,14 +83,23 @@ class Jet
 			$l[] = $descr.$ouv;
 			$this->c[] = $l;
 			$this->v[] = null;
+			$der = array_keys($d);
+			$der = array_pop($der);
 			foreach($d as $clé => $val)
-				$this->_charger($niveau + 1, $clés ? $clé : null, $val);
+				$this->_charger($niveau + 1, $clés ? $clé : null, $val, $clé != $der ? ',' : '');
+			/* À FAIRE: en cas de tableau JSON lorsque !$this->enJson, on distingue mal le côté tableau: mieux vaudrait réintroduire quelque chose qui ressemble à un truc itérable. */
+			if($this->enJson)
+			{
+				$l[count($l) - 1] = $fer.$sépSuivant;
+				$this->c[] = $l;
+				$this->v[] = null;
+			}
 		}
 		else
 		{
 			$l[] = $descr;
 			$this->c[] = $l;
-			$this->v[] = json_encode($objet);
+			$this->v[] = $this->enJson ? json_encode($objet).$sépSuivant : $objet;
 		}
 	}
 	
