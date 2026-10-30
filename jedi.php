@@ -27,6 +27,7 @@
  * 2. Un JSON d'exemple mettant dans chaque attribut le chemin de sa source
  * 3. Deux JSON, les mentions uniques retrouvées de part et d'autre indiquent quoi est reversé où.
  */
+/* À FAIRE: un format vrai JSON, en ajoutant les } et ] fermantes et les , qui permettent de copier-coller le contenu du tableau pour avoir un JSON complet valide. */
 
 require_once dirname(__FILE__).'/Modele/Diagramme/Tableau.php';
 
