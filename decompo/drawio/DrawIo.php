@@ -442,7 +442,7 @@ class DrawIo
 		TERMINE);
 	}
 	
-	public function affLien($de, $vers, $style = null)
+	public function affLien($de, $vers, $style = null, $libellé = null)
 	{
 		$id = ++$this->_id;
 		$c0 = $this->_p->pos($de);
@@ -452,6 +452,18 @@ class DrawIo
 				<mxGeometry relative="1" as="geometry" />
 			</mxCell>
 		TERMINE);
+		
+		if(isset($libellé))
+		{
+			$affLibellé = $this->affT($libellé);
+			$this->_sortir(<<<TERMINE
+				<mxCell id="xsif-$id-t" connectable="0" parent="xsif-$id" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];inheritText=1;fontFamily=inherit;defaultLabelBackgroundColor=page;" value="$affLibellé" vertex="1">
+					<mxGeometry relative="1" as="geometry">
+						<mxPoint as="offset"/>
+					</mxGeometry>
+				</mxCell>
+			TERMINE);
+		}
 	}
 	
 	/*- Utilitaires ----------------------------------------------------------*/
