@@ -134,6 +134,14 @@ foreach($argv as $arg)
 $t0 = new Tableau($t0);
 $t0->style = 'd';
 	$tout[] = $t0;
+	
+	/* Raccrochage */
+	
+	if(isset($t1))
+		$t0->prédécesseurs[] = $t1;
+	
+	$t1 = $t0;
+	$v1 = $compo->v;
 }
 
 require_once dirname(__FILE__).'/decompo/drawio/DrawIo.php';
