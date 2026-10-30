@@ -272,6 +272,8 @@ class Talend
 		$oVers = $this->_nœuds[$vers];
 		
 		$oVers->prédécesseurs[] = $oDe;
+		if(isset($oVers->notifPrédécesseur))
+			call_user_func($oVers->notifPrédécesseur, $oDe, $oVers);
 	}
 	
 	protected $_nœuds;
