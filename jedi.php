@@ -138,7 +138,16 @@ $t0->style = 'd';
 	/* Raccrochage */
 	
 	if(isset($t1))
+	{
 		$t0->prédécesseurs[] = $t1;
+		foreach($compo->v as $l0 => $val0)
+			if(isset($val0) && strlen($val0) > 3)
+			{
+				$simi = array_filter($v1, function($val1) use($val0) { return $val0 == $val1; });
+				foreach($simi as $l1 => $trou)
+					$t0->depuis[] = [ $t1, $l1, $l0, 'attr' ];
+			}
+	}
 	
 	$t1 = $t0;
 	$v1 = $compo->v;
