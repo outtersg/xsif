@@ -347,8 +347,13 @@ class DrawIo
         	{
         	if(!is_array($ligne)) $ligne = [ $ligne ];
 			$coord->ids[$numLigne] = $ide = $idt.'['.$iLigne.']';
+			// Pour donner une apparence texte au tableau, on fait sauter les séparateurs de lignes:
+			$bords = '';
+			if(isset($tableau->style) && preg_match('/ texte /', ' '.$tableau->style.' '))
+				if($iLigne > 0) // … Sauf la première ligne, dont le haut forme le cadre du tableau.
+					$bords .= 'top=0;';
 			$this->_sortir(<<<TERMINE
-				<mxCell id="xsif-$ide" parent="xsif-$idt" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fixedHeader=1;fontFamily=inherit;fillColor=inherit;" value="" vertex="1">
+				<mxCell id="xsif-$ide" parent="xsif-$idt" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;strokeColor=inherit;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fixedHeader=1;fontFamily=inherit;fillColor=inherit;$bords" value="" vertex="1">
 					<mxGeometry height="$hLigne" width="$lTableau" y="$y" as="geometry" />
 				</mxCell>
 			TERMINE);
