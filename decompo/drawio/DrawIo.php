@@ -314,6 +314,11 @@ class DrawIo
 		}
 	}
 	
+	public function affT($texte)
+	{
+		return strtr(htmlentities($texte), [ "\n" => '&#xA;' ]);
+	}
+	
 	public function affCase($case)
 	{
 		if(!isset($case)) return '';
