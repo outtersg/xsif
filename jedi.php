@@ -132,7 +132,7 @@ foreach($argv as $arg)
 	}
 	$t0 = $compo->chargerFichier($arg);
 $t0 = new Tableau($t0);
-$t0->style = 'd';
+	$t0->style = 'd texte';
 	$tout[] = $t0;
 	
 	/* Raccrochage */
