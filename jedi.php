@@ -98,14 +98,20 @@ class Jet
 }
 
 $compo = new Jet();
-$t0 = $compo->chargerFichier($argv[1]);
+array_shift($argv);
+$tout = [];
+foreach($argv as $arg)
+{
+	$t0 = $compo->chargerFichier($arg);
 $t0 = new Tableau($t0);
 $t0->style = 'd';
+	$tout[] = $t0;
+}
 
 require_once dirname(__FILE__).'/decompo/drawio/DrawIo.php';
 
 $e = new DrawIo();
 $e->police('Lato', DrawIo::P_GOOGLE);
-$e->pondreFichier([ $t0 ]);
+$e->pondreFichier($tout);
 
 ?>
