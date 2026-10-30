@@ -141,8 +141,7 @@ class DrawIo
 		
 		foreach($modèle as $bloc)
 		{
-			foreach($bloc->prédécesseurs as $p)
-				$this->affLien($p, $bloc);
+			$prédécesseurs = $bloc->prédécesseurs;
 			if(isset($bloc->depuis))
 				foreach($bloc->depuis as $depuis)
 				{
@@ -161,7 +160,11 @@ class DrawIo
 					else
 						$de = $depuis;
 					$this->affLien($de, $vers, $style);
+					// Si $de est un prédécesseur que nous avons voulu lier avec style, inutile de le re-représenter comme prédécesseur (sans style).
+					$prédécesseurs = array_filter($prédécesseurs, function($x) use($de) { return $x !== $de; });
 				}
+			foreach($prédécesseurs as $p)
+				$this->affLien($p, $bloc);
 		}
 		
 		$this->sortirDessin();
