@@ -462,7 +462,9 @@ class DrawIo
 		$classes[''] = true;
 		$styles = [];
 		if(isset($style))
-			$styles[$style] = true;
+			foreach(explode(' ', $style) as $s)
+				if($s)
+					$styles[$s] = true;
 		$styles[''] = true;
 		
 		foreach($classes as $classe => $trou)
