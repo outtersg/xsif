@@ -100,6 +100,7 @@ class Jet
 $compo = new Jet();
 $t0 = $compo->chargerFichier($argv[1]);
 $t0 = new Tableau($t0);
+$t0->style = 'd';
 
 require_once dirname(__FILE__).'/decompo/drawio/DrawIo.php';
 
