@@ -70,21 +70,21 @@ class Jet
 			$l[] = null;
 		$descr = isset($champ) ? '"'.$champ.'": ' : '';
 		
-		if(is_object($objet))
+		if(is_object($objet) || is_array($objet))
 		{
-			$l[] = $descr.'{';
+			if(is_array($objet)) /* À FAIRE: s'assurer que les clés sont séquentielles. */
+			{
+				$ouv = '['; $fer = ']'; $clés = false; $d = $objet;
+			}
+			else
+			{
+				$ouv = '{'; $fer = '}'; $clés = true; $d = get_object_vars($objet);
+			}
+			$l[] = $descr.$ouv;
 			$this->c[] = $l;
 			$this->v[] = null;
-			foreach(get_object_vars($objet) as $clé => $val)
-				$this->_charger($niveau + 1, $clé, $val);
-		}
-		else if(is_array($objet))
-		{
-			$l[] = $descr.'[';
-			$this->c[] = $l;
-			$this->v[] = null;
-			foreach($objet as $clé => $val)
-				$this->_charger($niveau + 1, null, $val);
+			foreach($d as $clé => $val)
+				$this->_charger($niveau + 1, $clés ? $clé : null, $val);
 		}
 		else
 		{
