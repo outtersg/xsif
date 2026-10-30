@@ -179,7 +179,6 @@ class Talend
 		}
 		
 		$oTransfo = new Tableau('XMLPath '.$r['nom']."\n".$this->_déchaîne($r['exprItér']), $tTransfo);
-		/* À FAIRE: le nom du tableau "donnée" se trouve dans le <connection> qui sort de ce nœud. */
 		$oRés = new Tableau($tRés);
 		$oRés->style = 'd';
 		$oRés->prédécesseurs[] = $oTransfo;
@@ -266,6 +265,9 @@ class Talend
 		
 		if(!isset($this->_nœuds[$de])) { fprintf(STDERR, "# Lien depuis le nœud inconnu %s\n", $de); return; }
 		$oDe = $this->_nœuds[$de.(isset($this->_nœuds[$de.'.d']) ? '.d' : '')];
+		// Si le nœud précédent est un nœud données, il représente ce qui circule dans cette jonction: on lui en donne le titre.
+		if(!isset($oDe->titre) && isset($infos['nom']))
+			$oDe->titre = $infos['nom'];
 		if(!isset($this->_nœuds[$vers])) { fprintf(STDERR, "# Lien depuis le nœud inconnu %s\n", $vers); return; }
 		$oVers = $this->_nœuds[$vers];
 		
