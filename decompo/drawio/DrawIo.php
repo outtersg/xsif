@@ -314,6 +314,18 @@ class DrawIo
 		}
 	}
 	
+	public function affCase($case)
+	{
+		if(!isset($case)) return '';
+		
+		$case = htmlentities($case);
+		$case = preg_replace("/^(\t+)/", '<span style="white-space: pre;">\1</span>', $case);
+		$case = strtr($case, [ "\t" => '&#9;' ]);
+		$case = htmlentities($case);
+		
+		return $case;
+	}
+	
 	public function affTableau($tableau)
 	{
 		$brut = $tableau->d;
@@ -346,7 +358,7 @@ class DrawIo
 			{
 				++$col;
 				$idi = $ide.'['.$col.']';
-        		$case = isset($case) ? htmlentities(htmlentities($case)) : '';
+				$case = $this->affCase($case);
         		$xCond = $x ? ' x="'.$x.'"' : '';
 				$lColErre =
         		$lCol = $lCols[$col];
