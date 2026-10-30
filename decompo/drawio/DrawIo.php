@@ -147,6 +147,7 @@ class DrawIo
 				{
 					$vers = $bloc;
 					$style = null;
+					$libellé = null;
 					if(is_array($depuis))
 					{
 						$de = $depuis[0];
@@ -156,10 +157,12 @@ class DrawIo
 							$vers = [ $vers, $depuis[2] ];
 						if(isset($depuis[3]))
 							$style = $depuis[3];
+						if(isset($depuis[4]))
+							$libellé = $depuis[4];
 					}
 					else
 						$de = $depuis;
-					$this->affLien($de, $vers, $style);
+					$this->affLien($de, $vers, $style, $libellé);
 					// Si $de est un prédécesseur que nous avons voulu lier avec style, inutile de le re-représenter comme prédécesseur (sans style).
 					$prédécesseurs = array_filter($prédécesseurs, function($x) use($de) { return $x !== $de; });
 				}
