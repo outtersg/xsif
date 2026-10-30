@@ -35,6 +35,7 @@ use Gui\Xsif\Modele\Diagramme\Tableau;
 /** JSON en Tableau */
 class Jet
 {
+	public $enTableau = false;
 	public $enJson = true;
 	
 	public function chargerFichier($chemin)
@@ -53,12 +54,23 @@ class Jet
 		foreach($t as $l)
 			if(count($l) > $nCols)
 				$nCols = count($l);
+		if($this->enTableau)
 		foreach($t as $numL => $l)
 		{
 			for($i = count($l); ++$i <= $nCols;)
 				$t[$numL][] = null;
 			$t[$numL][] = $this->v[$numL];
 		}
+		else
+			foreach($t as $numL => $l)
+			{
+				$lc = '';
+				foreach($l as $v)
+					$lc .= isset($v) ? $v : "\t";
+				if(isset($this->v[$numL]))
+					$lc .= $this->v[$numL];
+				$t[$numL] = $lc;
+			}
 		
 		return $t;
 	}
@@ -112,6 +124,10 @@ array_shift($argv);
 $tout = [];
 foreach($argv as $arg)
 {
+	switch($arg)
+	{
+		case '-t': $compo->enTableau = true; continue 2;
+	}
 	$t0 = $compo->chargerFichier($arg);
 $t0 = new Tableau($t0);
 $t0->style = 'd';
