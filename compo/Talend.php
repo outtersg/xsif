@@ -166,6 +166,8 @@ class Talend
 		return $chaîne;
 	}
 	
+	/*- Nœuds de mise en correspondance --------------------------------------*/
+	
 	protected function _compilerNœud_tExtractXMLField($nœud, $r)
 	{
 		/* À FAIRE: mode alternatif tableau deux colonnes (plutôt que deux tableaux). */
@@ -234,6 +236,8 @@ class Talend
 		/* À FAIRE: nom du tableau données à piocher dans la <connection> qui part du $nœud. */
 	}
 	
+	/*- Nœuds de contexte ----------------------------------------------------*/
+	
 	protected function _compilerNœud_tFlowToIterate($nœud, $r)
 	{
 		if(!isset($r['GlobalMap']) || $r['GlobalMap'] !== 'true')
@@ -255,6 +259,8 @@ class Talend
 		if(isset($oDe->titre))
 			$oVers->depuis[] = [ $oDe, null, null, null, $oDe->titre.'.*' ];
 	}
+	
+	/*- Les liens ------------------------------------------------------------*/
 	
 	protected function _compilerLien($lien)
 	{
