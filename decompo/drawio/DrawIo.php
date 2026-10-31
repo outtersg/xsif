@@ -434,7 +434,7 @@ class DrawIo
 	{
 		$corresp =
 		[
-			'nuage' => 'cloud',
+			'nuage' => 'ellipse;shape=cloud;perimeter=cloudPerimeter;',
 		];
 		$coord = $this->_p->pos($forme);
 		$ff = $forme->forme;
@@ -442,7 +442,7 @@ class DrawIo
 		$id = $coord->id;
 		$affStyle = $this->style(isset($forme->style) ? $forme->style : null, $forme);
 		$this->_sortir(<<<TERMINE
-			<mxCell id="xsif-$id" parent="1" style="ellipse;shape={$ff};whiteSpace=wrap;html=1;perimeter={$ff}Perimeter;$affStyle" value="{$forme->titre}" vertex="1">
+			<mxCell id="xsif-$id" parent="1" style="{$ff}html=1;$affStyle" value="{$this->affT($forme->titre)}" vertex="1">
 				<mxGeometry height="{$coord->h}" width="{$coord->l}" x="{$coord->x}" y="{$coord->y}" as="geometry"/>
 			</mxCell>
 		TERMINE);
