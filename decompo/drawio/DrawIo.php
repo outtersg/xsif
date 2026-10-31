@@ -448,6 +448,10 @@ class DrawIo
 		TERMINE);
 	}
 	
+	/* À FAIRE: qu'affLien sache prendre un Lien, ou un tableau [ $de, $vers, $style, $libellé ] (indicé façon Lien), ou un tableau depuis.
+	 * De fait si on crée une fonction calcLien(), celle-ci sera automatiquement invoquée sur les Lien figurant dans le graphe à représenter.
+	 * Pour la distinction entre les deux tableaux, un booléen en second paramètre? En fait il faudrait faire sauter l'un des deux (mais le format depuis évite la redondance, puisque, porté par un Nœud qui en est la destination, il n'a pas à mentionner son VERS).
+	 */
 	public function affLien($de, $vers, $style = null, $libellé = null)
 	{
 		$id = ++$this->_id;
