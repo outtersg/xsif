@@ -104,6 +104,9 @@ class Talend
 				'LABEL' => 'nom',
 				/* Correspondances */
 				'LOOP_QUERY' => 'exprItér',
+				/* Bases */
+				'HOST',
+				'DBNAME',
 			],
 			'CHECK' =>
 			[
@@ -259,6 +262,19 @@ class Talend
 		if(isset($oDe->titre))
 			$oVers->depuis[] = [ $oDe, null, null, null, $oDe->titre.'.*' ];
 	}
+	
+	/*- Nœuds de persistance -------------------------------------------------*/
+	
+	protected function _compilerNœud_tSQLConnection($nœud, $infos)
+	{
+		/* À FAIRE?: valider que les tPostgresqlInput etc. qui s'y branchent utilisent les mêmes paramètres de connexion */
+		fprintf(STDERR, "%s", print_r($infos, true));
+		$o = new Forme($infos['nom']."\n".$this->_déchaîne($infos['HOST']).'/'.$this->_déchaîne($infos['DBNAME']));
+		$o->forme = 'bdd';
+		$this->_nœuds[$infos['id']] = $o;
+	}
+	
+	protected function _compilerNœud_tPostgresqlConnection($nœud, $infos) { return $this->_compilerNœud_tSQLConnection($nœud, $infos); }
 	
 	/*- Les liens ------------------------------------------------------------*/
 	
