@@ -435,6 +435,7 @@ class DrawIo
 		$corresp =
 		[
 			'nuage' => 'ellipse;shape=cloud;perimeter=cloudPerimeter;',
+			'bdd' => 'shape=mxgraph.flowchart.database;aspect=fixed;strokeColor=#00007F;fillColor=#7F7FFF;',
 		];
 		$coord = $this->_p->pos($forme);
 		$ff = $forme->forme;
