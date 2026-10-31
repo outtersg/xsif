@@ -36,7 +36,6 @@ class DrawIo
 		[
 			'' =>
 			[
-				'strokeColor' => '#000000',
 				'fontFamily' => 'inherit',
 			],
 			'Tableau' =>
