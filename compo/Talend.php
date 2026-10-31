@@ -110,6 +110,11 @@ class Talend
 				'DEFAULT_MAP' => 'GlobalMap',
 			],
 		];
+		/** À FAIRE: coller cela dans un static. Inutile de recalculer notre table de correspondances à chaque fois. */
+		foreach($corresp as $caté => $trucs)
+			foreach($trucs as $clé => $val)
+				if(is_int($clé))
+					$corresp[$caté][$val] = $val;
 		
 		$tableaux = [];
 		
