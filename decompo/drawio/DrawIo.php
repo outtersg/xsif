@@ -500,8 +500,8 @@ class DrawIo
 					$styles[$s] = true;
 		$styles[''] = true;
 		
+		foreach($styles as $style => $trou)
 		foreach($classes as $classe => $trou)
-			foreach($styles as $style => $trou)
 				if(isset($this->styles[$style][$classe]))
 					$départ += $this->styles[$style][$classe];
 		$r = '';
