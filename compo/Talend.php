@@ -108,6 +108,10 @@ class Talend
 				'HOST',
 				'DBNAME',
 			],
+			'MEMO_SQL' =>
+			[
+				'QUERY',
+			],
 			'CHECK' =>
 			[
 				'DEFAULT_MAP' => 'GlobalMap',
@@ -274,6 +278,19 @@ class Talend
 	}
 	
 	protected function _compilerNœud_tPostgresqlConnection($nœud, $infos) { return $this->_compilerNœud_tSQLConnection($nœud, $infos); }
+	
+	protected function _compilerNœud_tSQLInput($nœud, $infos)
+	{
+		/* Tableau de style texte plutôt que zone de texte: ça permet de faire arriver des liens en face de chaque ligne, pour indiquer où interviennent les tables. */
+		/* À FAIRE: si on reconnaît des tables ou assimilées (vues, séquences), les matérialiser comme intermédiaires entre la base et nous. */
+		$o = new Tableau($infos['nom'], explode("\n", $this->_déchaîne($infos['QUERY'])));
+		$o->forme = 'bdd';
+		$o->style = 'texte';
+		$this->_nœuds[$infos['id']] = $o;
+		/* À FAIRE: les colonnes en sortie */
+	}
+	
+	protected function _compilerNœud_tPostgresqlInput($nœud, $infos) { return $this->_compilerNœud_tSQLInput($nœud, $infos); }
 	
 	/*- Les liens ------------------------------------------------------------*/
 	
