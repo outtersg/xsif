@@ -268,7 +268,6 @@ class Talend
 	protected function _compilerNœud_tSQLConnection($nœud, $infos)
 	{
 		/* À FAIRE?: valider que les tPostgresqlInput etc. qui s'y branchent utilisent les mêmes paramètres de connexion */
-		fprintf(STDERR, "%s", print_r($infos, true));
 		$o = new Forme($infos['nom']."\n".$this->_déchaîne($infos['HOST']).'/'.$this->_déchaîne($infos['DBNAME']));
 		$o->forme = 'bdd';
 		$this->_nœuds[$infos['id']] = $o;
