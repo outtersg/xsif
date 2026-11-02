@@ -168,8 +168,7 @@ class Talend
 	
 	protected function _déchaîne($chaîne)
 	{
-		/* À FAIRE: \" */
-		$chaîne = preg_replace_callback('/"[^"]*"\+?|[^"]+\+?/', function($x) { $x = $x[0]; return substr($x, 0, 1) == '"' ? substr($x, 1, -1) : '${'.$x.'}'; }, $chaîne);
+		$chaîne = preg_replace_callback('/"(?:[^"]+|\\")*"\+?|[^"]+\+?/', function($x) { $x = $x[0]; return substr($x, 0, 1) == '"' ? substr(strtr($x, [ '\"' => '"' ]), 1, -1) : '${'.$x.'}'; }, $chaîne);
 		return $chaîne;
 	}
 	
