@@ -130,10 +130,26 @@ foreach($argv as $arg)
 	{
 		case '-t': $compo->enTableau = true; continue 2;
 	}
+	
+	if(preg_match('/\.csv$/', $arg))
+	{
+		$f = fopen($arg, 'r');
+		$d = [];
+		while(($l = fgetcsv($f, 0, "\t", '"', '\\'))) /* À FAIRE: détection tabulation ou ; ou , */
+			$d[] = $l;
+		fclose($f);
+		$t = new Tableau(basename($arg), $d);
+		$t->style = 'd';
+		$tout[] = $t;
+		$t0 = $t;
+	}
+	else
+	{
 	$t0 = $compo->chargerFichier($arg);
 $t0 = new Tableau($t0);
 	$t0->style = 'd texte';
 	$tout[] = $t0;
+	}
 	
 	/* Raccrochage */
 	
