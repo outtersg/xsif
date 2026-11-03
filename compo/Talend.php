@@ -198,7 +198,8 @@ class Talend
 	
 	protected function _déchaîne($chaîne)
 	{
-		$chaîne = preg_replace_callback('/"(?:[^"]+|\\")*"\+?|[^"]+\+?/', function($x) { $x = $x[0]; return substr($x, 0, 1) == '"' ? substr(strtr($x, [ '\"' => '"' ]), 1, -1) : '${'.$x.'}'; }, $chaîne);
+		/* À FAIRE: on ne gère toujours pas les "truc"+globalMap.get("blabla"). En fait il faudrait parcourir la chaîne avec un compteur de " ( et \, et ne simplifier que lorsque la pile est à 0. */
+		$chaîne = preg_replace_callback('/\+?("(?:[^\\\\"]+|\\\\")*"|[^"+]+|[+][^"])/', function($x) { $x = $x[1]; return substr($x, 0, 1) == '"' ? substr(strtr($x, [ '\"' => '"' ]), 1, -1) : '${'.$x.'}'; }, $chaîne);
 		return $chaîne;
 	}
 	
