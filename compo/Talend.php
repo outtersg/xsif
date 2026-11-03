@@ -316,7 +316,11 @@ class Talend
 		$o->forme = 'bdd';
 		$o->style = 'texte';
 		$this->_nœuds[$infos['id']] = $o;
-		/* À FAIRE: les colonnes en sortie */
+		
+		$os = new Tableau($infos['>n'][0]);
+		$os->style = 'd';
+		$os->prédécesseurs[] = $o;
+		$this->_nœuds[$infos['id'].'.d'] = $os;
 	}
 	
 	protected function _compilerNœud_tPostgresqlInput($nœud, $infos) { return $this->_compilerNœud_tSQLInput($nœud, $infos); }
