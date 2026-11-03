@@ -153,6 +153,36 @@ class Talend
 				if(isset($corresp[$type = $fils->getAttributeNS(null, 'field')]) && isset($corresp[$type][$champ = $fils->getAttributeNS(null, 'name')]))
 					$r[$corresp[$type][$champ]] = $fils->getAttributeNS(null, 'value');
 			}
+			/* Les sorties exposées.
+			 * On peut avoir plusieurs FLOW (ex.: out6 et copyOfout1_0).
+			 * Couples rencontrés: FLOW+REJECT, FLOW+RESPONSE+FAULT, FLOW+FLOW
+			 * Dans FLOW+RESPONSE, RESPONSE, c'était statusCode + les champs de FLOW. Redondant?
+			 * Dans FLOW+REJECT, REJECT, c'était les champs de FLOW + errorCode + errorMessage [+ errorXMLField].
+			 * FAULT c'est errorCode + errorMessage.
+			 * Investigation:
+			 *   egrep '<node |<metadata connector.*">' ….item | awk '/<node /{n=0;accu=$0;next}/<metadata/{++n}n==2{print accu}n>=2{print;next}{accu=accu"\n"$0}'
+			 */
+			else if($fils->localName == 'metadata' && ($typeSortie = $fils->getAttribute('connector')))
+			{
+				switch($typeSortie)
+				{
+					case 'FLOW': $typeSortie = '>'; break;
+					case 'RESPONSE': $typeSortie = '>'; break;
+					case 'REJECT': $typeSortie = '!'; break;
+					case 'FAULT': $typeSortie = '!'; break;
+					default: fprintf(STDERR, "# Je ne sais pas gérer les <metadata connector=\"%s\">\n", $typeSortie); continue 2;
+				}
+				
+				$champsSortie = [];
+				foreach($fils->childNodes as $petitFils)
+				{
+					if($petitFils->localName != 'column') continue;
+					$col = $petitFils->getAttribute('name');
+					$champsSortie[] = $col;
+				}
+				// Et une copie indicée [0] pour s'y retrouver:
+				$r[$typeSortie.'n'][] = $r[$typeSortie][$nom = $fils->getAttribute('name')] = $champsSortie;
+			}
 		
 		if(!isset($r['nom']))
 			$r['nom'] = $r['id'];
