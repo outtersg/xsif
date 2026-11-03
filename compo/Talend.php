@@ -302,6 +302,18 @@ class Talend
 	protected function _compilerNœud_tExtractXMLField($nœud, $r)
 	{
 		/* À FAIRE: mode alternatif tableau deux colonnes (plutôt que deux tableaux). */
+		/* À FAIRE: présenter façon XML; par ex., au lieu de:
+		 *   id                → id
+		 *   truc/bidule/chose → chose
+		 *   truc/machin       → machin
+		 * présenter en:
+		 *   id                → id
+		 *   truc
+		 *     bidule
+		 *       chose         → chose
+		 *     machin          → machin
+		 * /!\ bidule peut revenir, si un autre attribut provient de lui mais que dans la sortie on a voulu le placer sous machin.
+		 */
 		/* À FAIRE: LOOP_QUERY_BASE != "" */
 		/* À FAIRE: XML_TEXT != "" */
 		/* À FAIRE: XML_PREFIX != "" */
