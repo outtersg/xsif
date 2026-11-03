@@ -251,19 +251,28 @@ class Talend
 					break;
 				case '(':
 					if($courant == '"') break;
-					$pile[] = '(';
+					if(isset($courant)) $pile[] = $courant;
+					$courant = '(';
+					break;
 				case ')':
 					if($courant == '"') break;
-					if($courant == ')')
+					if($courant == '(')
 						$courant = array_pop($pile);
 					break;
 				case '+':
-					if(!count($pile) && substr($chaîne, $p[1] + 1, 1) == '"') continue 2;
+					if(!count($pile) && !isset($courant) && substr($chaîne, $p[1] + 1, 1) == '"')
+					{
+						$retour .= ($dollar ? '' : '${').substr($chaîne, $pos, $p[1] - $pos).'}';
+						$pos = $p[1] + 1;
+						continue 2;
+					}
 					break;
 			}
 			$pos0 = $pos;
 			$pos = $p[1] + strlen($p[0]);
-			if(!isset($courant) && !$dollar) { $retour .= '${'; $dollar = true; }
+			// Si on est dans une section variabilisée dont on n'a pas encore sorti la balise de démarrage;
+			// sachant qu'on n'est pas en variabilisé si on est dans un guillemet de premier niveau.
+			if(!$dollar && ($courant != '"' || count($pile))) { $retour .= '${'; $dollar = true; }
 			$retour .= substr($chaîne, $pos0, $pos - $pos0);
 		}
 		if($dollar)
@@ -272,6 +281,20 @@ class Talend
 		/* À FAIRE?: simplifier certaines formules Talend, par ex.: ${((<type>)globalMap.get("raymond.carré")} en ${GM.raymond.carré}
 		 * Ou alors le proposer via un fonction passée en paramètre: comme ça l'appelant peut fournir sa version spécialisée, capable d'en profiter pour créer un lien depuis un nœud virtuel GlobalMap. */
 		return $retour;
+	}
+	
+	public function testDéchaîne()
+	{
+		foreach
+		(
+			[
+				'"fixe."+globalMap.get("entre \"guillemets\"")+" et \"guillemets\""+" etc."' => 'fixe.${globalMap.get("entre \"guillemets\"")} et "guillemets" etc.',
+				'globalMap.get("entre \"guillemets\"")+" et \"guillemets\""+" etc."' => '${globalMap.get("entre \"guillemets\"")} et "guillemets" etc.',
+			]
+			as $avant => $attendu
+		)
+			if(($après = $this->_déchaîne($avant)) != $attendu)
+				echo "# Résultat inattendu:\n    $avant\n  - $attendu\n  + $après\n";
 	}
 	
 	/*- Nœuds de mise en correspondance --------------------------------------*/
