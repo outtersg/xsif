@@ -196,11 +196,82 @@ class Talend
 		return $r;
 	}
 	
+	/**
+	 * Convertit une chaîne Java (éléments fixes entre guillemets, éléments variables tels quels) en chaîne shell (éléments fixes tels quels, éléments variables entre ${…}).
+	 */
 	protected function _déchaîne($chaîne)
 	{
-		/* À FAIRE: on ne gère toujours pas les "truc"+globalMap.get("blabla"). En fait il faudrait parcourir la chaîne avec un compteur de " ( et \, et ne simplifier que lorsque la pile est à 0. */
-		$chaîne = preg_replace_callback('/\+?("(?:[^\\\\"]+|\\\\")*"|[^"+]+|[+][^"])/', function($x) { $x = $x[1]; return substr($x, 0, 1) == '"' ? substr(strtr($x, [ '\"' => '"' ]), 1, -1) : '${'.$x.'}'; }, $chaîne);
-		return $chaîne;
+		if(strpos($chaîne, '"') === false) return '${'.$chaîne.'}';
+		if(preg_match('/^"[^"]*"$/', $chaîne)) return trim($chaîne, '"');
+		
+		preg_match_all('/["()+]|\\\\./', $chaîne, $r, PREG_OFFSET_CAPTURE);
+		$retour = '';
+		$pile = [];
+		$courant = null;
+		$dollar = false;
+		$pos = 0;
+		foreach($r[0] as $p)
+		{
+			// Si un caractère précédent (ex.: \) a déjà traité le caractère actuel, on passe.
+			if($p[1] < $pos) continue;
+			switch(substr($p[0], 0, 1))
+			{
+				case '"':
+					if($courant == '"')
+					{
+						$courant = array_pop($pile);
+						if(!count($pile) && !isset($courant))
+						{
+							$retour .= substr($chaîne, $pos, $p[1] - $pos);
+							$pos = $p[1] + 1;
+							if(substr($chaîne, $pos, 1) == '+') ++$pos;
+							continue 2;
+						}
+					}
+					else
+					{
+						if(isset($courant)) $pile[] = $courant;
+						$courant = '"';
+						if(!count($pile))
+						{
+							if($p[1] > $pos && substr($chaîne, $p[1] - 1, 1) == '+')
+								$retour .= ($dollar ? '' : '${').substr($chaîne, $pos, $p[1] - 1 - $pos).'}';
+							$dollar = false;
+							$pos = $p[1] + 1;
+							continue 2;
+						}
+					}
+					break;
+				case '\\':
+					if($courant == '"' && !count($pile))
+					{
+						$retour .= substr($chaîne, $pos, $p[1] - $pos).substr($p[0], 1);
+						$pos = $p[1] + strlen($p[0]);
+					}
+					break;
+				case '(':
+					if($courant == '"') break;
+					$pile[] = '(';
+				case ')':
+					if($courant == '"') break;
+					if($courant == ')')
+						$courant = array_pop($pile);
+					break;
+				case '+':
+					if(!count($pile) && substr($chaîne, $p[1] + 1, 1) == '"') continue 2;
+					break;
+			}
+			$pos0 = $pos;
+			$pos = $p[1] + strlen($p[0]);
+			if(!isset($courant) && !$dollar) { $retour .= '${'; $dollar = true; }
+			$retour .= substr($chaîne, $pos0, $pos - $pos0);
+		}
+		if($dollar)
+			$retour .= '}';
+		/* À FAIRE: là on doit avoir une pile vide, et $courant === null. */
+		/* À FAIRE?: simplifier certaines formules Talend, par ex.: ${((<type>)globalMap.get("raymond.carré")} en ${GM.raymond.carré}
+		 * Ou alors le proposer via un fonction passée en paramètre: comme ça l'appelant peut fournir sa version spécialisée, capable d'en profiter pour créer un lien depuis un nœud virtuel GlobalMap. */
+		return $retour;
 	}
 	
 	/*- Nœuds de mise en correspondance --------------------------------------*/
