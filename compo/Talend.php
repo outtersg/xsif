@@ -312,7 +312,7 @@ class Talend
 	{
 		/* Tableau de style texte plutôt que zone de texte: ça permet de faire arriver des liens en face de chaque ligne, pour indiquer où interviennent les tables. */
 		/* À FAIRE: si on reconnaît des tables ou assimilées (vues, séquences), les matérialiser comme intermédiaires entre la base et nous. */
-		$o = new Tableau($infos['nom'], explode("\n", $this->_déchaîne($infos['QUERY'])));
+		$o = new Tableau($infos['nom'], explode("\n", trim($this->_déchaîne($infos['QUERY']))));
 		$o->forme = 'bdd';
 		$o->style = 'texte';
 		$this->_nœuds[$infos['id']] = $o;
