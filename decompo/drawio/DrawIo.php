@@ -424,6 +424,7 @@ class DrawIo
 	
 	public function calcForme($forme)
 	{
+		/* À FAIRE: si plusieurs formes nuage proches avec le même nom, les fusionner: le nuage, c'est un peu la prise terre, c'est un machin qui peut émerger partout mais représente la même réalité sous-jacente. */
 		$coord = $this->_p->pos($forme);
 		$coord->id = ++$this->_id;
 		$coord->h = 50;
