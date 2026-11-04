@@ -335,7 +335,8 @@ class Talend
 	protected function _compilerNœud_tExtractXMLField($nœud, $r)
 	{
 		/* À FAIRE: mode alternatif tableau deux colonnes (plutôt que deux tableaux). */
-		/* À FAIRE: présenter façon XML; par ex., au lieu de:
+		
+		/* $arbo: pour avoir une représentation façon arbo XML; par ex., au lieu de:
 		 *   id                → id
 		 *   truc/bidule/chose → chose
 		 *   truc/machin       → machin
@@ -347,22 +348,41 @@ class Talend
 		 *     machin          → machin
 		 * /!\ bidule peut revenir, si un autre attribut provient de lui mais que dans la sortie on a voulu le placer sous machin.
 		 */
+		$arbo = 1;
+		
 		/* À FAIRE: LOOP_QUERY_BASE != "" */
 		/* À FAIRE: XML_TEXT != "" */
 		/* À FAIRE: XML_PREFIX != "" */
 		/* À FAIRE: FLOW, REJECT, CHECK */
+		
+		// Si intermédiaires, on ne passe pas directement de truc/a à truc/b/c/d, on crée les intermédiaires truc/b, truc/b/c, pour mener tout doucement à truc/b/c/d.
+		$intermédiaires = $arbo; // La représentation des intermédiaires est nécessaire pour passer par $this->cheminsEnArbo().
 		
 		$tTransfo = [];
 		$tRés = [];
 		$tr = [];
 		
 		$numT = $numR = -1;;
+		$préc = [];
 		foreach($r['MAPPING'] as $l)
 		{
-			$tTransfo[++$numT] = $this->_déchaîne($l['QUERY']);
+			$chem = $this->_déchaîne($l['QUERY']);
+			if($intermédiaires)
+			{
+				$chem = explode('/', $chem);
+				// On crée toutes les lignes intermédiaires représentant les nœuds parents du nôtre, s'ils ne sont pas communs avec notre prédécesseur.
+				for($d = 0; isset($préc[$d]) && isset($chem[$d]) && $préc[$d] === $chem[$d]; ++$d) {}
+				--$d;
+				while(isset($chem[++$d]))
+					$tTransfo[++$numT] = implode('/', array_slice($chem, 0, $d + 1));
+			}
+			else
+				$tTransfo[++$numT] = $chem;
 			$tRés[++$numR] = $l['SCHEMA_COLUMN'];
 			$tr[$numR] = $numT;
+			$préc = $chem;
 		}
+		/* À FAIRE: if($intermédiaires) trier. Sinon si on pioche les attributs un coup à gauche, un coup à droite, on repart à chaque fois sur une hiérarchie complète différente. */
 		
 		$oTransfo = new Tableau('XMLPath '.$r['nom']."\n".$this->_déchaîne($r['exprItér']), $tTransfo);
 		$oRés = new Tableau($tRés);
@@ -370,6 +390,9 @@ class Talend
 		$oRés->prédécesseurs[] = $oTransfo;
 		foreach($tRés as $clé => $trou)
 			$oRés->depuis[] = [ $oTransfo, $tr[$clé], $clé, 'attr' ];
+		
+		if($arbo)
+			$oTransfo->d = $this->cheminsEnArbo($oTransfo->d);
 		
 		$this->_nœuds[$r['id']] = $oTransfo;
 		$this->_nœuds[$r['id'].'.d'] = $oRés;
