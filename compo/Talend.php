@@ -554,7 +554,7 @@ class Talend
 					foreach($réfs as $réf)
 					{
 						$source = $champs[$réf];
-						$table->depuis[] = [ $source[0], $source[1], $num, 'attr' ];
+						$table->depuis[] = [ $source[0], $source[1], $num, $formule == $réf ? 'attr' : 'compo' ]; // 'attr' si cible = source, 'compo' si cible = source + d'autres choses.
 						$prédés[$source[0]->titre] = $source[0];
 					}
 				}
