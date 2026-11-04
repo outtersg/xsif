@@ -321,19 +321,22 @@ class Talend
 		
 		$tTransfo = [];
 		$tRés = [];
+		$tr = [];
 		
+		$numT = $numR = -1;;
 		foreach($r['MAPPING'] as $l)
 		{
-			$tTransfo[] = $this->_déchaîne($l['QUERY']);
-			$tRés[] = $l['SCHEMA_COLUMN'];
+			$tTransfo[++$numT] = $this->_déchaîne($l['QUERY']);
+			$tRés[++$numR] = $l['SCHEMA_COLUMN'];
+			$tr[$numR] = $numT;
 		}
 		
 		$oTransfo = new Tableau('XMLPath '.$r['nom']."\n".$this->_déchaîne($r['exprItér']), $tTransfo);
 		$oRés = new Tableau($tRés);
 		$oRés->style = 'd';
 		$oRés->prédécesseurs[] = $oTransfo;
-		foreach($tTransfo as $clé => $trou)
-			$oRés->depuis[] = [ $oTransfo, $clé, $clé, 'attr' ];
+		foreach($tRés as $clé => $trou)
+			$oRés->depuis[] = [ $oTransfo, $tr[$clé], $clé, 'attr' ];
 		
 		$this->_nœuds[$r['id']] = $oTransfo;
 		$this->_nœuds[$r['id'].'.d'] = $oRés;
