@@ -532,7 +532,7 @@ class Talend
 						$oPar = new Tableau($par);
 						$oVers->prédécesseurs[] = $oPar;
 						foreach($oVers->d as $num => $champ)
-							$oVers->depuis[] = [ $oPar, $num ];
+							$oVers->depuis[] = [ $oPar, $num, $num, 'attr' ];
 						$this->_nœuds[$r['id'].'.'.$nom] = $oPar;
 					}
 					$this->_nœuds[$r['id'].'.'.$nom.'.d'] = $oVers;
