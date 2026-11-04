@@ -600,6 +600,7 @@ class Talend
 		
 		$champs = [];
 		foreach($infos['VARIABLES'] as $v)
+			/* À FAIRE?: inverser pour que la colonne de gauche soit le calcul et celle de droite (connectée au nuage) le résultat à entreposer? */
 			$champs[] = [ $this->_déchaîne($v['KEY']), $this->_déchaîne($v['VALUE']) ];
 		$oc = new Tableau($champs);
 		$oc->style = 'd';
@@ -608,6 +609,8 @@ class Talend
 		
 		$this->_nœuds[$infos['id']] = $oc;
 		$this->_nœuds[$infos['id'].'.d'] = $o; // Alors en fait, dans ce sens (données vers nuage), d ça ne veut plus dire données, ça veut dire droite. Parce que la sortie de la constellation données → nuage est à droite, dans le nuage.
+		
+		/* À FAIRE: sur notifPrédécesseur(), simplifier si on est une liste de champs sur le même modèle ${rowX.champY}; on peut même faire sauter la colonne si toutes ses cases sont ainsi simplifiées. */
 	}
 	
 	/*- Nœuds de persistance -------------------------------------------------*/
