@@ -297,6 +297,39 @@ class Talend
 				echo "# Résultat inattendu:\n    $avant\n  - $attendu\n  + $après\n";
 	}
 	
+	/**
+	 * Transforme une liste:
+	 *   a
+	 *   a/b
+	 *   a/b/c
+	 *   a/b/d
+	 *   a/e
+	 * en:
+	 *   a
+	 *     b
+	 *       c
+	 *       d
+	 *     e
+	 */
+	public function cheminsEnArbo($chemins)
+	{
+		$r = [];
+		
+		/* À FAIRE: pouvoir créer les intermédiaires (cf. $intermédiaires dans _compilerNœud_tExtractXMLField) tout en préservant les clés pour ne pas perdre les assoc. */
+		
+		$pile = [];
+		foreach($chemins as $clé => $chemin)
+		{
+			while(count($pile) && substr($chemin, 0, strlen($pile[0])) != $pile[0])
+				array_shift($pile);
+			$r[$clé] = array_fill(0, count($pile), null);
+			$r[$clé][] = count($pile) ? ltrim(substr($chemin, strlen($pile[0])), '/') : $chemin;
+			array_unshift($pile, $chemin);
+		}
+		
+		return $r;
+	}
+	
 	/*- Nœuds de mise en correspondance --------------------------------------*/
 	
 	protected function _compilerNœud_tExtractXMLField($nœud, $r)
