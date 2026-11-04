@@ -592,6 +592,24 @@ class Talend
 			$oVers->depuis[] = [ $oDe, null, null, null, $oDe->titre.'.*' ];
 	}
 	
+	protected function _compilerNœud_tSetGlobalVar($nœud, $infos)
+	{
+		$o = new Forme('GM');
+		$o->forme = 'nuage';
+		$o->style = 'global';
+		
+		$champs = [];
+		foreach($infos['VARIABLES'] as $v)
+			$champs[] = [ $this->_déchaîne($v['KEY']), $this->_déchaîne($v['VALUE']) ];
+		$oc = new Tableau($champs);
+		$oc->style = 'd';
+		$o->prédécesseurs[] = $oc;
+		/* À FAIRE: lier en bleu */
+		
+		$this->_nœuds[$infos['id'].'.d'] = $oc;
+		$this->_nœuds[$infos['id']] = $o;
+	}
+	
 	/*- Nœuds de persistance -------------------------------------------------*/
 	
 	protected function _compilerNœud_tSQLConnection($nœud, $infos)
