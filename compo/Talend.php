@@ -533,13 +533,18 @@ class Talend
 						$oVers->prédécesseurs[] = $oPar;
 						foreach($oVers->d as $num => $champ)
 							$oVers->depuis[] = [ $oPar, $num, $num, 'attr' ];
-						$this->_nœuds[$r['id'].'.'.$nom] = $oPar;
+						$tables[$r['id'].'.'.$nom] = $oPar;
 					}
-					$this->_nœuds[$r['id'].'.'.$nom.'.d'] = $oVers;
+					$tables[$r['id'].'.'.$nom.'.d'] = $oVers;
 					
 				}
 		/* À FAIRE: tirer les liens source des expressions. */
 		/* À FAIRE: distinguer un champ copié tel quel d'un participant seulement à une formule. */
+		
+		// [] + [] manuel, pour garder l'ordre de création d'origine (permet de représenter les blocs dans l'ordre si aucune dépendance entre eux), tout en écrasant par la dernière valeur si l'ID est déjà utilisé.
+		// Bon on pourrait aussi faire du array_diff_key() + $table, ou se dire qu'il n'y a pas de raison que Talend nous fournisse deux blocs de même ID, mais…
+		foreach($tables as $id => $table)
+			$this->_nœuds[$id] = $table;
 	}
 	
 	/*- Nœuds de contexte ----------------------------------------------------*/
