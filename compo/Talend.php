@@ -298,6 +298,61 @@ class Talend
 	}
 	
 	/**
+	 * Tri stable d'une liste de chemins, pour éviter de rentrer plusieurs fois dans la même branche.
+	 */
+	public function regrouperChemins($chemins)
+	{
+		/* Tri stable: si on a:
+		 *   b
+		 *   b/b
+		 *   b/b/c
+		 *   a
+		 *   b     # ← Là une répétition de b pour pouvoir rerentrer dans la branche b en vue de la ligne suivante.
+		 *   b/a
+		 * le b/a ira se ranger après les b/b, histoire de perturber le moins possible l'ordre initial.
+		 */
+		
+		$inconnu = 0;
+		
+		$racine = [];
+		foreach($chemins as $numChemin => $c)
+		{
+			$c = explode('/', $c);
+			$ptrT = & $racine;
+			foreach($c as $numBout => $bout)
+			{
+				// Pas encore passés par là? On crée la branche.
+				if(!isset($ptrT[$bout]))
+				{
+					$ptrT[$bout] =
+					[
+						// Pour l'identifiant: les feuilles gardent l'indice qu'elles avaient dans le tableau de départ (des éléments pourraient s'y être liés par indice),
+						// mais si on doit créer le nœud de zéro, on lui donne une clé négative pour espérer ne pas empiéter.
+						$numBout == count($c) - 1 ? $numChemin : --$inconnu,
+						implode('/', array_slice($c, 0, $numBout + 1)),
+						[]
+					];
+				}
+				$ptrT = & $ptrT[$bout][2];
+			}
+		}
+		
+		$retour = [];
+		$this->_regrouperChemins_dérouler($racine, /*&*/ $retour);
+		
+		return $retour;
+	}
+	
+	protected function _regrouperChemins_dérouler($enfants, & $dest)
+	{
+		foreach($enfants as $enfant)
+		{
+			$dest[$enfant[0]] = $enfant[1];
+			$this->_regrouperChemins_dérouler($enfant[2], /*&*/ $dest);
+		}
+	}
+	
+	/**
 	 * Transforme une liste:
 	 *   a
 	 *   a/b
