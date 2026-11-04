@@ -489,6 +489,59 @@ class Talend
 		/* À FAIRE: nom du tableau données à piocher dans la <connection> qui part du $nœud. */
 	}
 	
+	protected function _compilerNœud_tMap($nœud, $r)
+	{
+		$tables = [];
+		$champs = [];
+		foreach($nœud->childNodes as $fils)
+			if($fils->localName == 'nodeData')
+				foreach($fils->childNodes as $petitFils)
+				{
+					if(!$petitFils instanceof DOMElement) continue;
+					switch($petitFils->localName)
+					{
+						case 'varTables':
+						case 'uiProperties':
+							continue 2;
+						case 'inputTables':
+						case 'outputTables':
+							// On traite de la même manière: les input peuvent elles-mêmes dépendre d'autres input.
+							break;
+						default:
+							fprintf(STDERR, "# tMap: je ne sais pas gérer les sous-nœuds %s\n", $petitFils->localName);
+							continue 2;
+					}
+					// Les tables de correspondances sont établies maintenant.
+					$par = [];
+					$vers = [];
+					$expressif = false;
+					$oVers = new Tableau($nom = $petitFils->getAttribute('name'));
+					$oVers->style = 'd';
+					foreach($petitFils->childNodes as $ppf)
+					{
+						if(!$ppf instanceof DOMElement) continue;
+						$vers[] = $champ = $ppf->getAttribute('name');
+						$champs[$nom.'.'.$champ] = [ $oVers, count($vers) - 1 ];
+						$par[] = $expr = $ppf->getAttribute('expression');
+						if(isset($expr))
+							$expressif = true;
+					}
+					$oVers->d = $vers;
+					if($expressif)
+					{
+						$oPar = new Tableau($par);
+						$oVers->prédécesseurs[] = $oPar;
+						foreach($oVers->d as $num => $champ)
+							$oVers->depuis[] = [ $oPar, $num ];
+						$this->_nœuds[$r['id'].'.'.$nom] = $oPar;
+					}
+					$this->_nœuds[$r['id'].'.'.$nom.'.d'] = $oVers;
+					
+				}
+		/* À FAIRE: tirer les liens source des expressions. */
+		/* À FAIRE: distinguer un champ copié tel quel d'un participant seulement à une formule. */
+	}
+	
 	/*- Nœuds de contexte ----------------------------------------------------*/
 	
 	protected function _compilerNœud_tFlowToIterate($nœud, $r)
