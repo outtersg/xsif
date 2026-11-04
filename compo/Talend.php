@@ -538,8 +538,25 @@ class Talend
 					$tables[$r['id'].'.'.$nom.'.d'] = $oVers;
 					
 				}
-		/* À FAIRE: tirer les liens source des expressions. */
 		/* À FAIRE: distinguer un champ copié tel quel d'un participant seulement à une formule. */
+		$tousChamps = implode('|', array_keys($champs));
+		$exprTousChamps = '/\b('.$tousChamps.')\b/';
+		foreach($tables as $idTable => $table)
+			if(substr($idTable, -2) != '.d')
+			{
+				foreach($table->d as $num => $formule)
+				{
+					$réfs = [];
+					preg_match_all($exprTousChamps, $formule, $r);
+					foreach($r[0] as $réf)
+						$réfs[$réf] = $réf; // Par indice pour ne garder qu'une seule entrée si la même source est citée plusieurs fois dans la formule.
+					foreach($réfs as $réf)
+					{
+						$source = $champs[$réf];
+						$table->depuis[] = [ $source[0], $source[1], $num, 'attr' ];
+					}
+				}
+			}
 		
 		// [] + [] manuel, pour garder l'ordre de création d'origine (permet de représenter les blocs dans l'ordre si aucune dépendance entre eux), tout en écrasant par la dernière valeur si l'ID est déjà utilisé.
 		// Bon on pourrait aussi faire du array_diff_key() + $table, ou se dire qu'il n'y a pas de raison que Talend nous fournisse deux blocs de même ID, mais…
