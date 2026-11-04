@@ -606,8 +606,8 @@ class Talend
 		$o->prédécesseurs[] = $oc;
 		/* À FAIRE: lier en bleu */
 		
-		$this->_nœuds[$infos['id'].'.d'] = $oc;
-		$this->_nœuds[$infos['id']] = $o;
+		$this->_nœuds[$infos['id']] = $oc;
+		$this->_nœuds[$infos['id'].'.d'] = $o; // Alors en fait, dans ce sens (données vers nuage), d ça ne veut plus dire données, ça veut dire droite. Parce que la sortie de la constellation données → nuage est à droite, dans le nuage.
 	}
 	
 	/*- Nœuds de persistance -------------------------------------------------*/
