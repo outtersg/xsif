@@ -523,7 +523,7 @@ class Talend
 						$vers[] = $champ = $ppf->getAttribute('name');
 						$champs[$nom.'.'.$champ] = [ $oVers, count($vers) - 1 ];
 						$par[] = $expr = $ppf->getAttribute('expression');
-						if(isset($expr))
+						if(isset($expr) && strlen($expr))
 							$expressif = true;
 					}
 					$oVers->d = $vers;
