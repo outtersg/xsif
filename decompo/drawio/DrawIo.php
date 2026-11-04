@@ -57,6 +57,17 @@ class DrawIo
 				'curveGeometry' => 1,
 			],
 		],
+		/* Composant: pas grand-chose. */
+		'compo' =>
+		[
+			'Lien' =>
+			[
+				'strokeColor' => '#7FBFFF',
+				// Quand on colle une palanquée de liens depuis les attributs d'un nœud, ils vont avoir tendance à se chevaucher. On atténue ce chevauchement en optant pour des courbes plutôt que des angles droits.
+				'curved' => 1,
+				'curveGeometry' => 1,
+			],
+		],
 		/* Donnée brute, et non flux de travail. */
 		'd' =>
 		[
