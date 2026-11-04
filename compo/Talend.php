@@ -412,6 +412,7 @@ class Talend
 		
 		// Si intermédiaires, on ne passe pas directement de truc/a à truc/b/c/d, on crée les intermédiaires truc/b, truc/b/c, pour mener tout doucement à truc/b/c/d.
 		$intermédiaires = $arbo; // La représentation des intermédiaires est nécessaire pour passer par $this->cheminsEnArbo().
+		$tri = 1; // Si pas tri, et que le MachinPath va taper un coup à droite, un coup à gauche, ça devient compliqué de s'y retrouver.
 		
 		$tTransfo = [];
 		$tRés = [];
@@ -437,7 +438,10 @@ class Talend
 			$tr[$numR] = $numT;
 			$préc = $chem;
 		}
-		/* À FAIRE: if($intermédiaires) trier. Sinon si on pioche les attributs un coup à gauche, un coup à droite, on repart à chaque fois sur une hiérarchie complète différente. */
+		
+		if($tri)
+			$tTransfo = $this->regrouperChemins($tTransfo);
+			/* À FAIRE: trier $tRés en conséquence pour éviter les croisements de liens. */
 		
 		$oTransfo = new Tableau('XMLPath '.$r['nom']."\n".$this->_déchaîne($r['exprItér']), $tTransfo);
 		$oRés = new Tableau($tRés);
