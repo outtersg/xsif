@@ -538,7 +538,6 @@ class Talend
 					$tables[$r['id'].'.'.$nom.'.d'] = $oVers;
 					
 				}
-		/* À FAIRE: distinguer un champ copié tel quel d'un participant seulement à une formule. */
 		$tousChamps = implode('|', array_keys($champs));
 		$exprTousChamps = '/\b('.$tousChamps.')\b/';
 		foreach($tables as $idTable => $table)
