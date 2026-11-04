@@ -544,6 +544,7 @@ class Talend
 		foreach($tables as $idTable => $table)
 			if(substr($idTable, -2) != '.d')
 			{
+				$prédés = [];
 				foreach($table->d as $num => $formule)
 				{
 					$réfs = [];
@@ -554,8 +555,11 @@ class Talend
 					{
 						$source = $champs[$réf];
 						$table->depuis[] = [ $source[0], $source[1], $num, 'attr' ];
+						$prédés[$source[0]->titre] = $source[0];
 					}
 				}
+				foreach($prédés as $prédé)
+					$table->prédécesseurs[] = $prédé;
 			}
 		
 		// [] + [] manuel, pour garder l'ordre de création d'origine (permet de représenter les blocs dans l'ordre si aucune dépendance entre eux), tout en écrasant par la dernière valeur si l'ID est déjà utilisé.
