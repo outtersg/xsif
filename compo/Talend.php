@@ -647,6 +647,7 @@ class Talend
 		$os->prédécesseurs[] = $o;
 		$this->_nœuds[$infos['id'].'.d'] = $os;
 		
+		/* À FAIRE: gérer DBTABLE.TABLE, qui contient aussi le nom de la table. */
 		$this->_lierBdd($o, $infos['CONNECTION'], $sql);
 	}
 	
@@ -667,6 +668,44 @@ class Talend
 		}
 		$ob = $this->_nœuds[$idBdd];
 		
+		/* Représente-t-on des objets table intermédiaires? */
+		
+		if(is_array($tables))
+		{
+			$oTables = [];
+			foreach($tables as $t)
+			{
+				if(is_array($t))
+				{
+					$nomTable = $t[0];
+					/* À FAIRE: gérer la ligne */
+				}
+				else
+				{
+					$nomTable = $t;
+				}
+				/* À FAIRE: simplifier pour retrouver le nom normalisé (retirer les guillemets, retirer le nom de base, placer le schéma en-dessous à titre informatif). */
+				$idTable = $idBdd.'.'.$nomTable;
+				if(isset($this->_nœuds[$idTable]))
+					$ot = $this->_nœuds[$idTable];
+				else
+				{
+					$ot = $this->_nœuds[$idTable] = new Forme($nomTable);
+					$ot->forme = 'table';
+					if($this->basesÀDroite)
+						$ob->prédécesseurs[] = $ot;
+					else
+						$ot->prédécesseurs[] = $ob;
+					/* À FAIRE: styler le lien table - base comme relation de contenu à conteneur. */
+				}
+				$oTables[] = $ot;
+			}
+		}
+		else
+			$oTables = $ob;
+		
+		foreach($oTables as $ob)
+		{
 		if($this->basesÀDroite)
 		{
 			$ob->prédécesseurs[] = $o;
@@ -676,6 +715,7 @@ class Talend
 			$o->prédécesseurs[] = $ob;
 		
 		$o->depuis[] = [ $ob, null, null, 'd' ];
+		}
 	}
 	
 	protected function _compilerNœud_tPostgresqlInput($nœud, $infos) { return $this->_compilerNœud_tSQLInput($nœud, $infos); }
