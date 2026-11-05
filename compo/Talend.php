@@ -668,7 +668,10 @@ class Talend
 		$ob = $this->_nœuds[$idBdd];
 		
 		if($this->basesÀDroite)
+		{
 			$ob->prédécesseurs[] = $o;
+			$ob->depuis[] = [ $o, null, null, false ];
+		}
 		else
 			$o->prédécesseurs[] = $ob;
 		
