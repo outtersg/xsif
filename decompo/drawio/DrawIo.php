@@ -466,6 +466,7 @@ class DrawIo
 		$coord = $this->_p->pos($forme);
 		$ff = $forme->forme;
 		if(isset($corresp[$ff])) $ff = $corresp[$ff];
+		if(strlen($ff) && substr($ff, -1) != ';') $ff .= ';';
 		$id = $coord->id;
 		$affStyle = $this->style(isset($forme->style) ? $forme->style : null, $forme);
 		$titre = $forme->titre;
