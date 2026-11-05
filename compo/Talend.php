@@ -32,6 +32,9 @@ use Gui\Xsif\Modele\Diagramme\Tableau;
 
 class Talend
 {
+	/** Les bases de données sont-elles en bout de chaîne? */
+	public $basesÀDroite = true;
+	
 	public function charger($fichier)
 	{
 		$contenu = file_get_contents($fichier);
@@ -115,6 +118,11 @@ class Talend
 			'CHECK' =>
 			[
 				'DEFAULT_MAP' => 'GlobalMap',
+			],
+			'COMPONENT_LIST' =>
+			[
+				/* Ressources liées */
+				'CONNECTION',
 			],
 		];
 		/** À FAIRE: coller cela dans un static. Inutile de recalculer notre table de correspondances à chaque fois. */
@@ -628,7 +636,7 @@ class Talend
 	{
 		/* Tableau de style texte plutôt que zone de texte: ça permet de faire arriver des liens en face de chaque ligne, pour indiquer où interviennent les tables. */
 		/* À FAIRE: si on reconnaît des tables ou assimilées (vues, séquences), les matérialiser comme intermédiaires entre la base et nous. */
-		$o = new Tableau($infos['nom'], explode("\n", trim($this->_déchaîne($infos['QUERY']))));
+		$o = new Tableau($infos['nom'], explode("\n", $sql = trim($this->_déchaîne($infos['QUERY']))));
 		$o->forme = 'bdd';
 		$o->style = 'texte';
 		$this->_nœuds[$infos['id']] = $o;
@@ -637,6 +645,28 @@ class Talend
 		$os->style = 'd';
 		$os->prédécesseurs[] = $o;
 		$this->_nœuds[$infos['id'].'.d'] = $os;
+		
+		$this->_lierBdd($o, $infos['CONNECTION'], $sql);
+	}
+	
+	protected function _lierBdd($o, $idBdd, $tables)
+	{
+		/* Extraction des tables. */
+		
+		if(is_string($tables))
+		{
+			/* À FAIRE */
+		}
+		
+		$ob = $this->_nœuds[$idBdd];
+		/* À FAIRE: et si la BdD n'est pas encore arrivée? Créer un nœud virtuel en attente. */
+		
+		if($this->basesÀDroite)
+			$ob->prédécesseurs[] = $o;
+		else
+			$o->prédécesseurs[] = $ob;
+		
+		$o->depuis[] = [ $ob, null, null, 'd' ];
 	}
 	
 	protected function _compilerNœud_tPostgresqlInput($nœud, $infos) { return $this->_compilerNœud_tSQLInput($nœud, $infos); }
