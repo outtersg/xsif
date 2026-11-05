@@ -458,8 +458,11 @@ class DrawIo
 		if(isset($corresp[$ff])) $ff = $corresp[$ff];
 		$id = $coord->id;
 		$affStyle = $this->style(isset($forme->style) ? $forme->style : null, $forme);
+		$titre = $forme->titre;
+		if(in_array($forme->forme, [ 'bdd' ]))
+			$titre = preg_replace('/^(?: *[^( ]+)+/', '<b>\0</b>', $titre);
 		$this->_sortir(<<<TERMINE
-			<mxCell id="xsif-$id" parent="1" style="{$ff}html=1;$affStyle" value="{$this->affT($forme->titre)}" vertex="1">
+			<mxCell id="xsif-$id" parent="1" style="{$ff}html=1;$affStyle" value="{$this->affT($titre)}" vertex="1">
 				<mxGeometry height="{$coord->h}" width="{$coord->l}" x="{$coord->x}" y="{$coord->y}" as="geometry"/>
 			</mxCell>
 		TERMINE);
