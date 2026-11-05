@@ -176,6 +176,7 @@ class DrawIo
 					}
 					else
 						$de = $depuis;
+					if($style !== false) // Certains liens sont créés juste pour lier techniquement, sans souhait de représentation.
 					$this->affLien($de, $vers, $style, $libellé);
 					// Si $de est un prédécesseur que nous avons voulu lier avec style, inutile de le re-représenter comme prédécesseur (sans style).
 					$prédécesseurs = array_filter($prédécesseurs, function($x) use($de) { return $x !== $de; });
