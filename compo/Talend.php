@@ -625,7 +625,8 @@ class Talend
 	protected function _compilerNœud_tSQLConnection($nœud, $infos)
 	{
 		/* À FAIRE?: valider que les tPostgresqlInput etc. qui s'y branchent utilisent les mêmes paramètres de connexion */
-		$o = new Forme($infos['nom']."\n".$this->_déchaîne($infos['HOST']).'/'.$this->_déchaîne($infos['DBNAME']));
+		$o = isset($this->_nœuds[$infos['id']]) ? $this->_nœuds[$infos['id']] : new Forme();
+		$o->titre = $infos['nom']."\n".$this->_déchaîne($infos['HOST']).'/'.$this->_déchaîne($infos['DBNAME']);
 		$o->forme = 'bdd';
 		$this->_nœuds[$infos['id']] = $o;
 	}
@@ -658,8 +659,13 @@ class Talend
 			/* À FAIRE */
 		}
 		
+		if(!isset($this->_nœuds[$idBdd]))
+		{
+			$ob = new Forme();
+			$ob->forme = 'bdd';
+			$this->_nœuds[$idBdd] = $ob;
+		}
 		$ob = $this->_nœuds[$idBdd];
-		/* À FAIRE: et si la BdD n'est pas encore arrivée? Créer un nœud virtuel en attente. */
 		
 		if($this->basesÀDroite)
 			$ob->prédécesseurs[] = $o;
