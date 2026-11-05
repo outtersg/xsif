@@ -688,8 +688,13 @@ class Talend
 				{
 					$nomTable = $t;
 				}
-				/* À FAIRE: simplifier pour retrouver le nom normalisé (retirer les guillemets, retirer le nom de base, placer le schéma en-dessous à titre informatif). */
-				$idTable = $idBdd.'.'.$nomTable;
+				/* À FAIRE: conserver le schéma pour information, non seulement en dessous (visuellement), mais aussi en interne pour éviter les fusions à tort:
+				 * on le simplifie à l'affichage pour lisibilité, et pour pouvoir fusionner ma_table et schéma.ma_table, mais si d'aventure un de nos traitements déversait schéma1.ma_table vers schéma2.ma_table, il faudrait qu'on puisse instancier un objet table distinct (et signaler toutes les ambiguïtés passées).
+				 * En ce cas l'instance initiale pourrait s'appeler $idBdd.'.*.'.$idTable, et une fois l'ambiguïté créée, le schéma serait explicitement donné.
+				 * Ou alors n'effectuer la passe de fusion qu'une fois tout le modèle récupéré: plus facile pour être sûrs de ne pas avoir d'ambiguïtés, moins facile pour fusionner une fois chacun des nœuds inséré avec ses relations éparpillées dans le graphe.
+				 */
+				$nomTable = trim(preg_replace('/^([^.]+\.)+/', '', $nomTable), '"');
+				$idTable = $idBdd.'.'.strtolower($nomTable);
 				if(isset($this->_nœuds[$idTable]))
 					$ot = $this->_nœuds[$idTable];
 				else
