@@ -21,6 +21,13 @@
  * SOFTWARE.
  */
 
+/* À FAIRE: imperfections en passant par l'appli lourde:
+ * - titre de SQL en Times New Roman
+ * - titre de Forme en Times
+ * - flèche de SQL vers nuage arrive au centre du nuage plutôt qu'en bordure
+ * - /!\ commencer par une ligne vide plante le client lourd
+ */
+
 class DrawIo
 {
 	const P_STANDARD = 0;
