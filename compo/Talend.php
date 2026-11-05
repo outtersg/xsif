@@ -393,6 +393,13 @@ class Talend
 		return $r;
 	}
 	
+	protected function _blocTexte()
+	{
+		/* À FAIRE: permettre de choisir soit un mode tableau (une ligne par ligne), soit un bloc texte (juste une zone de texte: copiable-collable). */
+		/* À FAIRE: savoir caler précisément la hauteur de ligne, pour savoir, dans un bloc texte, où arrive le connecteur pour chaque ligne.
+		 * Alors on n'aura plus besoin du mode tableau. */
+	}
+	
 	/*- Nœuds de mise en correspondance --------------------------------------*/
 	
 	protected function _compilerNœud_tExtractXMLField($nœud, $r)
