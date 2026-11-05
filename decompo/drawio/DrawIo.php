@@ -21,6 +21,8 @@
  * SOFTWARE.
  */
 
+/* À FAIRE: fusionner lorsqu'on enchaîne des transformations champ à champ. */
+
 /* À FAIRE: imperfections en passant par l'appli lourde:
  * - titre de SQL en Times New Roman
  * - titre de Forme en Times
