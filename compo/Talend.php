@@ -657,7 +657,11 @@ class Talend
 		
 		if(is_string($tables))
 		{
-			/* À FAIRE */
+			preg_match_all('/\bfrom\s+(\S+)/i', $tables, $tables, PREG_OFFSET_CAPTURE);
+			/* À FAIRE: nextval(…) */
+			/* À FAIRE: pas les from (select …) as bla */
+			$tables = $tables[1];
+			/* À FAIRE: traduire la position en numéro de ligne */
 		}
 		
 		if(!isset($this->_nœuds[$idBdd]))
