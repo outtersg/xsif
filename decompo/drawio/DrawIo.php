@@ -79,6 +79,10 @@ class DrawIo
 				'roundedPerimeter' => false,
 				'collapsible' => 'true',
 			],
+			'Lien' =>
+			[
+				'strokeColor' => '#FF00FF',
+			],
 		],
 		'global' =>
 		[
