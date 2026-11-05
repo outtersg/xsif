@@ -462,6 +462,7 @@ class DrawIo
 		[
 			'nuage' => 'ellipse;shape=cloud;perimeter=cloudPerimeter;',
 			'bdd' => 'shape=mxgraph.flowchart.database;aspect=fixed;strokeColor=#00007F;fillColor=#7F7FFF;',
+			'table' => 'shape=image;imageAspect=0;aspect=fixed;verticalLabelPosition=bottom;verticalAlign=top;image=https://tmp.outters.eu/database-table.svg;'
 		];
 		$coord = $this->_p->pos($forme);
 		$ff = $forme->forme;
