@@ -547,6 +547,7 @@ class Talend
 					// Les tables de correspondances sont établies maintenant.
 					$par = [];
 					$vers = [];
+					$filtrant = false;
 					$expressif = false;
 					$oVers = new Tableau($nom = $petitFils->getAttribute('name'));
 					$oVers->style = 'd';
@@ -557,10 +558,35 @@ class Talend
 						$champs[$nom.'.'.$champ] = [ $oVers, count($vers) - 1 ];
 						$expr = trim($ppf->getAttribute('expression'));
 						if(isset($expr) && strlen($expr))
+						{
+							if(($compar = $ppf->getAttribute('operator')))
+							{
+								$filtrant = true;
+								/* À FAIRE: et si l'operator est différent de = écrit-on dans le bon sens? */
+								/* NOTE: Symboles pour exprimer le filtre
+								 * L'entonnoir n'existe pas https://stackoverflow.com/questions/37991395/unicode-character-for-funnel-to-signify-filtering
+								 * Mais parmi les symboles mathématiques (https://en.wikipedia.org/wiki/Mathematical_operators_and_symbols_in_Unicode) certains sont jolis:
+								 * ≣ strictement équivalent à
+								 * ⊨ "satisfait", "force"
+								 * ⊦ assertion
+								 * ⋺ contient avec long trait horizontal
+								 * ⊳ contient comme sous-groupe normal
+								 */
+								$expr = '⊳'.' '.$compar.' '.$expr;
+							}
+							else
 							$expressif = true;
+						}
 						$par[] = $expr;
 					}
 					$oVers->d = $vers;
+					if($filtrant && $expressif)
+						fprintf(STDERR, "# Nœud à la fois à formule et à filtre. Résultats non garantis.\n");
+					if($filtrant)
+					{
+						foreach($oVers->d as $numLigne => $ligne)
+							$oVers->d[$numLigne] = [ $par[$numLigne], $ligne];
+					}
 					if($expressif)
 					{
 						$oPar = new Tableau($par);
