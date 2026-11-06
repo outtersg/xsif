@@ -393,11 +393,15 @@ class Talend
 		return $r;
 	}
 	
-	protected function _blocTexte()
+	protected function _blocTexte($nœud, $infos, $texte)
 	{
 		/* À FAIRE: permettre de choisir soit un mode tableau (une ligne par ligne), soit un bloc texte (juste une zone de texte: copiable-collable). */
 		/* À FAIRE: savoir caler précisément la hauteur de ligne, pour savoir, dans un bloc texte, où arrive le connecteur pour chaque ligne.
 		 * Alors on n'aura plus besoin du mode tableau. */
+		
+		$o = new Tableau($infos['nom'], explode("\n", $texte));
+		$o->style = 'texte';
+		$this->_nœuds[$infos['id']] = $o;
 	}
 	
 	/*- Nœuds de mise en correspondance --------------------------------------*/
