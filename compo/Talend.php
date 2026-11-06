@@ -652,6 +652,7 @@ class Talend
 	}
 	
 	protected function _compilerNœud_tPostgresqlConnection($nœud, $infos) { return $this->_compilerNœud_tSQLConnection($nœud, $infos); }
+	protected function _compilerNœud_tOracleConnection($nœud, $infos) { return $this->_compilerNœud_tSQLConnection($nœud, $infos); }
 	
 	protected function _compilerNœud_tSQLInput($nœud, $infos)
 	{
@@ -748,6 +749,7 @@ class Talend
 	}
 	
 	protected function _compilerNœud_tPostgresqlInput($nœud, $infos) { return $this->_compilerNœud_tSQLInput($nœud, $infos); }
+	protected function _compilerNœud_tOracleInput($nœud, $infos) { return $this->_compilerNœud_tSQLInput($nœud, $infos); }
 	
 	/*- Code -----------------------------------------------------------------*/
 	
