@@ -529,6 +529,11 @@ class Talend
 					switch($petitFils->localName)
 					{
 						case 'varTables':
+							// Une varTables, c'est un truc qui est à la fois input et output. Mais la plupart du temps la balise existe, vide, et on ne veut pas pondre un nœud pour ça.
+							if($petitFils->hasChildNodes())
+								break;
+							else
+								continue 2;
 						case 'uiProperties':
 							continue 2;
 						case 'inputTables':
