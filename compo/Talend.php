@@ -128,6 +128,10 @@ class Talend
 			[
 				'DEFAULT_MAP' => 'GlobalMap',
 			],
+			'FILE' =>
+			[
+				'FILENAME',
+			],
 			'COMPONENT_LIST' =>
 			[
 				/* Ressources liées */
@@ -417,6 +421,13 @@ class Talend
 	
 	protected function _compilerNœud_tExtractXMLField($nœud, $r)
 	{
+		return $this->_compilerNœud_XMLVersChamps($nœud, $r);
+	}
+	
+	protected function _compilerNœud_tFileInputXML($nœud, $r) { return $this->_compilerNœud_XMLVersChamps($nœud, $r); }
+	
+	protected function _compilerNœud_XMLVersChamps($nœud, $r)
+	{
 		/* À FAIRE: mode alternatif tableau deux colonnes (plutôt que deux tableaux). */
 		
 		/* $arbo: pour avoir une représentation façon arbo XML; par ex., au lieu de:
@@ -471,7 +482,10 @@ class Talend
 			$tTransfo = $this->regrouperChemins($tTransfo);
 			/* À FAIRE: trier $tRés en conséquence pour éviter les croisements de liens. */
 		
-		$oTransfo = new Tableau('XMLPath '.$r['nom']."\n".$this->_déchaîne($r['exprItér']), $tTransfo);
+		$titre = 'XMLPath '.$r['nom'];
+		if(isset($r['FILENAME'])) $titre .= "\n".$this->_déchaîne($r['FILENAME']);
+		$titre .= "\n".$this->_déchaîne($r['exprItér']);
+		$oTransfo = new Tableau($titre, $tTransfo);
 		$oRés = new Tableau($tRés);
 		$oRés->style = 'd';
 		$oRés->prédécesseurs[] = $oTransfo;
