@@ -814,6 +814,16 @@ class Talend
 	
 	protected function _compilerNœud_tJava($nœud, $infos) { return $this->_compilerNœud_tJavaRow($nœud, $infos); }
 	
+	/*- Nœuds informatifs ----------------------------------------------------*/
+	/* Quelques nœuds dont on n'a rien à faire d'un point de vue fonctionnel, mais que l'on parcourt tout de même pour récupérer leurs identifiants (sur lesquels se branchent leurs successeurs) et éviter de casser la chaîne. */
+	
+	protected function _compilerNœud_tLogRow($nœud, $infos)
+	{
+		$o = new Forme($infos['nom']);
+		$o->forme = '';
+		$this->_nœuds[$infos['id']] = $o;
+	}
+	
 	/*- Les liens ------------------------------------------------------------*/
 	
 	protected function _compilerLien($lien)
