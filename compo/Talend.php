@@ -555,9 +555,10 @@ class Talend
 						if(!$ppf instanceof DOMElement) continue;
 						$vers[] = $champ = $ppf->getAttribute('name');
 						$champs[$nom.'.'.$champ] = [ $oVers, count($vers) - 1 ];
-						$par[] = $expr = trim($ppf->getAttribute('expression'));
+						$expr = trim($ppf->getAttribute('expression'));
 						if(isset($expr) && strlen($expr))
 							$expressif = true;
+						$par[] = $expr;
 					}
 					$oVers->d = $vers;
 					if($expressif)
