@@ -113,7 +113,16 @@ class Talend
 			],
 			'MEMO_SQL' =>
 			[
+				/* À FAIRE: ça ça part en 'code', pour uniformiser. */
 				'QUERY',
+			],
+			'MEMO_JAVA' =>
+			[
+				'CODE' => 'code',
+			],
+			'MEMO_IMPORT' =>
+			[
+				'IMPORT' => 'inc',
 			],
 			'CHECK' =>
 			[
@@ -739,6 +748,23 @@ class Talend
 	}
 	
 	protected function _compilerNœud_tPostgresqlInput($nœud, $infos) { return $this->_compilerNœud_tSQLInput($nœud, $infos); }
+	
+	/*- Code -----------------------------------------------------------------*/
+	
+	/* N.B.: les tPostgresqlInput et autres SQL pourraient venir ici aussi. */
+	
+	protected function _compilerNœud_tJavaRow($nœud, $infos)
+	{
+		$code = $infos['inc'];
+		$code = trim(preg_replace('#^\s*//.*#m', '', $code)); // Les // import java.util; laissés traîner par défaut ne nous intéressent pas.
+		$code = $code ? [ $code ] : [];
+		if(isset($infos['code']))
+			$code[] = trim($infos['code']);
+		$code = implode("\n", $code);
+		$this->_blocTexte($nœud, $infos, $code);
+	}
+	
+	protected function _compilerNœud_tJava($nœud, $infos) { return $this->_compilerNœud_tJavaRow($nœud, $infos); }
 	
 	/*- Les liens ------------------------------------------------------------*/
 	
