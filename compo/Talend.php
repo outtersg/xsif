@@ -222,6 +222,7 @@ class Talend
 	 */
 	public function _déchaîne($chaîne)
 	{
+		/* À FAIRE: "machin".equals(truc.bidule): ne sort-il pas en machin${.equals(truc.bidule)} ? */
 		// Les entiers bruts sortent tels quels:
 		if(is_numeric($chaîne)) return $chaîne;
 		if(strpos($chaîne, '"') === false) return '${'.$chaîne.'}';
@@ -313,6 +314,8 @@ class Talend
 			[
 				'"fixe."+globalMap.get("entre \"guillemets\"")+" et \"guillemets\""+" etc."' => 'fixe.${globalMap.get("entre \"guillemets\"")} et "guillemets" etc.',
 				'globalMap.get("entre \"guillemets\"")+" et \"guillemets\""+" etc."' => '${globalMap.get("entre \"guillemets\"")} et "guillemets" etc.',
+				'"\"machin\"".equals(truc.bidule) ? "oui" : "non"' => '${"\"machin\"".equals(truc.bidule) ? "oui" : "non"}',
+				/* À FAIRE: une parenthèse dans des guillemets. */
 			]
 			as $avant => $attendu
 		)
