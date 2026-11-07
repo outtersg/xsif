@@ -688,7 +688,7 @@ class Talend
 		$oc->style = 'd';
 		$o->prédécesseurs[] = $oc;
 		/* À FAIRE: lier en bleu */
-		$of = new Tableau($formus);
+		$of = new Tableau($infos['nom'], $formus);
 		$oc->prédécesseurs[] = $of;
 		foreach($oc->d as $num => $champ)
 			$oc->depuis[] = [ $of, $num, $num, 'attr' ];
