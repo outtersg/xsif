@@ -693,7 +693,7 @@ class Talend
 		foreach($oc->d as $num => $champ)
 			$oc->depuis[] = [ $of, $num, $num, 'attr' ];
 		
-		$this->_nœuds[$infos['id'].'.f'] = $of;
+		$this->_nœuds[$infos['id'].'.a'] = $of;
 		$this->_nœuds[$infos['id']] = $oc;
 		$this->_nœuds[$infos['id'].'.d'] = $o; // Alors en fait, dans ce sens (données vers nuage), d ça ne veut plus dire données, ça veut dire droite. Parce que la sortie de la constellation données → nuage est à droite, dans le nuage.
 		
