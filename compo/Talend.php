@@ -672,14 +672,26 @@ class Talend
 		$o->style = 'global';
 		
 		$champs = [];
+		$formus = [];
+		// On adopte la typologie "Tableau formus → Tableau données" commune à pas mal de traitements:
+		// ça nous rendra éligibles à la simplification de la partie formu si tous les champs sont calculés comme ${entrée.champ}.
+		/* À FAIRE: phase simplification. */
+		/* À FAIRE: simplification partielle: si tous les champs sont simplifiables sauf 1 (ex.: valeur fixe), ne garder du tableau formu que la valeur fixe injectée vers le champ, pour tous les autres champs se brancher directement au champ source correspondant. */
 		foreach($infos['VARIABLES'] as $v)
-			/* À FAIRE?: inverser pour que la colonne de gauche soit le calcul et celle de droite (connectée au nuage) le résultat à entreposer? */
-			$champs[] = [ $this->_déchaîne($v['KEY']), $this->_déchaîne($v['VALUE']) ];
+		{
+			$champs[] = $this->_déchaîne($v['KEY']);
+			$formus[] = $this->_déchaîne($v['VALUE']);
+		}
 		$oc = new Tableau($champs);
 		$oc->style = 'd';
 		$o->prédécesseurs[] = $oc;
 		/* À FAIRE: lier en bleu */
+		$of = new Tableau($formus);
+		$oc->prédécesseurs[] = $of;
+		foreach($oc->d as $num => $champ)
+			$oc->depuis[] = [ $of, $num, $num, 'attr' ];
 		
+		$this->_nœuds[$infos['id'].'.f'] = $of;
 		$this->_nœuds[$infos['id']] = $oc;
 		$this->_nœuds[$infos['id'].'.d'] = $o; // Alors en fait, dans ce sens (données vers nuage), d ça ne veut plus dire données, ça veut dire droite. Parce que la sortie de la constellation données → nuage est à droite, dans le nuage.
 		
