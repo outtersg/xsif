@@ -247,7 +247,7 @@ class Talend
 						{
 							$retour .= substr($chaîne, $pos, $p[1] - $pos);
 							$pos = $p[1] + 1;
-							if(substr($chaîne, $pos, 1) == '+') ++$pos;
+							if(preg_match('/^\s*[+]\s*/', substr($chaîne, $pos), /*&*/ $rex)) $pos += strlen($rex[0]);
 							continue 2;
 						}
 					}
@@ -283,9 +283,9 @@ class Talend
 						$courant = array_pop($pile);
 					break;
 				case '+':
-					if(!count($pile) && !isset($courant) && substr($chaîne, $p[1] + 1, 1) == '"')
+					if(!count($pile) && !isset($courant) && preg_match('/^\s*"/', substr($chaîne, $p[1] + 1)))
 					{
-						$retour .= ($dollar ? '' : '${').substr($chaîne, $pos, $p[1] - $pos).'}';
+						$retour .= ($dollar ? '' : '${').rtrim(substr($chaîne, $pos, $p[1] - $pos)).'}';
 						$pos = $p[1] + 1;
 						continue 2;
 					}
