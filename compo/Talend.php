@@ -865,7 +865,7 @@ class Talend
 		if(!isset($oDe->titre) && isset($infos['nom']))
 			$oDe->titre = $infos['nom'];
 		if(!isset($this->_nœuds[$vers])) { fprintf(STDERR, "# Lien depuis le nœud inconnu %s\n", $vers); return; }
-		$oVers = $this->_nœuds[$vers];
+		$oVers = $this->_nœuds[$vers.(isset($this->_nœuds[$vers.'.a']) ? '.a' : '')];
 		
 		$oVers->prédécesseurs[] = $oDe;
 		if(isset($oVers->notifPrédécesseur))
