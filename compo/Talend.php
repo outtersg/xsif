@@ -220,7 +220,7 @@ class Talend
 	/**
 	 * Convertit une chaîne Java (éléments fixes entre guillemets, éléments variables tels quels) en chaîne shell (éléments fixes tels quels, éléments variables entre ${…}).
 	 */
-	protected function _déchaîne($chaîne)
+	public function _déchaîne($chaîne)
 	{
 		// Les entiers bruts sortent tels quels:
 		if(is_numeric($chaîne)) return $chaîne;
