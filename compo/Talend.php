@@ -222,6 +222,8 @@ class Talend
 	 */
 	protected function _déchaîne($chaîne)
 	{
+		// Les entiers bruts sortent tels quels:
+		if(is_numeric($chaîne)) return $chaîne;
 		if(strpos($chaîne, '"') === false) return '${'.$chaîne.'}';
 		if(preg_match('/^"[^"]*"$/', $chaîne)) return trim($chaîne, '"');
 		
