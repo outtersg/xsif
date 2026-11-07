@@ -137,10 +137,11 @@ class Simple
 		{
 			$hMax = 0;
 			foreach($l as $n)
-				if(isset($this->pos($n)->h) && $this->pos($n)->h > $hMax)
+				if(isset($n) && isset($this->pos($n)->h) && $this->pos($n)->h > $hMax)
 					$hMax = $this->pos($n)->h;
 			if(!$hMax) $hMax = $this->tailleParDéfaut;
 			foreach($l as $n)
+				if(isset($n))
 				$this->pos($n)->y = $y + (isset($this->pos($n)->h) ? ($hMax - $this->pos($n)->h) / 2 : 0);
 			$y += $hMax + $this->marge;
 			
