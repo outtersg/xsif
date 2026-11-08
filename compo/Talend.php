@@ -505,8 +505,6 @@ class Talend
 		
 		$this->_nœuds[$r['id']] = $oSrc;
 		$this->_nœuds[$r['id'].'.d'] = $oDst;
-		
-		/* À FAIRE: nom du tableau données à piocher dans la <connection> qui part du $nœud. */
 	}
 	
 	protected function _compilerNœud_tMap($nœud, $r)
