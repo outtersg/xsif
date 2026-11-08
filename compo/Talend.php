@@ -222,86 +222,57 @@ class Talend
 	 */
 	public function _déchaîne($chaîne)
 	{
-		/* À FAIRE: "machin".equals(truc.bidule): ne sort-il pas en machin${.equals(truc.bidule)} ? */
 		// Les entiers bruts sortent tels quels:
 		if(is_numeric($chaîne)) return $chaîne;
 		if(strpos($chaîne, '"') === false) return '${'.$chaîne.'}';
 		if(preg_match('/^"[^"]*"$/', $chaîne)) return trim($chaîne, '"');
 		
-		preg_match_all('/["()+]|\\\\./', $chaîne, $r, PREG_OFFSET_CAPTURE);
+		$exprChaîne = '"(?:[^\\"]+|\\\\.)*"';
+		$exprConcat = '(?:[+]\s*|$)';
+		$exprChaîneNiveau0 = '\s*('.$exprChaîne.')\s*'.$exprConcat;
+		$exprParen = '([(](?:[^()"]+|'.$exprChaîne.'|(?1))*[)])'; // /!\ Le ?1 oblige à embarquer $exprParen en 1ère position d'une regex globale.
+		$exprToutVenant = '\s*(?:'.$exprParen.'|[^"(+]+|'.$exprChaîne.'\s*(?:[^+\s]|$))+'.$exprConcat;
+		
+		$sousch = $chaîne;
 		$retour = '';
-		$pile = [];
-		$courant = null;
 		$dollar = false;
-		$pos = 0;
-		foreach($r[0] as $p)
+		while(true)
 		{
-			// Si un caractère précédent (ex.: \) a déjà traité le caractère actuel, on passe.
-			if($p[1] < $pos) continue;
-			switch(substr($p[0], 0, 1))
+			if(preg_match('/^'.$exprChaîneNiveau0.'/', $sousch, /*&*/ $rex))
 			{
-				case '"':
-					if($courant == '"')
-					{
-						$courant = array_pop($pile);
-						if(!count($pile) && !isset($courant))
-						{
-							$retour .= substr($chaîne, $pos, $p[1] - $pos);
-							$pos = $p[1] + 1;
-							if(preg_match('/^\s*[+]\s*/', substr($chaîne, $pos), /*&*/ $rex)) $pos += strlen($rex[0]);
-							continue 2;
-						}
-					}
-					else
-					{
-						if(isset($courant)) $pile[] = $courant;
-						$courant = '"';
-						if(!count($pile))
-						{
-							if($p[1] > $pos && substr($chaîne, $p[1] - 1, 1) == '+')
-								$retour .= ($dollar ? '' : '${').substr($chaîne, $pos, $p[1] - 1 - $pos).'}';
-							$dollar = false;
-							$pos = $p[1] + 1;
-							continue 2;
-						}
-					}
-					break;
-				case '\\':
-					if($courant == '"' && !count($pile))
-					{
-						$retour .= substr($chaîne, $pos, $p[1] - $pos).substr($p[0], 1);
-						$pos = $p[1] + strlen($p[0]);
-					}
-					break;
-				case '(':
-					if($courant == '"') break;
-					if(isset($courant)) $pile[] = $courant;
-					$courant = '(';
-					break;
-				case ')':
-					if($courant == '"') break;
-					if($courant == '(')
-						$courant = array_pop($pile);
-					break;
-				case '+':
-					if(!count($pile) && !isset($courant) && preg_match('/^\s*"/', substr($chaîne, $p[1] + 1)))
-					{
-						$retour .= ($dollar ? '' : '${').rtrim(substr($chaîne, $pos, $p[1] - $pos)).'}';
-						$pos = $p[1] + 1;
-						continue 2;
-					}
-					break;
+				if($dollar)
+				{
+					$retour = rtrim(rtrim(rtrim($retour), '+')).'}';
+					$dollar = false;
+				}
+				$retour .= preg_replace('/\\\\(.)/', '\1', substr($rex[1], 1, -1));
 			}
-			$pos0 = $pos;
-			$pos = $p[1] + strlen($p[0]);
-			// Si on est dans une section variabilisée dont on n'a pas encore sorti la balise de démarrage;
-			// sachant qu'on n'est pas en variabilisé si on est dans un guillemet de premier niveau.
-			if(!$dollar && ($courant != '"' || count($pile))) { $retour .= '${'; $dollar = true; }
-			$retour .= substr($chaîne, $pos0, $pos - $pos0);
+			else if(preg_match('/^'.$exprToutVenant.'/', $sousch, /*&*/ $rex))
+			{
+				if(!$dollar)
+				{
+					$retour .= '${'.ltrim($rex[0]);
+					$dollar = true;
+				}
+				else
+					$retour .= $rex[0];
+			}
+			else
+				break;
+			if(!strlen($rex[0])) // Bon normalement toutes nos expressions bouffent au moins 1 octet à la fois. Mais par prudence…
+				break;
+			$sousch = substr($sousch, strlen($rex[0]));
+		}
+		if(!$dollar)
+			$sousch = trim($sousch);
+		if(strlen($sousch))
+		{
+			fprintf(STDERR, "# Je ne sais pas interpréter la fin de l'expression `%s` à partir de `%s`.", $chaîne, $sousch);
+			$retour .= '${'.$sousch.'}';
 		}
 		if($dollar)
-			$retour .= '}';
-		/* À FAIRE: là on doit avoir une pile vide, et $courant === null. */
+			$retour = rtrim($retour).'}';
+		
 		/* À FAIRE?: simplifier certaines formules Talend, par ex.: ${((<type>)globalMap.get("raymond.carré")} en ${GM.raymond.carré}
 		 * Ou alors le proposer via un fonction passée en paramètre: comme ça l'appelant peut fournir sa version spécialisée, capable d'en profiter pour créer un lien depuis un nœud virtuel GlobalMap. */
 		return $retour;
@@ -315,6 +286,8 @@ class Talend
 				'"fixe."+globalMap.get("entre \"guillemets\"")+" et \"guillemets\""+" etc."' => 'fixe.${globalMap.get("entre \"guillemets\"")} et "guillemets" etc.',
 				'globalMap.get("entre \"guillemets\"")+" et \"guillemets\""+" etc."' => '${globalMap.get("entre \"guillemets\"")} et "guillemets" etc.',
 				'"\"machin\"".equals(truc.bidule) ? "oui" : "non"' => '${"\"machin\"".equals(truc.bidule) ? "oui" : "non"}',
+				'globalMap.get("max")+1' => '${globalMap.get("max")+1}', // Ma version manuelle supprimait le 1 après le +.
+				'val?(bloc.replace("{"+val+"}","")):bloc' => '${val?(bloc.replace("{"+val+"}","")):bloc}' // Idem, le :bloc disparaissait à la fin.
 				/* À FAIRE: une parenthèse dans des guillemets. */
 			]
 			as $avant => $attendu
