@@ -840,8 +840,15 @@ class Talend
 		// Si le nœud précédent est un nœud données, il représente ce qui circule dans cette jonction: on lui en donne le titre.
 		if(!isset($oDe->titre) && isset($infos['nom']))
 			$oDe->titre = $infos['nom'];
-		if(!isset($this->_nœuds[$vers])) { fprintf(STDERR, "# Lien depuis le nœud inconnu %s\n", $vers); return; }
-		$oVers = $this->_nœuds[$vers.(isset($this->_nœuds[$vers.'.a']) ? '.a' : '')];
+		foreach([ '.'.$infos['id'], '' ] as $suffLien)
+			foreach([ '.a', '.d', '' ] as $suffType)
+				if(isset($this->_nœuds[$vers.$suffLien.$suffType]))
+				{
+					$vers .= $suffLien.$suffType;
+					$oVers = $this->_nœuds[$vers];
+					break 2;
+				}
+		if(!isset($oVers)) { fprintf(STDERR, "# Lien depuis le nœud inconnu %s[.%s]\n", $vers, $infos['id']); return; }
 		
 		$oVers->prédécesseurs[] = $oDe;
 		if(isset($oVers->notifPrédécesseur))
