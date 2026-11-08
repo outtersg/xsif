@@ -830,24 +830,30 @@ class Talend
 				return;
 		}
 		
-		$de = $lien->getAttributeNS(null, 'source');
-		$vers = $lien->getAttributeNS(null, 'target');
-		
 		/* À FAIRE: en fait ce n'est pas l'ID du nœud que l'on cherche, mais son <metadata connector="…"> qui dans la plupart des cas a effectivement le même nom. */
-		if(!isset($this->_nœuds[$de])) { fprintf(STDERR, "# Lien depuis le nœud inconnu %s\n", $de); return; }
-		$oDe = $this->_nœuds[$de.(isset($this->_nœuds[$de.'.d']) ? '.d' : '')];
+		foreach([ 'source', 'target' ] as $sens => $attr)
+		{
+			$où = $lien->getAttributeNS(null, $attr);
+			$suffixes = $sens ? [ '.a', '.d', '' ] : [ '.d', '' ];
+			foreach([ '.'.$infos['id'], '' ] as $suffLien)
+				foreach($suffixes as $suffType)
+					if(isset($this->_nœuds[$où.$suffLien.$suffType]))
+					{
+						$où .= $suffLien.$suffType;
+						$o = $this->_nœuds[$où];
+						break 2;
+					}
+			if(!isset($o)) { fprintf(STDERR, "# Lien depuis le nœud inconnu %s[.%s]\n", $où, $infos['id']); return; }
+			if($sens)
+				$oVers = $o;
+			else
+			{
+				$oDe = $o;
 		// Si le nœud précédent est un nœud données, il représente ce qui circule dans cette jonction: on lui en donne le titre.
 		if(!isset($oDe->titre) && isset($infos['nom']))
 			$oDe->titre = $infos['nom'];
-		foreach([ '.'.$infos['id'], '' ] as $suffLien)
-			foreach([ '.a', '.d', '' ] as $suffType)
-				if(isset($this->_nœuds[$vers.$suffLien.$suffType]))
-				{
-					$vers .= $suffLien.$suffType;
-					$oVers = $this->_nœuds[$vers];
-					break 2;
-				}
-		if(!isset($oVers)) { fprintf(STDERR, "# Lien depuis le nœud inconnu %s[.%s]\n", $vers, $infos['id']); return; }
+			}
+		}
 		
 		$oVers->prédécesseurs[] = $oDe;
 		if(isset($oVers->notifPrédécesseur))
