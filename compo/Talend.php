@@ -833,6 +833,7 @@ class Talend
 		/* À FAIRE: en fait ce n'est pas l'ID du nœud que l'on cherche, mais son <metadata connector="…"> qui dans la plupart des cas a effectivement le même nom. */
 		foreach([ 'source', 'target' ] as $sens => $attr)
 		{
+			unset($o);
 			$où = $lien->getAttributeNS(null, $attr);
 			$suffixes = $sens ? [ '.a', '.d', '' ] : [ '.d', '' ];
 			foreach([ '.'.$infos['id'], '' ] as $suffLien)
