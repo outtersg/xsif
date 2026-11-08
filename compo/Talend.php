@@ -835,6 +835,7 @@ class Talend
 		$de = $lien->getAttributeNS(null, 'source');
 		$vers = $lien->getAttributeNS(null, 'target');
 		
+		/* À FAIRE: en fait ce n'est pas l'ID du nœud que l'on cherche, mais son <metadata connector="…"> qui dans la plupart des cas a effectivement le même nom. */
 		if(!isset($this->_nœuds[$de])) { fprintf(STDERR, "# Lien depuis le nœud inconnu %s\n", $de); return; }
 		$oDe = $this->_nœuds[$de.(isset($this->_nœuds[$de.'.d']) ? '.d' : '')];
 		// Si le nœud précédent est un nœud données, il représente ce qui circule dans cette jonction: on lui en donne le titre.
