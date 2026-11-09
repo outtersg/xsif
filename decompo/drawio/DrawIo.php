@@ -124,8 +124,6 @@ class DrawIo
 	
 	public function pondreFichier($modèle)
 	{
-		$this->d = $modèle;
-		
 		require_once dirname(__FILE__).'/../../MiseEnPage/Simple.php';
 		$placeur = new Gui\Xsif\MiseEnPage\Simple();
 		$placeur->marge = 40;
@@ -135,6 +133,16 @@ class DrawIo
 		$this->entrerFichier();
 		$this->entrerDessin();
 		$this->_id = 1;
+		
+		// On se protège contre les apparitions multiples du nœud dans la représentation.
+		// Tout ce qui nous intéresse désormais est l'affichage des nœuds, pas leur index dans le tableau originel.
+		foreach($modèle as $clé => $bloc)
+		{
+			if(isset($this->_p->pos($bloc)->placé))
+				unset($modèle[$clé]);
+			else
+				$this->_p->pos($bloc)->placé = true;
+		}
 		
 		foreach($modèle as $bloc)
 		{
