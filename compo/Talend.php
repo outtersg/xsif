@@ -868,6 +868,37 @@ class Talend
 	{
 	}
 	
+	protected function _fusionner($récessif, $dominant)
+	{
+		/* À FAIRE: pouvoir être appelé en effectuant des fusions de prédécesseurs et depuis (là on écrase, supposant qu'on est appelés par _opti_fusionIdemDonnées()). */
+		$dominant->prédécesseurs = $récessif->prédécesseurs;
+		$dominant->depuis = $récessif->depuis;
+		//$dominant->d = $récessif->d;
+		//$dominant->pos = $récessif->pos;
+		
+		if($récessif->titre != $dominant->titre)
+		{
+			if(!isset($dominant->titres)) $dominant->titres = [ $dominant->titre => true ];
+			if(!isset($récessif->titres)) $récessif->titres = [ $récessif->titre => true ];
+			$dominant->titres = $récessif->titres + $dominant->titres;
+			$dominant->titre = implode(' / ', $dominant->titres);
+		}
+		
+		foreach($this->_nœuds as $clép => $pote) // $potentiel.
+		{
+			if($pote === $récessif)
+				$this->_nœuds[$clép] = $dominant;
+			if(isset($pote->depuis))
+				foreach($pote->depuis as & $ptrDep)
+					if($ptrDep === $récessif)
+						/***/$ptrDep = $dominant;
+					else if(is_array($ptrDep) && $ptrDep[0] === $récessif)
+						$ptrDep[0] = $dominant;
+		}
+		
+		/* À FAIRE: s'assurer qu'il n'est pas référencé directement comme prédécesseur ou depuis d'un autre nœud. On pourrait avoir un successeurs, calculé en première passe, listant tous ceux qui nous ont comme prédécesseur */
+	}
+	
 	/*- Entrepôt -------------------------------------------------------------*/
 	
 	protected $_nœuds;
