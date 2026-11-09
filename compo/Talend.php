@@ -866,6 +866,31 @@ class Talend
 	
 	protected function _optimiser()
 	{
+		$this->_opti_fusionIdemDonnées();
+	}
+	
+	protected function _opti_fusionIdemDonnées()
+	{
+		/* On laisse le nœud aux deux endroits: un successeur sera bien content de le retrouver référencé sous ses deux ID. Et normalement le parcours de mise en page s'assure de ne placer le nœud qu'une seule fois. */
+		
+		foreach($this->_nœuds as $clé => $n)
+		{
+			$n = $this->_nœuds[$clé]; // Si un précédent tour de boucle nous a fait remplacer l'entrée dans le tableau, on préfère travailler sur le remplaçant.
+			
+			if(!isset($n->style) || $n->style != 'd') continue;
+			if(count($n->prédécesseurs) > 1) continue;
+			if(isset($n->depuis)) continue;
+			
+			foreach($n->prédécesseurs as $p)
+			{
+				if(!isset($p->style) || $p->style != 'd') continue;
+				if($p === $n) continue;
+				
+				if($p->d !== $n->d) continue;
+				
+				$this->_fusionner($p, $n);
+			}
+		}
 	}
 	
 	protected function _fusionner($récessif, $dominant)
