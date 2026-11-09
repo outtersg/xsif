@@ -44,6 +44,7 @@ class Talend
 		$racine = $doc->documentElement;
 		
 		$this->_compiler($racine);
+		$this->_optimiser();
 		
 		return $this->_nœuds;
 	}
@@ -746,7 +747,7 @@ class Talend
 				/* À FAIRE: conserver le schéma pour information, non seulement en dessous (visuellement), mais aussi en interne pour éviter les fusions à tort:
 				 * on le simplifie à l'affichage pour lisibilité, et pour pouvoir fusionner ma_table et schéma.ma_table, mais si d'aventure un de nos traitements déversait schéma1.ma_table vers schéma2.ma_table, il faudrait qu'on puisse instancier un objet table distinct (et signaler toutes les ambiguïtés passées).
 				 * En ce cas l'instance initiale pourrait s'appeler $idBdd.'.*.'.$idTable, et une fois l'ambiguïté créée, le schéma serait explicitement donné.
-				 * Ou alors n'effectuer la passe de fusion qu'une fois tout le modèle récupéré: plus facile pour être sûrs de ne pas avoir d'ambiguïtés, moins facile pour fusionner une fois chacun des nœuds inséré avec ses relations éparpillées dans le graphe.
+				 * Ou alors n'effectuer la passe de fusion qu'une fois tout le modèle récupéré: plus facile pour être sûrs de ne pas avoir d'ambiguïtés, moins facile pour fusionner une fois chacun des nœuds inséré avec ses relations éparpillées dans le graphe. Cf. _optimiser().
 				 */
 				$nomTable = trim(preg_replace('/^([^.]+\.)+/', '', $nomTable), '"');
 				$idTable = $idBdd.'.'.strtolower($nomTable);
@@ -860,6 +861,14 @@ class Talend
 		if(isset($oVers->notifPrédécesseur))
 			call_user_func($oVers->notifPrédécesseur, $oDe, $oVers);
 	}
+	
+	/*- Optimisation ---------------------------------------------------------*/
+	
+	protected function _optimiser()
+	{
+	}
+	
+	/*- Entrepôt -------------------------------------------------------------*/
 	
 	protected $_nœuds;
 }
