@@ -354,6 +354,7 @@ class DrawIo
 	
 	public function affT($texte)
 	{
+		if(!isset($texte)) return '';
 		return strtr(htmlentities($texte), [ "\n" => '&#xA;' ]);
 	}
 	
