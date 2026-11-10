@@ -179,6 +179,7 @@ class DrawIo
 				foreach($bloc->depuis as $depuis)
 				{
 					$vers = $bloc;
+					$icône =
 					$style = null;
 					$libellé = null;
 					if(is_array($depuis))
@@ -195,11 +196,12 @@ class DrawIo
 						// À partir de maintenant on essaie de redonner à notre tableau une tronche de tableau indicé Lien::…:
 						array_shift($depuis);
 						$depuis = array_values($depuis);
+						$icône = isset($depuis[Lien::ICÔNE]) ? $depuis[Lien::ICÔNE] : null;
 					}
 					else
 						$de = $depuis;
 					if($style !== false) // Certains liens sont créés juste pour lier techniquement, sans souhait de représentation.
-					$this->affLien($de, $vers, $style, $libellé);
+					$this->affLien($de, $vers, $style, $libellé, $icône);
 					// Si $de est un prédécesseur que nous avons voulu lier avec style, inutile de le re-représenter comme prédécesseur (sans style).
 					$prédécesseurs = array_filter($prédécesseurs, function($x) use($de) { return $x !== $de; });
 				}
@@ -530,7 +532,7 @@ class DrawIo
 	 * De fait si on crée une fonction calcLien(), celle-ci sera automatiquement invoquée sur les Lien figurant dans le graphe à représenter.
 	 * Pour la distinction entre les deux tableaux, un booléen en second paramètre? En fait il faudrait faire sauter l'un des deux (mais le format depuis évite la redondance, puisque, porté par un Nœud qui en est la destination, il n'a pas à mentionner son VERS).
 	 */
-	public function affLien($de, $vers, $style = null, $libellé = null)
+	public function affLien($de, $vers, $style = null, $libellé = null, $icône = null)
 	{
 		$id = ++$this->_id;
 		$c0 = $this->_p->pos($de);
@@ -552,6 +554,9 @@ class DrawIo
 				</mxCell>
 			TERMINE);
 		}
+		
+		if(isset($icône))
+			$this->affIcône($id, $icône);
 	}
 	
 	public function affIcône($idParent, $icône)
