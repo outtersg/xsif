@@ -547,6 +547,11 @@ class DrawIo
 		}
 	}
 	
+	public function affIcône($idParent, $icône)
+	{
+		$this->_affImage("xsif-$idParent-icone", 'xsif-'.$idParent, $icône, [ 'l' => 24, 'rel' => true ], '');
+	}
+	
 	/*- Utilitaires ----------------------------------------------------------*/
 	
 	public function style($style, $classe = null, $départ = [])
