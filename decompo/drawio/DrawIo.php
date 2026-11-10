@@ -466,23 +466,28 @@ class DrawIo
 	
 	public function affForme($forme)
 	{
+		$coord = $this->_p->pos($forme);
+		$id = $coord->id;
+		$affStyle = $this->style(isset($forme->style) ? $forme->style : null, $forme);
+		$titre = $forme->titre;
+		if(in_array($forme->forme, [ 'bdd' ]))
+			$titre = preg_replace('/^(?: *[^( ]+)+/', '<b>\0</b>', $titre);
+		$this->_affImage('xsif-'.$id, 1, $forme->forme, $coord, $affStyle, $titre);
+	}
+	
+	protected function _affImage($id, $idParent, $ff, $coord, $affStyle, $titre = null)
+	{
+		// ff = forme forme
 		$corresp =
 		[
 			'nuage' => 'ellipse;shape=cloud;perimeter=cloudPerimeter;',
 			'bdd' => 'shape=mxgraph.flowchart.database;aspect=fixed;strokeColor=#00007F;fillColor=#7F7FFF;',
 			'table' => 'shape=image;imageAspect=0;aspect=fixed;verticalLabelPosition=bottom;verticalAlign=top;image=https://tmp.outters.eu/database-table.svg;'
 		];
-		$coord = $this->_p->pos($forme);
-		$ff = $forme->forme;
 		if(isset($corresp[$ff])) $ff = $corresp[$ff];
 		if(strlen($ff) && substr($ff, -1) != ';') $ff .= ';';
-		$id = $coord->id;
-		$affStyle = $this->style(isset($forme->style) ? $forme->style : null, $forme);
-		$titre = $forme->titre;
-		if(in_array($forme->forme, [ 'bdd' ]))
-			$titre = preg_replace('/^(?: *[^( ]+)+/', '<b>\0</b>', $titre);
 		$this->_sortir(<<<TERMINE
-			<mxCell id="xsif-$id" parent="1" style="{$ff}html=1;$affStyle" value="{$this->affT($titre)}" vertex="1">
+			<mxCell id="$id" parent="$idParent" style="{$ff}html=1;$affStyle" value="{$this->affT($titre)}" vertex="1">
 				<mxGeometry height="{$coord->h}" width="{$coord->l}" x="{$coord->x}" y="{$coord->y}" as="geometry"/>
 			</mxCell>
 		TERMINE);
