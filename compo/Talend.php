@@ -542,6 +542,14 @@ class Talend
 					$expressif = false;
 					$oVers = new Tableau($nom = $petitFils->getAttribute('name'));
 					$oVers->style = 'd';
+					if($petitFils->getAttribute('activateExpressionFilter') == 'true' && ($filtre = $petitFils->getAttribute('expressionFilter')) !== '')
+					{
+						$filtre = new Forme($filtre);
+						$filtre->forme = 'filtre';
+						$oVers->prédécesseurs[] = $filtre;
+						$tables[$r['id'].'.f'] = $filtre;
+						/* À FAIRE: si filtre n'a lui-même qu'un seul prédécesseur, remplacer la Forme par un simple lien. */
+					}
 					foreach($petitFils->childNodes as $ppf)
 					{
 						if(!$ppf instanceof DOMElement) continue;
@@ -564,6 +572,7 @@ class Talend
 								 * ⊳ contient comme sous-groupe normal
 								 */
 								$expr = '⊳'.' '.$compar.' '.$expr;
+								/* À FAIRE: unifier le filtre par champs et l'expressionFilter ($filtre). */
 							}
 							else
 							$expressif = true;
