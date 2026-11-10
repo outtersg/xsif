@@ -483,7 +483,9 @@ class DrawIo
 		[
 			'nuage' => 'ellipse;shape=cloud;perimeter=cloudPerimeter;',
 			'bdd' => 'shape=mxgraph.flowchart.database;aspect=fixed;strokeColor=#00007F;fillColor=#7F7FFF;',
-			'table' => 'shape=image;imageAspect=0;aspect=fixed;verticalLabelPosition=bottom;verticalAlign=top;image=https://tmp.outters.eu/database-table.svg;'
+			'table' => 'shape=image;imageAspect=0;aspect=fixed;verticalLabelPosition=bottom;verticalAlign=top;image=https://tmp.outters.eu/database-table.svg;',
+			//'filtre' => 'shape=image;verticalAlign=top;verticalLabelPosition=bottom;imageAspect=0;aspect=fixed;image=https://icons.diagrams.net/icon-cache1/Bootstrap_Vol_3-2297/funnel-886.svg;labelPerimeter=1;',
+			'filtre' => 'shape=mxgraph.mscae.enterprise.filter;aspect=fixed;strokeColor=#007F00;fillColor=#3FBF3F;',
 		];
 		if(isset($corresp[$ff])) $ff = $corresp[$ff];
 		if(strlen($ff) && substr($ff, -1) != ';') $ff .= ';';
