@@ -486,9 +486,34 @@ class DrawIo
 		];
 		if(isset($corresp[$ff])) $ff = $corresp[$ff];
 		if(strlen($ff) && substr($ff, -1) != ';') $ff .= ';';
+		
+		/* Détermination des coordonnées */
+		
+		if(is_object($coord))
+			$coord = get_object_vars($coord);
+		$lSurH = 1;
+		/* À FAIRE: proportions par forme. */
+		if(!isset($coord['h']) && !isset($coord['l']))
+			$coord['h'] = $placeur->tailleParDéfaut;
+		if(!isset($coord['l']))
+			$coord['l'] = $lSurH * $coord['h'];
+		else if(!isset($coord['h']))
+			$coord['h'] = $coord['l'] / $lSurH;
+		if(($relatif = isset($coord['rel']) && $coord['rel']))
+		{
+			$coord += [ 'x' => 0, 'y' => 0 ];
+			$coord['x'] -= $coord['l'] / 2;
+			$coord['y'] -= $coord['h'] / 2;
+		}
+		$xy = 'x="'.$coord['x'].'" y="'.$coord['y'].'"';
+		if(($relatif = isset($coord['rel']) && $coord['rel']))
+			$intérieur = 'relative="1"><mxPoint '.$xy.' as="offset"/></mxGeometry';
+		else
+			$intérieur = $xy.'/';
+		
 		$this->_sortir(<<<TERMINE
 			<mxCell id="$id" parent="$idParent" style="{$ff}html=1;$affStyle" value="{$this->affT($titre)}" vertex="1">
-				<mxGeometry height="{$coord->h}" width="{$coord->l}" x="{$coord->x}" y="{$coord->y}" as="geometry"/>
+				<mxGeometry height="{$coord['h']}" width="{$coord['l']}" as="geometry" $intérieur>
 			</mxCell>
 		TERMINE);
 	}
