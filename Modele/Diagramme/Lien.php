@@ -8,6 +8,7 @@ class Lien
 	const VERS = 1;
 	const STYLE = 2;
 	const LIBELLÉ = 3;
+	const ICÔNE = 4;
 	
 	/** Source du lien. Nœud, ou [ Nœud, <numéro de sortie du nœud> ] */
 	public $de;
