@@ -30,6 +30,8 @@
  * - /!\ commencer par une ligne vide plante le client lourd
  */
 
+require_once dirname(__FILE__).'/../../Modele/Diagramme/Lien.php';
+
 class DrawIo
 {
 	const P_STANDARD = 0;
@@ -190,6 +192,9 @@ class DrawIo
 							$style = $depuis[3];
 						if(isset($depuis[4]))
 							$libellé = $depuis[4];
+						// À partir de maintenant on essaie de redonner à notre tableau une tronche de tableau indicé Lien::…:
+						array_shift($depuis);
+						$depuis = array_values($depuis);
 					}
 					else
 						$de = $depuis;
