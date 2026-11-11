@@ -560,7 +560,7 @@ class Talend
 						$filtre = new Forme($filtre);
 						$filtre->forme = 'filtre';
 						$oVers->prédécesseurs[] = $filtre;
-						$tables[$r['id'].'.f'] = $filtre;
+						$tables[$r['id'].'.'.$nom.'.f'] = $filtre;
 						/* À FAIRE: si filtre n'a lui-même qu'un seul prédécesseur, remplacer la Forme par un simple lien. */
 					}
 					foreach($petitFils->childNodes as $ppf)
