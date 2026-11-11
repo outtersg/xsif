@@ -317,7 +317,7 @@ class Talend
 		$racine = [];
 		foreach($chemins as $numChemin => $c)
 		{
-			$c = explode('/', $c);
+			$c = $this->xpathEnBouts($c);
 			$ptrT = & $racine;
 			foreach($c as $numBout => $bout)
 			{
@@ -396,6 +396,19 @@ class Talend
 		$this->_nœuds[$infos['id']] = $o;
 	}
 	
+	public function xpathEnBouts($chem)
+	{
+		// On ne segmente pas directement sur / car on peut avoir des expressions de type (.//sousel)[1]/titre.
+		$r = [];
+		while(preg_match('#^((?:[(][^)]*[)]|[^()/]+)*)/#', $chem, $rex))
+		{
+			$r[] = $rex[1];
+			$chem = substr($chem, strlen($rex[0]));
+		}
+		$r[] = $chem;
+		return $r;
+	}
+	
 	/*- Nœuds de mise en correspondance --------------------------------------*/
 	
 	protected function _compilerNœud_tExtractXMLField($nœud, $r)
@@ -443,7 +456,7 @@ class Talend
 			$chem = $this->_déchaîne($l['QUERY']);
 			if($intermédiaires)
 			{
-				$chem = explode('/', $chem);
+				$chem = $this->xpathEnBouts($chem);
 				// On crée toutes les lignes intermédiaires représentant les nœuds parents du nôtre, s'ils ne sont pas communs avec notre prédécesseur.
 				for($d = 0; isset($préc[$d]) && isset($chem[$d]) && $préc[$d] === $chem[$d]; ++$d) {}
 				--$d;
