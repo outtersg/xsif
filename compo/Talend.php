@@ -555,11 +555,11 @@ class Talend
 					$expressif = false;
 					$oVers = new Tableau($nom = $petitFils->getAttribute('name'));
 					$oVers->style = 'd';
+					$filtre = null;
 					if($petitFils->getAttribute('activateExpressionFilter') == 'true' && ($filtre = $petitFils->getAttribute('expressionFilter')) !== '')
 					{
 						$filtre = new Forme($filtre);
 						$filtre->forme = 'filtre';
-						$oVers->prédécesseurs[] = $filtre;
 						$tables[$r['id'].'.'.$nom.'.f'] = $filtre;
 						/* À FAIRE: si filtre n'a lui-même qu'un seul prédécesseur, remplacer la Forme par un simple lien. */
 					}
@@ -600,8 +600,10 @@ class Talend
 						foreach($oVers->d as $numLigne => $ligne)
 							$oVers->d[$numLigne] = [ $par[$numLigne], $ligne];
 					}
+					$oGauche = $oVers;
 					if($expressif)
 					{
+						$oGauche =
 						$oPar = new Tableau($par);
 						$oVers->prédécesseurs[] = $oPar;
 						foreach($oVers->d as $num => $champ)
@@ -609,6 +611,8 @@ class Talend
 						$tables[$r['id'].'.'.$nom] = $oPar;
 					}
 					$tables[$r['id'].'.'.$nom.'.d'] = $oVers;
+					if($filtre)
+						$oGauche->prédécesseurs[] = $filtre;
 					
 				}
 		$tousChamps = implode('|', array_keys($champs));
@@ -633,8 +637,10 @@ class Talend
 						$prédés[$source[0]->titre] = $source[0];
 					}
 				}
+				// Si un filtre est en frontal de la table, c'est lui qui prend.
+				$frontal = isset($tables[$idTable.'.f']) ? $tables[$idTable.'.f'] : $table;
 				foreach($prédés as $prédé)
-					$table->prédécesseurs[] = $prédé;
+					$frontal->prédécesseurs[] = $prédé;
 				if($num < 0)
 					unset($table->d);
 			}
