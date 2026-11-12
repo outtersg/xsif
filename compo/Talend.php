@@ -653,6 +653,9 @@ class Talend
 				$expressif = true;
 			}
 			$par[] = $expr;
+			
+			if(in_array($nf->localName, [ 'nodes', 'children' ]))
+				$this->parcourirArbo($nf, $nom, $oVers, /*&*/ $par, /*&*/ $vers, /*&*/ $champs, /*&*/ $expressif, /*&*/ $filtrant);
 		}
 	}
 	
