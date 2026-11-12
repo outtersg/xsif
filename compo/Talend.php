@@ -593,7 +593,13 @@ class Talend
 						$oGauche->prédécesseurs[] = $filtre;
 					
 				}
-		$tousChamps = implode('|', array_keys($champs));
+		
+		// Constitution de la liste des variables à repérer.
+		
+		$tousChamps = array_keys($champs);
+		// On trie par longueur décroissante, de manière à ce que le moteur PCRE de PHP détecte xml.racine.element avant xml.racine.
+		usort($tousChamps, function($a, $b) { return strlen($b) - strlen($a); });
+		$tousChamps = implode('|', $tousChamps);
 		$exprTousChamps = '#\b('.$tousChamps.')\b#';
 		
 		foreach($tables as $idTable => $table)
