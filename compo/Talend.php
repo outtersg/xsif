@@ -587,6 +587,7 @@ class Talend
 						$oPar = new Tableau($par);
 						$oVers->prédécesseurs[] = $oPar;
 						foreach($oVers->d as $num => $champ)
+							if(strlen($oPar->d[$num])) // Les formules vides représentent les niveaux intermédiaires de l'arborescence, pas les feuilles (seules à porter des données). /* À FAIRE: savoir distinguer formule de vidange ("") de formule absente. */
 							$oVers->depuis[] = [ $oPar, $num, $num, 'attr' ];
 						$tables[$r['id'].'.'.$nom] = $oPar;
 					}
