@@ -522,6 +522,10 @@ class Talend
 	}
 	
 	protected function _compilerNœud_tMap($nœud, $r)
+	{ return $this->_compilerNœud_StructVersStruct($nœud, $r); }
+	protected function _compilerNœud_tXMLMap($nœud, $r) { return $this->_compilerNœud_StructVersStruct($nœud, $r); }
+	
+	protected function _compilerNœud_StructVersStruct($nœud, $r)
 	{
 		$tables = [];
 		$champs = [];
@@ -542,6 +546,8 @@ class Talend
 							continue 2;
 						case 'inputTables':
 						case 'outputTables':
+						case 'inputTrees':
+						case 'outputTrees':
 							// On traite de la même manière: les input peuvent elles-mêmes dépendre d'autres input.
 							break;
 						default:
