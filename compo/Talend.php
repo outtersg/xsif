@@ -598,6 +598,7 @@ class Talend
 		
 		$tousChamps = array_keys($champs);
 		// On trie par longueur décroissante, de manière à ce que le moteur PCRE de PHP détecte xml.racine.element avant xml.racine.
+		/* À FAIRE: être plus rigoureux, gérer les [] que met Talend autour de variables contenant des séparateurs type / (ex.: [row0.xml:/racine/element]). */
 		usort($tousChamps, function($a, $b) { return strlen($b) - strlen($a); });
 		$tousChamps = implode('|', $tousChamps);
 		$exprTousChamps = '#\b('.$tousChamps.')\b#';
