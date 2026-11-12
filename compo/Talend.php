@@ -570,6 +570,8 @@ class Talend
 						/* À FAIRE: si filtre n'a lui-même qu'un seul prédécesseur, remplacer la Forme par un simple lien. */
 					}
 					$this->parcourirArbo($petitFils, $nom, $oVers, /*&*/ $par, /*&*/ $vers, /*&*/ $champs, /*&*/ $expressif, /*&*/ $filtrant);
+					if(in_array($petitFils->localName, [ 'inputTrees', 'outputTrees' ]))
+						$vers = $this->cheminsEnArbo($vers);
 					$oVers->d = $vers;
 					if($filtrant && $expressif)
 						fprintf(STDERR, "# Nœud à la fois à formule et à filtre. Résultats non garantis.\n");
@@ -642,12 +644,13 @@ class Talend
 		foreach($nr->childNodes as $nf)
 		{
 			if(!$nf instanceof DOMElement) continue;
-			$vers[] = $champ = $nf->getAttribute('name');
+			$champ = $nf->getAttribute('name');
 			$sép = $nf->localName == 'children' ? '/' : '.';
 			$nomChamp = $nom.$sép.$champ;
 			/* À FAIRE: vérifier l'égalité entre notre $nomChamp calculé, et l'éventuel attribut xpath des tXMLMap. */
 			if(($cn = $nf->getAttribute('xmlpath')) && $cn != $nomChamp)
 				fprintf(STDERR, "[31mparcourirArbo(): chemin calculé ≠ chemin Talend (%s ≠ %s)[0m\n", $nomChamp, $cn);
+			$vers[] = $nf->localName == 'children' ? $nomChamp : $champ;
 			$champs[$nomChamp] = [ $oVers, count($vers) - 1 ];
 			$expr = trim($nf->getAttribute('expression'));
 			if(isset($expr) && strlen($expr))
