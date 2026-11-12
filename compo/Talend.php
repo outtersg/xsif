@@ -129,6 +129,12 @@ class Talend
 			[
 				'DEFAULT_MAP' => 'GlobalMap',
 			],
+			'RADIO' =>
+			[
+				'USE_SINGLEMODE',
+				'USE_INTABLE',
+				'USE_INLINECONTENT',
+			],
 			'FILE' =>
 			[
 				'FILENAME',
@@ -410,6 +416,16 @@ class Talend
 	}
 	
 	/*- Nœuds de mise en correspondance --------------------------------------*/
+	
+	protected function _compilerNœud_tFixedFlowInput($nœud, $r)
+	{
+		if(isset($r['USE_SINGLEMODE']) && $r['USE_SINGLEMODE'] == 'true')
+			$this->_compilerNœud_tableau($nœud, $r);
+		if(isset($r['USE_INTABLE']) && $r['USE_INTABLE'] == 'true')
+			fprintf(STDERR, "# Je ne sais pas gérer les tFixedFlowInput autres que USE_SINGLEMODE\n");
+		if(isset($r['USE_INLINECONTENT']) && $r['USE_INLINECONTENT'] == 'true')
+			fprintf(STDERR, "# Je ne sais pas gérer les tFixedFlowInput autres que USE_SINGLEMODE\n");
+	}
 	
 	protected function _compilerNœud_tExtractXMLField($nœud, $r)
 	{
@@ -740,6 +756,32 @@ class Talend
 		$this->_nœuds[$infos['id'].'.d'] = $o; // Alors en fait, dans ce sens (données vers nuage), d ça ne veut plus dire données, ça veut dire droite. Parce que la sortie de la constellation données → nuage est à droite, dans le nuage.
 		
 		/* À FAIRE: sur notifPrédécesseur(), simplifier si on est une liste de champs sur le même modèle ${rowX.champY}; on peut même faire sauter la colonne si toutes ses cases sont ainsi simplifiées. */
+	}
+	
+	protected function _compilerNœud_tableau($nœud, $infos)
+	{
+		/* À FAIRE: mutualiser avec tSetGlobalVar. */
+		
+		$champs = [];
+		$formus = [];
+		// On adopte la typologie "Tableau formus → Tableau données" commune à pas mal de traitements:
+		// ça nous rendra éligibles à la simplification de la partie formu si tous les champs sont calculés comme ${entrée.champ}.
+		/* À FAIRE: simplification partielle: si tous les champs sont simplifiables sauf 1 (ex.: valeur fixe), ne garder du tableau formu que la valeur fixe injectée vers le champ, pour tous les autres champs se brancher directement au champ source correspondant. */
+		$source = isset($infos['VARIABLES']) ? $infos['VARIABLES'] : $infos['VALUES'];
+		foreach($source as $v)
+		{
+			$champs[] = isset($v['SCHEMA_COLUMN']) ? $v['SCHEMA_COLUMN'] : $this->_déchaîne($v['KEY']);
+			$formus[] = $this->_déchaîne($v['VALUE']);
+		}
+		$od = new Tableau($champs);
+		$od->style = 'd';
+		$of = new Tableau($infos['nom'], $formus);
+		$od->prédécesseurs[] = $of;
+		foreach($od->d as $num => $champ)
+			$od->depuis[] = [ $of, $num, $num, 'attr' ];
+		
+		$this->_nœuds[$infos['id']] = $of;
+		$this->_nœuds[$infos['id'].'.d'] = $od;
 	}
 	
 	/*- Nœuds de persistance -------------------------------------------------*/
