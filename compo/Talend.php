@@ -650,7 +650,10 @@ class Talend
 			/* À FAIRE: vérifier l'égalité entre notre $nomChamp calculé, et l'éventuel attribut xpath des tXMLMap. */
 			if(($cn = $nf->getAttribute('xmlpath')) && $cn != $nomChamp)
 				fprintf(STDERR, "[31mparcourirArbo(): chemin calculé ≠ chemin Talend (%s ≠ %s)[0m\n", $nomChamp, $cn);
-			$vers[] = $nf->localName == 'children' ? $nomChamp : $champ;
+			// Les champs d'un tableau à plat apparaissent sous leur seul nom, mettons <champ>.
+			// Dans les machinputTrees d'une tXMLMap, dont chaque champ représente un arbre, les chemins valent <ligne>.<champ>:/<racine>/<etc.>
+			// Pour que la <racine> apparaisse sous <champ> via .cheminsEnArbo(), il nous faut supprimer <ligne>. et le :
+			$vers[] = $nf->localName == 'children' ? preg_replace('#^[^:]*\.([^:]*):/#', '\1/', $nomChamp) : $champ;
 			$champs[$nomChamp] = [ $oVers, count($vers) - 1 ];
 			$expr = trim($nf->getAttribute('expression'));
 			if(isset($expr) && strlen($expr))
