@@ -594,7 +594,8 @@ class Talend
 					
 				}
 		$tousChamps = implode('|', array_keys($champs));
-		$exprTousChamps = '/\b('.$tousChamps.')\b/';
+		$exprTousChamps = '#\b('.$tousChamps.')\b#';
+		
 		foreach($tables as $idTable => $table)
 			if(substr($idTable, -2) != '.d')
 			{
