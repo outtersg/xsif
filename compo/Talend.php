@@ -642,7 +642,10 @@ class Talend
 		{
 			if(!$nf instanceof DOMElement) continue;
 			$vers[] = $champ = $nf->getAttribute('name');
-			$champs[$nom.'.'.$champ] = [ $oVers, count($vers) - 1 ];
+			$sép = $nf->localName == 'children' ? '/' : '.';
+			$nomChamp = $nom.$sép.$champ;
+			/* À FAIRE: vérifier l'égalité entre notre $nomChamp calculé, et l'éventuel attribut xpath des tXMLMap. */
+			$champs[$nomChamp] = [ $oVers, count($vers) - 1 ];
 			$expr = trim($nf->getAttribute('expression'));
 			if(isset($expr) && strlen($expr))
 			{
@@ -668,7 +671,7 @@ class Talend
 			$par[] = $expr;
 			
 			if(in_array($nf->localName, [ 'nodes', 'children' ]))
-				$this->parcourirArbo($nf, $nom, $oVers, /*&*/ $par, /*&*/ $vers, /*&*/ $champs, /*&*/ $expressif, /*&*/ $filtrant);
+				$this->parcourirArbo($nf, $nomChamp.($nf->localName == 'nodes' ? ':' : ''), $oVers, /*&*/ $par, /*&*/ $vers, /*&*/ $champs, /*&*/ $expressif, /*&*/ $filtrant);
 		}
 	}
 	
