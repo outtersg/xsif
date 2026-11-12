@@ -646,6 +646,8 @@ class Talend
 			$sép = $nf->localName == 'children' ? '/' : '.';
 			$nomChamp = $nom.$sép.$champ;
 			/* À FAIRE: vérifier l'égalité entre notre $nomChamp calculé, et l'éventuel attribut xpath des tXMLMap. */
+			if(($cn = $nf->getAttribute('xmlpath')) && $cn != $nomChamp)
+				fprintf(STDERR, "[31mparcourirArbo(): chemin calculé ≠ chemin Talend (%s ≠ %s)[0m\n", $nomChamp, $cn);
 			$champs[$nomChamp] = [ $oVers, count($vers) - 1 ];
 			$expr = trim($nf->getAttribute('expression'));
 			if(isset($expr) && strlen($expr))
