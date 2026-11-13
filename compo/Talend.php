@@ -385,20 +385,37 @@ class Talend
 	 *       c
 	 *       d
 	 *     e
+	 * Modes:
+	 *   0 Chaque ligne est un tableau dont les cases vides initiales font l'indentation
+	 *   1 XML
 	 */
-	public function cheminsEnArbo($chemins)
+	public function cheminsEnArbo($chemins, $mode = 0)
 	{
 		$r = [];
 		
 		/* À FAIRE: pouvoir créer les intermédiaires (cf. $intermédiaires dans _compilerNœud_tExtractXMLField) tout en préservant les clés pour ne pas perdre les assoc. */
+		/* À FAIRE: récupérer de jedi.php le _charger() qui prend un objet PHP et en fait une représentation JSON. */
 		
 		$pile = [];
 		foreach($chemins as $clé => $chemin)
 		{
 			while(count($pile) && substr($chemin, 0, strlen($pile[0])) != $pile[0])
-				array_shift($pile);
+			{
+				$fin = array_shift($pile);
+				if($mode == 1)
+					$r[] = '</'.$fin.'>';
+			}
+			$aff = count($pile) ? ltrim(substr($chemin, strlen($pile[0])), '/') : $chemin;
+			switch($mode)
+			{
+				case 0:
 			$r[$clé] = array_fill(0, count($pile), null);
-			$r[$clé][] = count($pile) ? ltrim(substr($chemin, strlen($pile[0])), '/') : $chemin;
+					$r[$clé][] = $aff;
+					break;
+				case 1:
+					$r[$clé] = str_repeat("\t", count($pile)).'<'.$aff.'>';
+					break;
+			}
 			array_unshift($pile, $chemin);
 		}
 		
