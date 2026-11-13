@@ -391,8 +391,30 @@ class Talend
 			$opts = $this->optionsNœuds[$o->titre];
 			if(isset($opts['xml']) && $opts['xml'])
 				$mode = 1;
+			if($mode && isset($this->optionsNœuds['_pseudoContenu']))
+			{
+				$pseudoContenu = [];
+				foreach($o->d as $clé => $chemin)
+					foreach($this->optionsNœuds['_pseudoContenu'] as $expr => $val)
+						if(preg_match($expr, $chemin))
+						{
+							$pseudoContenu[$clé] = $val;
+							break;
+						}
+			}
 		}
 		$o->d = $this->cheminsEnArbo($o->d, $mode);
+		if(isset($pseudoContenu))
+		{
+			foreach($o->d as $clé => $aff)
+				if(isset($pseudoContenu[$clé]))
+					switch($mode)
+					{
+						case 1:
+							$o->d[$clé] = strtr($aff, [ '><' => '>'.$pseudoContenu[$clé].'<' ]);
+							break;
+					}
+		}
 	}
 	
 	/**
