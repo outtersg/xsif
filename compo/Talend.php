@@ -390,7 +390,10 @@ class Talend
 		{
 			$opts = $this->optionsNœuds[$o->titre];
 			if(isset($opts['xml']) && $opts['xml'])
+			{
 				$mode = 1;
+				$o->style = isset($o->style) ? $o->style.' xml' : 'xml';
+			}
 			if($mode && isset($this->optionsNœuds['_pseudoContenu']))
 			{
 				$pseudoContenu = [];
