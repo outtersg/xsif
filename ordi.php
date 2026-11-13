@@ -26,11 +26,22 @@
  */
 
 /* À FAIRE: auto-détection du type d'entrée (ou -t <type> pour aider). */
+/* À FAIRE: --contenu pour fournir un pseudo-contenu pour illustrer les structures en arborescence. */
 
 require_once dirname(__FILE__).'/compo/Talend.php';
 
+$fichiers = [];
+$optionsNœuds = [];
+array_shift($argv);
+foreach($argv as $pos => $arg)
+	if(preg_match('/^--(xml|json)=(.*)/', $arg, $rex))
+		foreach(explode(',', $rex[2]) as $nœud)
+			$optionsNœuds[$nœud][$rex[1]] = true;
+	else
+		$fichiers[] = $arg;
+
 $compo = new Talend();
-$modèle = $compo->charger($argv[1]);
+$modèle = $compo->charger($fichiers, $optionsNœuds);
 
 require_once dirname(__FILE__).'/decompo/drawio/DrawIo.php';
 
