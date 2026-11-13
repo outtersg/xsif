@@ -372,6 +372,12 @@ class Talend
 		}
 	}
 	
+	public function arborer($o)
+	{
+		$mode = 0;
+		$o->d = $this->cheminsEnArbo($o->d, $mode);
+	}
+	
 	/**
 	 * Transforme une liste:
 	 *   a
