@@ -371,7 +371,11 @@ class DrawIo
 		
 		$case = htmlentities($case);
 		$case = preg_replace("/^(\t+)/", '<span style="white-space: pre;">\1</span>', $case);
-		$case = strtr($case, [ "\t" => '&#9;' ]);
+		/* À FAIRE: moins cracra que passer par des caractères de contrôle?
+		 * Mais bon, à un moment pour coloriser du XML je veux ajouter des balises avec des <>, avant que les <> du contenu soient transformés en &lt;&gt; bien plus difficiles à repérer par regex. Donc il me faut des caractères spéciaux.
+		 * Après, peut-être que des séquences ANSI seraient plus propres?
+		 */
+		$case = strtr($case, [ "\t" => '&#9;', "\002" => '<', "\003" => '>', "\037" => '"' ]);
 		$case = htmlentities($case);
 		
 		return $case;
