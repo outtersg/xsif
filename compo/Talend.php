@@ -34,9 +34,20 @@ class Talend
 {
 	/** Les bases de données sont-elles en bout de chaîne? */
 	public $basesÀDroite = true;
+	public $optionsNœuds;
 	
-	public function charger($fichier)
+	public function charger($fichier, $optionsNœuds = [])
 	{
+		if(is_array($fichier))
+		{
+			foreach($fichier as $f)
+				$this->charger($f, $optionsNœuds);
+			return $this->_nœuds;
+		}
+		
+		$this->optionsNœuds = $optionsNœuds;
+		/* À FAIRE: tenir un tableau des $optionsNœuds consommées, et à la fin alerter sur le fait que le nœud tartempion n'a pas vu ses options consommées. */
+		
 		$contenu = file_get_contents($fichier);
 		$doc = new DOMDocument();
 		$doc->loadXML($contenu);
