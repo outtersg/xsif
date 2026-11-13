@@ -437,6 +437,17 @@ class Talend
 				foreach(array_reverse(explode('/', $pile[0])) as $pos => $bout)
 					$r[--$comble] = str_repeat("\t", $indent - $pos).'</'.$bout.'>';
 			}
+			// Les <a></a> sont regroupés sur la même ligne.
+			$préc = null;
+			foreach($r as $clé => $contenu)
+			{
+				if(isset($préc) && isset($r[$préc]) && $contenu == strtr($r[$préc], [ '<' => '</']))
+				{
+					unset($r[$clé]);
+					$r[$préc] .= trim($contenu); /* À FAIRE: proposer de rajouter du contenu. */
+				}
+				$préc = $clé;
+			}
 		}
 		
 		return $r;
