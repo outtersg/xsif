@@ -395,15 +395,26 @@ class Talend
 		
 		/* À FAIRE: pouvoir créer les intermédiaires (cf. $intermédiaires dans _compilerNœud_tExtractXMLField) tout en préservant les clés pour ne pas perdre les assoc. */
 		/* À FAIRE: récupérer de jedi.php le _charger() qui prend un objet PHP et en fait une représentation JSON. */
+		/* À FAIRE: gérer les .., pourvu que quelqu'un nous indique le chemin de départ. */
 		
 		$pile = [];
+		$comble = 0;
 		foreach($chemins as $clé => $chemin)
 		{
 			while(count($pile) && substr($chemin, 0, strlen($pile[0])) != $pile[0])
 			{
 				$fin = array_shift($pile);
 				if($mode == 1)
-					$r[] = '</'.$fin.'>';
+				{
+					$indent = substr_count($fin, '/');
+					if(isset($pile[0]))
+						$fin = substr($fin, strlen($pile[0]) + 1);
+					foreach(array_reverse(explode('/', $fin)) as $pos => $bout)
+					{
+						$r[--$comble] = str_repeat("\t", $indent).'</'.$bout.'>';
+						--$indent;
+					}
+				}
 			}
 			$aff = count($pile) ? ltrim(substr($chemin, strlen($pile[0])), '/') : $chemin;
 			switch($mode)
@@ -417,6 +428,15 @@ class Talend
 					break;
 			}
 			array_unshift($pile, $chemin);
+		}
+		if($mode == 1)
+		{
+			if(count($pile))
+			{
+				$indent = substr_count($pile[0], '/');
+				foreach(array_reverse(explode('/', $pile[0])) as $pos => $bout)
+					$r[--$comble] = str_repeat("\t", $indent - $pos).'</'.$bout.'>';
+			}
 		}
 		
 		return $r;
