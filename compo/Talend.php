@@ -572,7 +572,7 @@ class Talend
 			$oRés->depuis[] = [ $oTransfo, $tr[$clé], $clé, 'attr' ];
 		
 		if($arbo)
-			$oTransfo->d = $this->cheminsEnArbo($oTransfo->d);
+			$this->arborer($oTransfo);
 		
 		$this->_nœuds[$r['id']] = $oTransfo;
 		$this->_nœuds[$r['id'].'.d'] = $oRés;
@@ -602,7 +602,7 @@ class Talend
 		ksort($oDst->d);
 		
 		// Création de l'arborescence.
-		$oDst->d = $this->cheminsEnArbo($oDst->d);
+		$this->arborer($oDst);
 		
 		$this->_nœuds[$r['id']] = $oSrc;
 		$this->_nœuds[$r['id'].'.d'] = $oDst;
@@ -657,9 +657,10 @@ class Talend
 						/* À FAIRE: si filtre n'a lui-même qu'un seul prédécesseur, remplacer la Forme par un simple lien. */
 					}
 					$this->parcourirArbo($petitFils, $nom, $oVers, /*&*/ $par, /*&*/ $vers, /*&*/ $champs, /*&*/ $expressif, /*&*/ $filtrant);
-					if(in_array($petitFils->localName, [ 'inputTrees', 'outputTrees' ]))
-						$vers = $this->cheminsEnArbo($vers);
 					$oVers->d = $vers;
+					if(in_array($petitFils->localName, [ 'inputTrees', 'outputTrees' ]))
+						$this->arborer($oVers);
+//fprintf(STDERR, "[35m%s[0m", print_r($this->cheminsEnArbo($vers), true));
 					if($filtrant && $expressif)
 						fprintf(STDERR, "# Nœud à la fois à formule et à filtre. Résultats non garantis.\n");
 					if($filtrant)
