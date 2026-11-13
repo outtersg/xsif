@@ -414,10 +414,15 @@ class DrawIo
 			TERMINE);
 			$x = 0;
 			$col = -1;
+			$colorisation = isset($tableau->style) && preg_match('/ xml /', ' '.$tableau->style.' ') ? 'xml' : false;
 			foreach(is_array($ligne) ? $ligne : [ $ligne ] as $numCol => $case)
 			{
 				++$col;
 				$idi = $ide.'['.$col.']';
+				switch($colorisation)
+				{
+					case 'xml': $case = preg_replace('#<[^>]*>#', strtr('<span style="color:#7F7F7F;">\0</span>', [ '<' => "\002", '>' => "\003", '"' => "\037" ]), $case); break;
+				}
 				$case = $this->affCase($case);
         		$xCond = $x ? ' x="'.$x.'"' : '';
 				$lColErre =
