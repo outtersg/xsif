@@ -386,6 +386,12 @@ class Talend
 	public function arborer($o)
 	{
 		$mode = 0;
+		if(isset($this->optionsNœuds[$o->titre]))
+		{
+			$opts = $this->optionsNœuds[$o->titre];
+			if(isset($opts['xml']) && $opts['xml'])
+				$mode = 1;
+		}
 		$o->d = $this->cheminsEnArbo($o->d, $mode);
 	}
 	
