@@ -406,10 +406,13 @@ class Talend
 				$fin = array_shift($pile);
 				if($mode == 1)
 				{
-					$indent = substr_count($fin, '/');
+					$indent = count($bouts = $this->xpathEnBouts($fin)) - 1;
 					if(isset($pile[0]))
+					{
 						$fin = substr($fin, strlen($pile[0]) + 1);
-					foreach(array_reverse($this->xpathEnBouts($fin)) as $pos => $bout)
+						$bouts = $this->xpathEnBouts($fin);
+					}
+					foreach(array_reverse($bouts) as $pos => $bout)
 					{
 						$r[--$comble] = str_repeat("\t", $indent).'</'.$bout.'>';
 						--$indent;
@@ -433,8 +436,8 @@ class Talend
 		{
 			if(count($pile))
 			{
-				$indent = substr_count($pile[0], '/');
-				foreach(array_reverse($this->xpathEnBouts($pile[0])) as $pos => $bout)
+				$indent = count($bouts = $this->xpathEnBouts($pile[0])) - 1;
+				foreach(array_reverse($bouts) as $pos => $bout)
 					$r[--$comble] = str_repeat("\t", $indent - $pos).'</'.$bout.'>';
 			}
 			// Les <a></a> sont regroupés sur la même ligne.
