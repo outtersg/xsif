@@ -26,9 +26,25 @@
  */
 
 /* À FAIRE: auto-détection du type d'entrée (ou -t <type> pour aider). */
-/* À FAIRE: --contenu pour fournir un pseudo-contenu pour illustrer les structures en arborescence. */
+/* À FAIRE: --xml (sans =nœud) pour demander un format par défaut en XML (et --struct ou --tableau pour revenir au format tableau). */
 
 require_once dirname(__FILE__).'/compo/Talend.php';
+
+function exprPseudoContenu($unSurDeux)
+{
+	$r = [];
+	
+	for($i = -2; ($i += 2) < count($unSurDeux);)
+	{
+		$expr = $unSurDeux[$i];
+		$val = $unSurDeux[$i + 1];
+		$expr = strtr($expr, [ '*' => '[^/]*' ]);
+		$expr = '#(?:^|/)'.$expr.'(?:/|$)#';
+		$r[$expr] = $val;
+	}
+	
+	return $r;
+}
 
 $fichiers = [];
 $optionsNœuds = [];
@@ -37,6 +53,12 @@ foreach($argv as $pos => $arg)
 	if(preg_match('/^--(xml|json)=(.*)/', $arg, $rex))
 		foreach(explode(',', $rex[2]) as $nœud)
 			$optionsNœuds[$nœud][$rex[1]] = true;
+	else if(preg_match('/^--contenu(\W)/', $arg, $rex)) // Le caractère séparant --contenu de la suite sera le délimiteur
+	{
+		if(!isset($optionsNœuds['_pseudoContenu']))
+			$optionsNœuds['_pseudoContenu'] = [];
+		$optionsNœuds['_pseudoContenu'] += exprPseudoContenu(explode($rex[1], substr($arg, strlen($rex[0]))));
+	}
 	else
 		$fichiers[] = $arg;
 
