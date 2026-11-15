@@ -528,6 +528,67 @@ class Talend
 		return $r;
 	}
 	
+	/**
+	 * D'une liste de XPath à la Talend (<ligne>.<col>:/<racine>/<nœud>/<nœud>/<feuille>),
+	 * sort les abréviations possibles sans introduire d'ambiguïté (…/<feuille> si aucune autre ne se termine par <feuille>; sinon on introduit un <nœud> intermédiaire distinctif).
+	 * En entrée les chemins sont en index.
+	 */
+	public function abréviations($liste)
+	{
+		$ràf = [];
+		foreach($liste as $clé => $rien)
+		{
+			preg_match_all('#(?:^|:?[./])[^./:]*#', $clé, $rex);
+			$ràf[$clé] = $rex[0];
+		}
+		$agrég = []; // Là où on mettra les bouts récupérés au fur et à mesure.
+		for($passe = -2; ++$passe < 20 && count($ràf);)
+		{
+			// La première passe tente par la fin: parfois le nom de la feuille suffit à différencier.
+			if($passe < 0)
+				foreach($ràf as $chemin => $bouts)
+					$agrég[$chemin] = [ $bouts[count($bouts) - 1] ];
+			else
+				foreach($ràf as $chemin => $bouts)
+					if(isset($bouts[$passe + 1])) // Seulement si l'on n'a pas dépassé l'avant-dernier bout (le dernier ne devant pas être ajouté puisqu'il a fait l'objet de la "1ère" passe, la -1).
+						array_splice($agrég[$chemin], $passe, 0, [ $bouts[$passe] ]);
+			$ambis = [];
+			foreach($agrég as $chemin => $bouts)
+				$ambis[implode("", $bouts)][] = $chemin;
+			foreach($ambis as $ambi)
+				if(count($ambi) == 1) // Plus d'ambiguïté!
+				{
+					$chemin = $ambi[0];
+					// Les nœuds restants avant la feuille ne contribuent pas à la levée d'ambiguïté. On les réduit.
+					$butée = $passe >= 0 ? $passe : 0;
+					for($i = count($ràf[$chemin]) - 1; --$i > $passe + 1;)
+						$ràf[$chemin][$i] = '';
+					if($i == $passe + 1)
+						$ràf[$chemin][$i] = preg_replace('#[^./:].*#', '…', $ràf[$chemin][$i]); // Celui-ci garde son séparateur.
+					$liste[$chemin] = preg_replace('#…([./:]*…)+#', '…', implode("", $ràf[$chemin]));
+					unset($ràf[$chemin]);
+					unset($agrég[$chemin]);
+				}
+				else if($passe >= 0) // Sinon, si on est dans le début du chemin (pas le -1, qui représente la feuille)…
+				{
+					// … à défaut de résoudre totalement l'ambiguïté, cette passe a-t-elle amélioré?
+					$ceCoup = [];
+					foreach($ambi as $chemin)
+						$ceCoup[$ràf[$chemin][$passe]] = true;
+					if(count($ceCoup) == 1) // Bof, sur ce segment tous avaient la même valeur: elle ne participe donc aucunement au discriminant.
+						foreach($ambi as $chemin)
+							$ràf[$chemin][$passe] = preg_replace('#[^./:].*#', '…', $ràf[$chemin][$passe]);
+				}
+		}
+		/* À FAIRE: il faudrait valider par regex qu'il n'y a pas d'ambiguïté avec la suite.
+		 * Ex.: si on a deux chemins /racine/A/B/suite/feuille et /racine/B/A/suite/feuille,
+		 * tombant sur le premier nœud A ou B on va décréter levée l'ambiguïté et donc les afficher sous forme …/A/…/feuille et …/B/…/feuille.
+		 * Sauf que visuellement chacun peut correspondre à l'autre chemin.
+		 * Il faudrait donc ajouter un tour de boucle en …/A/B/…/feuille et …/B/A/…/feuille.
+		 */
+		return $liste;
+	}
+	
 	/*- Nœuds de mise en correspondance --------------------------------------*/
 	
 	protected function _compilerNœud_tFixedFlowInput($nœud, $r)
@@ -740,6 +801,7 @@ class Talend
 			if(substr($idTable, -2) != '.d')
 			{
 				$prédés = [];
+				$utilisées = []; // Ici on va lister les références utilisées dans ce tableau, voir si on peut les abréger sans introduire d'ambiguïté.
 				// Table filtre: pas de données, juste un filtre.
 				if(!isset($table->d))
 					$table->d = [ -1 => $table->titre ];
@@ -749,6 +811,7 @@ class Talend
 					preg_match_all($exprTousChamps, $formule, $r);
 					foreach($r[0] as $réf)
 						$réfs[$réf] = $réf; // Par indice pour ne garder qu'une seule entrée si la même source est citée plusieurs fois dans la formule.
+					$utilisées += $réfs;
 					foreach($réfs as $réf)
 					{
 						$source = $champs[$réf];
@@ -760,8 +823,19 @@ class Talend
 				$frontal = isset($tables[$idTable.'.f']) ? $tables[$idTable.'.f'] : $table;
 				foreach($prédés as $prédé)
 					$frontal->prédécesseurs[] = $prédé;
+				// Abréviation des variables dans les formules, pour lisibilité.
+				// On se concentre sur celles à / susceptible d'aller chercher leur contenu très loin dans l'arbo (donc totalement illisibles).
+				$utilisées = array_filter($utilisées, function($x) { return strpos($x, '/') !== false; });
+				$utilisées = $this->abréviations($utilisées);
+				/* À FAIRE: on pourrait proposer d'afficher le chemin complet, mais en grisant les parties … */
+				foreach($table->d as $num => $formule)
+					$table->d[$num] = preg_replace_callback($exprTousChamps, function($rex) use($utilisées) { $rex = $rex[0]; return isset($utilisées[$rex]) ? $utilisées[$rex] : $rex; }, $formule);
+				// Ménage.
 				if($num < 0)
+				{
+					$table->titre = $table->d[$num];
 					unset($table->d);
+				}
 			}
 		
 		// [] + [] manuel, pour garder l'ordre de création d'origine (permet de représenter les blocs dans l'ordre si aucune dépendance entre eux), tout en écrasant par la dernière valeur si l'ID est déjà utilisé.
