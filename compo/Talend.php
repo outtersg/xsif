@@ -305,8 +305,8 @@ class Talend
 			$rex[2] = explode('"', $rex[0]);
 			$rex[2] = $rex[2][1];
 		}
-		if(preg_match('/[^a-zA-Z0-9_]/', $rex[2]))
-			$rex[2] = '"'.$rex[2].'"';
+		if(preg_match('/[^a-zA-Z0-9_.]/', $rex[2]))
+			return 'GM("'.$rex[2].'")';
 		return 'GM.'.$rex[2];
 	}
 	
