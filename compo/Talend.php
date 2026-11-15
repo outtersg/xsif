@@ -302,6 +302,15 @@ class Talend
 		/* À FAIRE?: simplifier certaines formules Talend, par ex.: ${((<type>)globalMap.get("raymond.carré")} en ${GM.raymond.carré}
 		 * Cf. ci-dessus.
 		 * Ou alors le proposer via un fonction passée en paramètre: comme ça l'appelant peut fournir sa version spécialisée, capable d'en profiter pour créer un lien depuis un nœud virtuel GlobalMap. */
+		$retour = strtr
+		(
+			$retour,
+			[
+				'Relational.ISNULL' => 'ISNULL',
+				'StringHandling.LEFT' => 'LEFT',
+				'StringHandling.RIGHT' => 'RIGHT',
+			]
+		);
 		return $retour;
 	}
 	
