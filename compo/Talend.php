@@ -245,6 +245,8 @@ class Talend
 		if(strpos($chaîne, '"') === false) return '${'.$chaîne.'}';
 		if(preg_match('/^"[^"]*"$/', $chaîne)) return trim($chaîne, '"');
 		
+		$chaîne = $this->abrégerFormule($chaîne);
+		
 		$exprChaîne = '"(?:[^\\"]+|\\\\.)*"';
 		$exprConcat = '(?:[+]\s*|$)';
 		$exprChaîneNiveau0 = '\s*('.$exprChaîne.')\s*'.$exprConcat;
@@ -291,6 +293,11 @@ class Talend
 		if($dollar)
 			$retour = rtrim($retour).'}';
 		
+		return $retour;
+	}
+	
+	public function abrégerFormule($retour)
+	{
 		$retour = preg_replace_callback('/\(((?:\([A-Za-z]+\))?globalMap\.get\("([^"]*)"\))\)|(?1)/', [ $this, '_déchaîne_globalMap' ], $retour);
 		/* À FAIRE?: simplifier certaines formules Talend, par ex.: ${((<type>)globalMap.get("raymond.carré")} en ${GM.raymond.carré}
 		 * Cf. ci-dessus.
