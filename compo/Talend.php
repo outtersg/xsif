@@ -845,7 +845,10 @@ class Talend
 				$utilisées = $this->abréviations($utilisées);
 				/* À FAIRE: on pourrait proposer d'afficher le chemin complet, mais en grisant les parties … */
 				foreach($table->d as $num => $formule)
+				{
 					$table->d[$num] = preg_replace_callback($exprTousChamps, function($rex) use($utilisées) { $rex = $rex[0]; return isset($utilisées[$rex]) ? $utilisées[$rex] : $rex; }, $formule);
+					$table->d[$num] = $this->abrégerFormule($table->d[$num]);
+				}
 				// Ménage.
 				if($num < 0)
 				{
