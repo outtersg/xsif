@@ -150,6 +150,10 @@ class Talend
 			[
 				'FILENAME',
 			],
+			'DBTABLE' =>
+			[
+				'TABLE',
+			],
 			'COMPONENT_LIST' =>
 			[
 				/* Ressources liées */
@@ -1022,6 +1026,23 @@ class Talend
 		/* À FAIRE: gérer DBTABLE.TABLE, qui contient aussi le nom de la table. */
 		$this->_lierBdd($o, $infos['CONNECTION'], $sql);
 	}
+	
+	protected function _compilerNœud_tSQLOutput($nœud, $infos)
+	{
+		$o = new Tableau($infos['nom'], $infos['>n'][0]);
+		$o->style = 'd';
+		$this->_nœuds[$infos['id'].'.d'] = $o; // .d: nous sommes la table de données / départ officielle, de laquelle se poursuit le flux; les éventuels ADD_COLS, destinés uniquement à la base, seront dans le nœud non .d.
+		
+		/* À FAIRE: les ADD_COLS. Ils s'ajoutent uniquement à la partie qui part en base, pas à ce qui poursuit son bonhomme de chemin.
+		 * Peut-être créer deux blocs données distincts, un pour la base, un pour le FLOW, et reposer sur l'optim pour fondre le second dans le premier s'il n'a aucune sortie propre outre celle base, cf. "simplification partielle". */
+		
+		/* À FAIRE: inscrire l'opération sur le lien. */
+		/* À FAIRE: rejeter les TABLE_ACTION différents de NONE. */
+		$this->_lierBdd($o, $infos['CONNECTION'], [ $infos['TABLE'] ], true);
+	}
+	
+	protected function _compilerNœud_tPostgresqlOutput($nœud, $infos) { return $this->_compilerNœud_tSQLOutput($nœud, $infos); }
+	protected function _compilerNœud_tOracleOutput($nœud, $infos) { return $this->_compilerNœud_tSQLOutput($nœud, $infos); }
 	
 	protected function _lierBdd($o, $idBdd, $tables = null, $écriture = false)
 	{
