@@ -46,6 +46,34 @@ function exprPseudoContenu($unSurDeux)
 	return $r;
 }
 
+/**
+ * Transforme un tableau:
+ *   A=B=C=D
+ * ou
+ *  ;A=B;C=D
+ * en [ A, B, C, D ]
+ */
+function optionEnUnSurDeux($égal, $chaîne)
+{
+	if(!preg_match('/^\W/', $chaîne))
+		return explode($égal, $chaîne);
+	else
+	{
+		$r = [];
+		$sép = substr($chaîne, 0, $début = 1);
+		$prochain = $égal;
+		while(($fin = strpos($chaîne, $prochain, $début)) !== false)
+		{
+			$r[] = substr($chaîne, $début, $fin - $début);
+			$début = $fin + 1;
+			$prochain = $prochain == $égal ? $sép : $égal;
+		}
+		if($début < strlen($chaîne) && count($r) % 2)
+			$r[] = substr($chaîne, $début);
+		return $r;
+	}
+}
+
 $fichiers = [];
 $optionsNœuds = [];
 array_shift($argv);
@@ -57,7 +85,8 @@ foreach($argv as $pos => $arg)
 	{
 		if(!isset($optionsNœuds['_pseudoContenu']))
 			$optionsNœuds['_pseudoContenu'] = [];
-		$optionsNœuds['_pseudoContenu'] += exprPseudoContenu(explode($rex[1], substr($arg, strlen($rex[0]))));
+		/* À FAIRE?: utiliser la , par défaut comme séparateur de paires, puisqu'il n'est pas censé apparaître dans des chemins d'attribut et n'est pas interprété par le shell? */
+		$optionsNœuds['_pseudoContenu'] += exprPseudoContenu(optionEnUnSurDeux($rex[1], substr($arg, strlen($rex[0]))));
 	}
 	else
 		$fichiers[] = $arg;
