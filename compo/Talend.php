@@ -154,6 +154,10 @@ class Talend
 			[
 				'TABLE',
 			],
+			'CLOSED_LIST' =>
+			[
+				'DATA_ACTION',
+			],
 			'COMPONENT_LIST' =>
 			[
 				/* Ressources liées */
@@ -1036,9 +1040,8 @@ class Talend
 		/* À FAIRE: les ADD_COLS. Ils s'ajoutent uniquement à la partie qui part en base, pas à ce qui poursuit son bonhomme de chemin.
 		 * Peut-être créer deux blocs données distincts, un pour la base, un pour le FLOW, et reposer sur l'optim pour fondre le second dans le premier s'il n'a aucune sortie propre outre celle base, cf. "simplification partielle". */
 		
-		/* À FAIRE: inscrire l'opération sur le lien. */
 		/* À FAIRE: rejeter les TABLE_ACTION différents de NONE. */
-		$this->_lierBdd($o, $infos['CONNECTION'], [ $infos['TABLE'] ], true);
+		$this->_lierBdd($o, $infos['CONNECTION'], [ $infos['TABLE'] ], $infos['DATA_ACTION']);
 	}
 	
 	protected function _compilerNœud_tPostgresqlOutput($nœud, $infos) { return $this->_compilerNœud_tSQLOutput($nœud, $infos); }
