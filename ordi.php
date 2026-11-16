@@ -55,11 +55,11 @@ function exprPseudoContenu($unSurDeux)
  */
 function optionEnUnSurDeux($égal, $chaîne)
 {
+	$r = [];
+	$début = 0;
 	if(!preg_match('/^\W/', $chaîne))
-		return explode($égal, $chaîne);
+		$sép = ',';
 	else
-	{
-		$r = [];
 		$sép = substr($chaîne, 0, $début = 1);
 		$prochain = $égal;
 		while(($fin = strpos($chaîne, $prochain, $début)) !== false)
@@ -71,7 +71,6 @@ function optionEnUnSurDeux($égal, $chaîne)
 		if($début < strlen($chaîne) && count($r) % 2)
 			$r[] = substr($chaîne, $début);
 		return $r;
-	}
 }
 
 $fichiers = [];
@@ -85,7 +84,6 @@ foreach($argv as $pos => $arg)
 	{
 		if(!isset($optionsNœuds['_pseudoContenu']))
 			$optionsNœuds['_pseudoContenu'] = [];
-		/* À FAIRE?: utiliser la , par défaut comme séparateur de paires, puisqu'il n'est pas censé apparaître dans des chemins d'attribut et n'est pas interprété par le shell? */
 		$optionsNœuds['_pseudoContenu'] += exprPseudoContenu(optionEnUnSurDeux($rex[1], substr($arg, strlen($rex[0]))));
 	}
 	else
