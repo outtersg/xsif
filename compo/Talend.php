@@ -1023,7 +1023,7 @@ class Talend
 		$this->_lierBdd($o, $infos['CONNECTION'], $sql);
 	}
 	
-	protected function _lierBdd($o, $idBdd, $tables)
+	protected function _lierBdd($o, $idBdd, $tables = null, $écriture = false)
 	{
 		/* Extraction des tables. */
 		
@@ -1089,12 +1089,22 @@ class Talend
 		{
 		if($this->basesÀDroite)
 		{
-			$ob->prédécesseurs[] = $o;
-			$ob->depuis[] = [ $o, null, null, false ];
+				$droite = $ob;
+				$gauche = $o;
 		}
 		else
-			$o->prédécesseurs[] = $ob;
+			{
+				$droite = $o;
+				$gauche = $ob;
+			}
 		
+			$droite->prédécesseurs[] = $gauche;
+			// Si l'ordre des blocs (données → table ou table → données) est différent de celui de la flèche, on surcharge le lien entre les deux pour qu'il ne s'affiche pas.
+			if($this->basesÀDroite ^ $écriture)
+				$droite->depuis[] = [ $gauche, null, null, false ];
+			if($écriture)
+				$ob->depuis[] = [ $o, null, null, 'd' ];
+			else
 		$o->depuis[] = [ $ob, null, null, 'd' ];
 		}
 	}
