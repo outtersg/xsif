@@ -1121,10 +1121,10 @@ class Talend
 		
 			$droite->prédécesseurs[] = $gauche;
 			// Si l'ordre des blocs (données → table ou table → données) est différent de celui de la flèche, on surcharge le lien entre les deux pour qu'il ne s'affiche pas.
-			if($this->basesÀDroite ^ $écriture)
+			if($this->basesÀDroite ^ ($écriture !== false))
 				$droite->depuis[] = [ $gauche, null, null, false ];
 			if($écriture)
-				$ob->depuis[] = [ $o, null, null, 'd' ];
+				$ob->depuis[] = [ $o, null, null, 'd', is_string($écriture) ? $écriture : null ];
 			else
 		$o->depuis[] = [ $ob, null, null, 'd' ];
 		}
