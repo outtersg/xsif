@@ -1106,10 +1106,15 @@ class Talend
 					$ot = $this->_nœuds[$idTable] = new Forme($nomTable);
 					$ot->forme = 'table';
 					if($this->basesÀDroite)
+					{
 						$ob->prédécesseurs[] = $ot;
+						$ob->depuis[] = [ $ot, null, null, false ];
+					}
 					else
+					{
 						$ot->prédécesseurs[] = $ob;
-					/* À FAIRE: styler le lien table - base comme relation de contenu à conteneur. */
+					}
+					$ot->depuis[] = [ $ob, null, null, 'parent' ];
 				}
 				$oTables[] = $ot;
 			}
