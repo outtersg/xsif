@@ -1255,6 +1255,7 @@ class Talend
 	{
 		/* À FAIRE: pouvoir être appelé en effectuant des fusions de prédécesseurs et depuis (là on écrase, supposant qu'on est appelés par _opti_fusionIdemDonnées()). */
 		$dominant->prédécesseurs = $récessif->prédécesseurs;
+		if(isset($récessif->depuis))
 		$dominant->depuis = $récessif->depuis;
 		//$dominant->d = $récessif->d;
 		//$dominant->pos = $récessif->pos;
