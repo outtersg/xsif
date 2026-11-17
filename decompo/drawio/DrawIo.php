@@ -113,6 +113,7 @@ class DrawIo
 			'Lien' =>
 			[
 				'strokeColor' => '#FF00FF',
+				'fontColor' => '#FF00FF',
 			],
 		],
 		'global' =>
