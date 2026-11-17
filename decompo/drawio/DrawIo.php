@@ -83,6 +83,22 @@ class DrawIo
 				'curveGeometry' => 1,
 			],
 		],
+		/* Relation parent - enfant entre deux nœuds. */
+		'parent' =>
+		[
+			'Lien' =>
+			[
+				'strokeWidth' => 3,
+				'endArrow' => 'oval',
+				'endFill' => 1,
+				'strokeColor' => '#7F7F7F',
+				'edgeStyle' => null,
+				// Pour faire des pointillés ronds, on fait des pointillés rectangles de longueur 0, car l'arrondi (de rayon 1/2 largeur de trait) s'ajoute à la longueur, donc pour une boule.
+				'dashed' => 1,
+				'dashPattern' => '0 2',
+				'linecap' => 'round',
+			],
+		],
 		/* Donnée brute, et non flux de travail. */
 		'd' =>
 		[
