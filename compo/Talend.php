@@ -1230,6 +1230,7 @@ class Talend
 	protected function _optimiser()
 	{
 		$this->_opti_fusionIdemDonnées();
+		$this->_opti_briquesTechniques();
 	}
 	
 	protected function _opti_fusionIdemDonnées()
@@ -1286,6 +1287,24 @@ class Talend
 		}
 		
 		/* À FAIRE: s'assurer qu'il n'est pas référencé directement comme prédécesseur ou depuis d'un autre nœud. On pourrait avoir un successeurs, calculé en première passe, listant tous ceux qui nous ont comme prédécesseur */
+	}
+	
+	/**
+	 * Remet les briques techniques (ex.: connexion à une base de données) en fin de modèle.
+	 * Elles sont parfois instanciées dès le début de la tâche, mais utilisées seulement en cours de flux. Du fait de leur instanciation précoce, elles apparaissent (et tous les composants qui y sont liés directement) en début de flux, au détriment des composants qui fonctionnellement interviennent en premier. On corrige donc cela.
+	 */
+	protected function _opti_briquesTechniques()
+	{
+		$clés = array_keys($this->_nœuds);
+		foreach($clés as $clé)
+		{
+			$n = $this->_nœuds[$clé];
+			if(isset($n->forme) && in_array($n->forme, [ 'bdd', 'table' ]))
+			{
+				unset($this->_nœuds[$clé]);
+				$this->_nœuds[$clé] = $n;
+			}
+		}
 	}
 	
 	/*- Entrepôt -------------------------------------------------------------*/
