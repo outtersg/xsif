@@ -306,7 +306,7 @@ class Talend
 	
 	public function abrégerFormule($retour)
 	{
-		$retour = preg_replace_callback('/\(((?:\([A-Za-z]+\))?globalMap\.get\("([^"]*)"\))\)|(?1)/', [ $this, '_déchaîne_globalMap' ], $retour);
+		$retour = preg_replace_callback('/(^|.)\(((?:\([A-Za-z]+\))?globalMap\.get\("([^"]*)"\))\)|(?2)/', [ $this, '_déchaîne_globalMap' ], $retour);
 		/* À FAIRE?: simplifier certaines formules Talend, par ex.: ${((<type>)globalMap.get("raymond.carré")} en ${GM.raymond.carré}
 		 * Cf. ci-dessus.
 		 * Ou alors le proposer via un fonction passée en paramètre: comme ça l'appelant peut fournir sa version spécialisée, capable d'en profiter pour créer un lien depuis un nœud virtuel GlobalMap. */
@@ -324,14 +324,22 @@ class Talend
 	
 	protected function _déchaîne_globalMap($rex)
 	{
-		if(!isset($rex[2]))
+		$avant = isset($rex[1]) ? $rex[1] : '';
+		if(!isset($rex[3]))
 		{
-			$rex[2] = explode('"', $rex[0]);
-			$rex[2] = $rex[2][1];
+			$contenu = explode('"', $rex[0]);
+			$contenu = $contenu[1];
 		}
-		if(preg_match('/[^a-zA-Z0-9_.]/', $rex[2]))
-			return 'GM("'.$rex[2].'")';
-		return 'GM.'.$rex[2];
+		else
+			$contenu = $rex[3];
+		if(preg_match('/[^a-zA-Z0-9_.]/', $contenu))
+			$contenu = '("'.$contenu.'")';
+		else
+			$contenu = '.'.$contenu;
+		$contenu = 'GM'.$contenu;
+		if(preg_match('/\w/', $avant))
+			$contenu = '('.$contenu.')';
+		return $avant.$contenu;
 	}
 	
 	public function testDéchaîne()
