@@ -56,6 +56,10 @@ class DrawIo
 				'rounded' => 1,
 				'roundedPerimeter' => 1,
 			],
+			'Lien' =>
+			[
+				'edgeStyle' => 'orthogonalEdgeStyle',
+			],
 		],
 		/* Attribut: pas un nœud complet. */
 		'attr' =>
@@ -547,7 +551,7 @@ class DrawIo
 		$c0 = $this->_p->pos($de);
 		$c1 = $this->_p->pos($vers);
 		$this->_sortir(<<<TERMINE
-			<mxCell id="xsif-$id" edge="1" parent="1" source="xsif-{$c0->id}" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;{$this->affAccroches($de, 'E', 'exit')}{$this->affAccroches($vers, 'O', 'entry')}defaultLabelBackgroundColor=page;{$this->style($style, 'Lien')}" target="xsif-{$c1->id}">
+			<mxCell id="xsif-$id" edge="1" parent="1" source="xsif-{$c0->id}" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;{$this->affAccroches($de, 'E', 'exit')}{$this->affAccroches($vers, 'O', 'entry')}defaultLabelBackgroundColor=page;{$this->style($style, 'Lien')}" target="xsif-{$c1->id}">
 				<mxGeometry relative="1" as="geometry" />
 			</mxCell>
 		TERMINE);
