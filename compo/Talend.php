@@ -1271,7 +1271,7 @@ class Talend
 			if(!isset($dominant->titres)) $dominant->titres = [ $dominant->titre => true ];
 			if(!isset($récessif->titres)) $récessif->titres = [ $récessif->titre => true ];
 			$dominant->titres = $récessif->titres + $dominant->titres;
-			$dominant->titre = implode(' / ', $dominant->titres);
+			$dominant->titre = implode(' / ', array_keys($dominant->titres));
 		}
 		
 		foreach($this->_nœuds as $clép => $pote) // $potentiel.
