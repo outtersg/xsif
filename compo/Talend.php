@@ -1243,14 +1243,39 @@ class Talend
 			
 			if(!isset($n->style) || $n->style != 'd') continue;
 			if(count($n->prédécesseurs) > 1) continue;
-			if(isset($n->depuis)) continue;
+			if(isset($n->depuis))
+			{
+				// On peut fusionner uniquement si les liens sont tous issus d'un des prédécesseurs avec lesquels on fusionne.
+				foreach($n->depuis as $source)
+					if(!in_array($source[0], $n->prédécesseurs))
+						continue 2;
+			}
 			
 			foreach($n->prédécesseurs as $p)
 			{
 				if(!isset($p->style) || $p->style != 'd') continue;
 				if($p === $n) continue;
 				
-				if($p->d !== $n->d) continue;
+				if($p->d !== $n->d)
+				{
+					// Si les tableaux sont différents, on investigue plus en détail (ex.: un tableau 1 dimension [ A, B, C] est équivalent à un tableau à 2 dimensions mais une colonne [ [ A ], [ B ], [ C ] ]).
+					foreach($p->d as $clé => $vp)
+					{
+						if(!isset($n->d[$clé])) continue 2; /* À FAIRE: rechercher aussi dans array_values, si les lignes sont les mêmes mais indicées par numéro plutôt que clé? */
+						
+						$vn = $n->d[$clé];
+						is_array($vp) || $vp = [ $vp ];
+						is_array($vn) || $vn = [ $vn ];
+						
+						if($vn == $vp) continue; // Là c'est bon: on sort de cette boucle exclusive.
+						
+						// Sinon on creuse encore.
+						
+						/* À FAIRE: les différences informatives sautent, ex.: indicateur de clé primaire d'un côté. */
+						
+						continue 2; // Là ça n'est pas bon: on sort de la boucle inclusive.
+					}
+				}
 				
 				$this->_fusionner($p, $n);
 			}
