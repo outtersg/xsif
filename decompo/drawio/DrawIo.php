@@ -508,7 +508,7 @@ class DrawIo
 		$id = $coord->id;
 		$affStyle = $this->style(isset($forme->style) ? $forme->style : null, $forme);
 		$titre = $forme->titre;
-		if(in_array($forme->forme, [ 'bdd' ]))
+		if(in_array($forme->forme, [ 'bdd' ]) && isset($titre))
 			$titre = preg_replace('/^(?: *[^( ]+)+/', '<b>\0</b>', $titre);
 		$this->_affImage('xsif-'.$id, 1, $forme->forme, $coord, $affStyle, $titre);
 	}
