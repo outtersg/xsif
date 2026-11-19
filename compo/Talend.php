@@ -1012,10 +1012,14 @@ class Talend
 	protected function _compilerNœud_tSQLConnection($nœud, $infos)
 	{
 		/* À FAIRE?: valider que les tPostgresqlInput etc. qui s'y branchent utilisent les mêmes paramètres de connexion */
-		$o = isset($this->_nœuds[$infos['id']]) ? $this->_nœuds[$infos['id']] : new Forme();
-		$o->titre = $infos['nom']."\n".$this->_déchaîne($infos['HOST']).'/'.$this->_déchaîne($infos['DBNAME']);
+		$instance = $this->_déchaîne($infos['HOST']).'/'.$this->_déchaîne($infos['DBNAME']);
+		$id = isset($infos['id']) ? $infos['id'] : $instance;
+		$o = isset($this->_nœuds[$id]) ? $this->_nœuds[$id] : new Forme();
+		$o->titre = (isset($infos['nom']) ? $o->titre = $infos['nom']."\n" : '').$instance;
 		$o->forme = 'bdd';
-		$this->_nœuds[$infos['id']] = $o;
+		$this->_nœuds[$id] = $o;
+		
+		return $id;
 	}
 	
 	protected function _compilerNœud_tPostgresqlConnection($nœud, $infos) { return $this->_compilerNœud_tSQLConnection($nœud, $infos); }
