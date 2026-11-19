@@ -1040,7 +1040,7 @@ class Talend
 		$this->_nœuds[$infos['id'].'.d'] = $os;
 		
 		/* À FAIRE: gérer DBTABLE.TABLE, qui contient aussi le nom de la table. */
-		$this->_lierBdd($o, $infos['CONNECTION'], $sql);
+		$this->_lierBdd($o, $infos, $sql);
 	}
 	
 	protected function _compilerNœud_tSQLOutput($nœud, $infos)
@@ -1053,14 +1053,16 @@ class Talend
 		 * Peut-être créer deux blocs données distincts, un pour la base, un pour le FLOW, et reposer sur l'optim pour fondre le second dans le premier s'il n'a aucune sortie propre outre celle base, cf. "simplification partielle". */
 		
 		/* À FAIRE: rejeter les TABLE_ACTION différents de NONE. */
-		$this->_lierBdd($o, $infos['CONNECTION'], [ $infos['TABLE'] ], $infos['DATA_ACTION']);
+		$this->_lierBdd($o, $infos, [ $infos['TABLE'] ], $infos['DATA_ACTION']);
 	}
 	
 	protected function _compilerNœud_tPostgresqlOutput($nœud, $infos) { return $this->_compilerNœud_tSQLOutput($nœud, $infos); }
 	protected function _compilerNœud_tOracleOutput($nœud, $infos) { return $this->_compilerNœud_tSQLOutput($nœud, $infos); }
 	
-	protected function _lierBdd($o, $idBdd, $tables = null, $écriture = false)
+	protected function _lierBdd($o, $infosTable, $tables = null, $écriture = false)
 	{
+		$idBdd = $infosTable['CONNECTION'];
+		
 		/* Extraction des tables. */
 		
 		if(is_string($tables))
