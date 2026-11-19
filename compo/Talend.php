@@ -1061,7 +1061,11 @@ class Talend
 	
 	protected function _lierBdd($o, $infosTable, $tables = null, $écriture = false)
 	{
-		$idBdd = $infosTable['CONNECTION'];
+		/* Récupération de la base. */
+		
+		// Pas de base préchargée? Alors les infos de base sont dans le nœud.
+		if(($idBdd = $infosTable['CONNECTION']) == '')
+			$idBdd = $this->_compilerNœud_tSQLConnection(null, array_diff_key($infosTable, [ 'id' => 1, 'nom' => 1 ]));
 		
 		/* Extraction des tables. */
 		
