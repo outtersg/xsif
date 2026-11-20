@@ -71,7 +71,7 @@ class Talend
 				$this->_fils($nœud);
 				break;
 			case 'node':
-				if(($nœud = $this->_compilerNœud($nœud)))
+				if(($nœud = $this->_compilerNœud($nœud)) && is_object($nœud))
 					$this->_nœuds[] = $nœud;
 				break;
 			case 'connection':
