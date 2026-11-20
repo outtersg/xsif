@@ -1049,6 +1049,29 @@ class Talend
 		$o->style = 'd';
 		$this->_nœuds[$infos['id'].'.d'] = $o; // .d: nous sommes la table de données / départ officielle, de laquelle se poursuit le flux; les éventuels ADD_COLS, destinés uniquement à la base, seront dans le nœud non .d.
 		
+		/* Colonnes en plus.
+		 * Si la ligne à écrire en base contient des colonnes supplémentaires, on ne peut plus se contenter du bloc passant transmis à la suite du flux:
+		 * on doit dissocier ce premier bloc, à transmettre à la suite du flux, du second, spécifique à la base.
+		 * Les optimiseurs pourront éventuellement décider de les fusionner. */
+		
+		if(isset($infos['ADD_COLS']) && count($infos['ADD_COLS']))
+		{
+			$odb = clone $o;
+			$this->_nœuds[$infos['id']] = $odb;
+			$odb->prédécesseurs[] = $o;
+			foreach($infos['ADD_COLS'] as $cold)
+			{
+				$col = $this->_déchaîne($cold['NAME']);
+				$val = $this->_déchaîne($cold['SQL']);
+				/* À FAIRE?: une vue 2 colonnes. */
+				$odb->d[] = $col.' = '.$val;
+			}
+			/* À FAIRE?: gérer le POS. */
+			/* À FAIRE: si ce sont des variables Talend, les relier à leur source. */
+			// Pour la suite des événements (lien à la base), c'est lui qui joue.
+			$o = $odb;
+		}
+		
 		/* À FAIRE: les ADD_COLS. Ils s'ajoutent uniquement à la partie qui part en base, pas à ce qui poursuit son bonhomme de chemin.
 		 * Peut-être créer deux blocs données distincts, un pour la base, un pour le FLOW, et reposer sur l'optim pour fondre le second dans le premier s'il n'a aucune sortie propre outre celle base, cf. "simplification partielle". */
 		
