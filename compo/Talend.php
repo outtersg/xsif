@@ -227,6 +227,8 @@ class Talend
 				{
 					if($petitFils->localName != 'column') continue;
 					$col = $petitFils->getAttribute('name');
+					if($petitFils->getAttribute('key') == 'true')
+						$col .= ' '.self::CLÉ;
 					$champsSortie[] = $col;
 				}
 				// Et une copie indicée [0] pour s'y retrouver:
