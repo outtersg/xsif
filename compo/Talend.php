@@ -36,6 +36,8 @@ class Talend
 	public $basesÀDroite = true;
 	public $optionsNœuds;
 	
+	const CLÉ = '🔑';
+	
 	public function charger($fichier, $optionsNœuds = [])
 	{
 		if(is_array($fichier))
