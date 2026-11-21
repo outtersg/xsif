@@ -1302,11 +1302,12 @@ class Talend
 						is_array($vp) || $vp = [ $vp ];
 						is_array($vn) || $vn = [ $vn ];
 						
+						foreach($vn as & $ptrCase)
+							$ptrCase = preg_replace('/\s*(?:'.self::CLÉ.')/', '', $ptrCase);
+						
 						if($vn == $vp) continue; // Là c'est bon: on sort de cette boucle exclusive.
 						
 						// Sinon on creuse encore.
-						
-						/* À FAIRE: les différences informatives sautent, ex.: indicateur de clé primaire d'un côté. */
 						
 						continue 2; // Là ça n'est pas bon: on sort de la boucle inclusive.
 					}
