@@ -594,6 +594,48 @@ class DrawIo
 		$this->_affImage("xsif-$idParent-icone", 'xsif-'.$idParent, $icône, [ 'l' => 24, 'rel' => true ], '');
 	}
 	
+	public function calcConteneur($o)
+	{
+		$coord = $this->_p->pos($o);
+		$coord->id = ++$this->_id;
+		// Le conteneur n'a pas à être placé: il s'adaptera à son contenu, dans affConteneur().
+		$coord->fait = 1;
+	}
+	
+	public function affConteneur($o)
+	{
+		$coord = $this->_p->pos($o);
+		
+		/* À FAIRE: à l'arrière-plan. Donc à dessiner en premier? */
+		
+		$x0 = $y0 = $x1 = $y1 = null;
+		foreach($o->d as $fil)
+		{
+			/* À FAIRE: les conteneurs de conteneurs doivent invoquer l'affConteneur récursivement (et marquer comme tels les enfants, pour qu'ils ne soient pas repondus). */
+			$cf = $this->_p->pos($fil);
+			if(!isset($x0) || $x0 > $cf->x) $x0 = $cf->x;
+			if(!isset($y0) || $y0 > $cf->y) $y0 = $cf->y;
+			if(!isset($x1) || $x1 < $cf->x + $cf->l) $x1 = $cf->x + $cf->l;
+			if(!isset($y1) || $y1 < $cf->y + $cf->h) $y1 = $cf->y + $cf->h;
+		}
+		
+		if(!isset($x0)) return;
+		
+		$mm = $this->_p->marge / 4; // Mini-marge. Deux mini-marges doivent faire moins qu'une marge.
+		$x0 -= $mm; $x1 += $mm;
+		$y0 -= $mm; $y1 += $mm;
+		$coord->x = $x0; $coord->l = $x1 - $x0;
+		$coord->y = $y0; $coord->h = $y1 - $y0;
+		
+		if(!isset($coord->y)) return;
+		$affLibellé = $this->affT($o->titre);
+		$this->_sortir(<<<TERMINE
+			<mxCell id="{$coord->id}" parent="1" style="rounded=0;whiteSpace=wrap;html=1;strokeWidth=2;dashed=1;strokeColor=#7F7F7F;fontColor=#7F7F7F;fillColor=none;align=left;verticalAlign=top;" value="$affLibellé" vertex="1">
+				<mxGeometry height="{$coord->h}" width="{$coord->l}" x="{$coord->x}" y="{$coord->y}" as="geometry"/>
+			</mxCell>
+		TERMINE);
+	}
+	
 	/*- Utilitaires ----------------------------------------------------------*/
 	
 	public function style($style, $classe = null, $départ = [])
