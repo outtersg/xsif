@@ -21,9 +21,11 @@
  * SOFTWARE.
  */
 
+require_once dirname(__FILE__).'/../Modele/Diagramme/Conteneur.php';
 require_once dirname(__FILE__).'/../Modele/Diagramme/Forme.php';
 require_once dirname(__FILE__).'/../Modele/Diagramme/Tableau.php';
 
+use Gui\Xsif\Modele\Diagramme\Conteneur;
 use Gui\Xsif\Modele\Diagramme\Forme;
 use Gui\Xsif\Modele\Diagramme\Tableau;
 
@@ -75,6 +77,9 @@ class Talend
 			case 'node':
 				if(($nœud = $this->_compilerNœud($nœud)) && is_object($nœud))
 					$this->_nœuds[] = $nœud;
+				break;
+			case 'subjob':
+				$this->_compilerConteneur($nœud);
 				break;
 			case 'connection':
 				$this->_compilerLien($nœud);
@@ -1262,12 +1267,27 @@ class Talend
 			call_user_func($oVers->notifPrédécesseur, $oDe, $oVers);
 	}
 	
+	/*- Conteneurs -----------------------------------------------------------*/
+	
+	protected function _compilerConteneur($nœud)
+	{
+		$infos = $this->_infosNœud($nœud);
+		
+		if(!isset($this->_nœuds[$infos['id']])) { fprintf(STDERR, "# <subjob> pour le nœud %s introuvable.\n", $infos['id']); return; }
+		
+		$o = new Conteneur();
+		$o->d = [ $this->_nœuds[$infos['id']] ];
+		
+		$this->_nœuds['#'.$infos['id']] = $o;
+	}
+	
 	/*- Optimisation ---------------------------------------------------------*/
 	
 	protected function _optimiser()
 	{
 		$this->_opti_fusionIdemDonnées();
 		$this->_opti_briquesTechniques();
+		/* À FAIRE: les conteneurs à un seul nœud après optimisation n'ont pas grand intérêt. Voir sous quelle condition les faire sauter (pas de lien avec autre chose, etc.). */
 	}
 	
 	protected function _opti_fusionIdemDonnées()
