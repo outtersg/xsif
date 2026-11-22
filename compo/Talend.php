@@ -1276,7 +1276,8 @@ class Talend
 		if(!isset($this->_nœuds[$infos['id']])) { fprintf(STDERR, "# <subjob> pour le nœud %s introuvable.\n", $infos['id']); return; }
 		
 		$o = new Conteneur();
-		$o->d = [ $this->_nœuds[$infos['id']] ];
+		$of = $this->_nœuds[$infos['id']];
+		$o->d = [ spl_object_hash($of) => $of ];
 		
 		$this->_nœuds['#'.$infos['id']] = $o;
 	}
