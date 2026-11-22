@@ -567,6 +567,13 @@ class DrawIo
 		$id = ++$this->_id;
 		$c0 = $this->_p->pos($de);
 		$c1 = $this->_p->pos($vers);
+		// On se protège des liens morts, suite probablement à une phase d'optimisation qui aurait oublié de rebrancher vers le remplaçant.
+		// Draw.io n'a pas de souci à avoir un lien qui figure sans que sa source corresponde, on le laisse donc pour diagnostic.
+		if(!isset($c0->id))
+		{
+			fprintf(STDERR, "# affLien(): lien depuis un nœud hors graphe.\n");
+			$c0->id = '(source introuvable)';
+		}
 		$this->_sortir(<<<TERMINE
 			<mxCell id="xsif-$id" edge="1" parent="1" source="xsif-{$c0->id}" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;{$this->affAccroches($de, 'E', 'exit')}{$this->affAccroches($vers, 'O', 'entry')}defaultLabelBackgroundColor=page;{$this->style($style, 'Lien')}" target="xsif-{$c1->id}">
 				<mxGeometry relative="1" as="geometry" />
