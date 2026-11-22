@@ -1289,6 +1289,7 @@ class Talend
 		$this->_opti_fusionIdemDonnées();
 		$this->_opti_briquesTechniques();
 		/* À FAIRE: les conteneurs à un seul nœud après optimisation n'ont pas grand intérêt. Voir sous quelle condition les faire sauter (pas de lien avec autre chose, etc.). */
+		$this->_opti_diffusionSousTâches();
 	}
 	
 	protected function _opti_fusionIdemDonnées()
@@ -1389,6 +1390,62 @@ class Talend
 				$this->_nœuds[$clé] = $n;
 			}
 		}
+	}
+	
+	/**
+	 * Pour Talend, un <subjob ne contient au départ que son nœud de démarrage. À nous de calculer tous les nœuds qui suivent. */
+	protected function _opti_diffusionSousTâches()
+	{
+		/* À FAIRE: et les conteneurs imbriqués? */
+		
+		foreach($this->_nœuds as $oc)
+			if($oc instanceof Conteneur)
+				foreach($oc->d as $contenu)
+				{
+					if(!isset($contenu->conteneurs)) $contenu->conteneurs = [];
+					$contenu->conteneurs[] = $oc;
+					/* À FAIRE: récupérer aussi les prédécesseurs de même radical (ex.: le nœud tBidule_5 a en fait instancié un tBidule_5.a, comme .arrivée, qui est le véritable point d'entrée). */
+					if(count($contenu->conteneurs) > 1)
+					{
+						/* À FAIRE: dénicher les id des conteneurs et contenu. */
+						fprintf(STDERR, "# %s est point de démarrage de plusieurs conteneurs.\n", get_class($contenu));
+					}
+				}
+		foreach($this->_nœuds as $o)
+			$this->_opti_calcConteneurs($o);
+		foreach($this->_nœuds as $o)
+			if(isset($o->conteneurs))
+				foreach($o->conteneurs as $oc)
+					$oc->d[spl_object_hash($o)] = $o;
+	}
+	
+	protected function _opti_calcConteneurs($o)
+	{
+		if($o instanceof Conteneur)
+			return;
+		if(isset($o->conteneurs)) // Déjà fait.
+			return $o->conteneurs;
+		
+		$o->conteneurs = [];
+		foreach($o->prédécesseurs as $op)
+		{
+			/* À FAIRE: être bien rigoureux et ne suivre que le FLOW. */
+			/* À FAIRE: ne pas englober les mutualisés (BdD, tables, etc.). */
+			if(!($cons = $this->_opti_calcConteneurs($op)) || !count($cons)) continue;
+			
+			foreach($cons as $con)
+				if(!in_array($con, $o->conteneurs))
+					$o->conteneurs[] = $con;
+		}
+		switch(count($o->conteneurs))
+		{
+			case 0: unset($o->conteneurs); return;
+			case 1: break;
+			default:
+				/* À FAIRE: dénicher les id des conteneurs et contenu. */
+				fprintf(STDERR, "# %s est point de jonction de plusieurs conteneurs.\n", get_class($o));
+		}
+		return $o->conteneurs;
 	}
 	
 	/*- Entrepôt -------------------------------------------------------------*/
