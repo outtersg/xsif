@@ -1278,8 +1278,11 @@ class Talend
 		if(!isset($this->_nœuds[$infos['id']])) { fprintf(STDERR, "# <subjob> pour le nœud %s introuvable.\n", $infos['id']); return; }
 		
 		$o = new Conteneur();
-		$of = $this->_nœuds[$infos['id']];
+		$of = $this->_nœuds[$id = $infos['id']];
 		$o->d = [ spl_object_hash($of) => $of ];
+		// Les nœuds peuvent avoir instancié des satellites en amont de celui possédant l'identifiant nominal.
+		foreach(array_filter($this->_nœuds, function($clé) use($id) { return substr($clé, 0, strlen($id) + 1) == $id.'.'; }, ARRAY_FILTER_USE_KEY) as $satellite)
+			$o->d[spl_object_hash($satellite)] = $satellite;
 		
 		$this->_nœuds['#'.$infos['id']] = $o;
 	}
@@ -1406,7 +1409,6 @@ class Talend
 				{
 					if(!isset($contenu->conteneurs)) $contenu->conteneurs = [];
 					$contenu->conteneurs[] = $oc;
-					/* À FAIRE: récupérer aussi les prédécesseurs de même radical (ex.: le nœud tBidule_5 a en fait instancié un tBidule_5.a, comme .arrivée, qui est le véritable point d'entrée). */
 					if(count($contenu->conteneurs) > 1)
 					{
 						/* À FAIRE: dénicher les id des conteneurs et contenu. */
