@@ -108,6 +108,7 @@ class Talend
 		if(!method_exists($this, $fonc = '_compilerNœud_'.$type)) { fprintf(STDERR, "# Je ne sais pas gérer les nœuds %s.\n", $type); return; }
 		
 		$infos = $this->_infosNœud($nœud);
+		if(isset($infos['ACTIVATE']) && $infos['ACTIVATE'] == 'false') return;
 		$infos['type'] = $type;
 		
 		return $this->$fonc($nœud, $infos);
@@ -146,6 +147,7 @@ class Talend
 			'CHECK' =>
 			[
 				'DEFAULT_MAP' => 'GlobalMap',
+				'ACTIVATE',
 			],
 			'RADIO' =>
 			[
