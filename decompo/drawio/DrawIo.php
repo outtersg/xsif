@@ -61,6 +61,14 @@ class DrawIo
 				'edgeStyle' => 'orthogonalEdgeStyle',
 			],
 		],
+		'inactif' =>
+		[
+			'' =>
+			[
+				'fontColor' => '#BFBFBF',
+				'strokeColor' => '#BFBFBF',
+			],
+		],
 		/* Attribut: pas un nœud complet. */
 		'attr' =>
 		[
