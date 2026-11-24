@@ -417,6 +417,9 @@ class DrawIo
 		list($lCols, $lTableau, $hTotale, $hTitre, $hLigne, $idt, $idtt, $y) = $coord->vars;
 		
 		$style = $this->style(isset($tableau->style) ? $tableau->style : '', $tableau);
+		// Quelques attributs ne sont pas transmis aux cases par inherit; on les prélève ici.
+		preg_match_all('/\bfontColor=[^;]*(?:;|$)/', $style, $héritage);
+		$héritage = $héritage ? implode('', $héritage[0]) : '';
 		
 		$titre = isset($tableau->titre) ? $this->affT($tableau->titre) : '';
 		$this->_sortir(<<<TERMINE
@@ -475,7 +478,7 @@ class DrawIo
 							$bords .= $direction.'=0;';
 				}
 				$this->_sortir(<<<TERMINE
-					<mxCell id="xsif-$idi" parent="xsif-$ide" style="shape=partialRectangle;connectable=0;strokeColor=inherit;overflow=hidden;pointerEvents=1;html=1;align=left;fontFamily=inherit;fillColor=inherit;$étendue$bords" value="$case" vertex="1">
+					<mxCell id="xsif-$idi" parent="xsif-$ide" style="shape=partialRectangle;connectable=0;strokeColor=inherit;overflow=hidden;pointerEvents=1;html=1;align=left;fontFamily=inherit;fillColor=inherit;$héritage$étendue$bords" value="$case" vertex="1">
 						<mxGeometry height="$hLigne" width="{$lColErre}"$xCond as="geometry">
 							<mxRectangle height="$hLigne" width="{$lCol}" as="alternateBounds" />
 						</mxGeometry>
