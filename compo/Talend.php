@@ -567,7 +567,7 @@ class Talend
 		
 		$o = new Tableau($infos['nom'], explode("\n", $texte));
 		$o->style = 'texte';
-		$this->_nœuds[$infos['id']] = $o;
+		$this->_emballer($infos['id'], $o);
 	}
 	
 	public function xpathEnBouts($chem)
@@ -732,8 +732,8 @@ class Talend
 		if($arbo)
 			$this->arborer($oTransfo);
 		
-		$this->_nœuds[$r['id']] = $oTransfo;
-		$this->_nœuds[$r['id'].'.d'] = $oRés;
+		$this->_emballer($r['id'], $oTransfo);
+		$this->_emballer($r['id'].'.d', $oRés);
 	}
 	
 	protected function _compilerNœud_tWriteJSONField($nœud, $r)
@@ -762,8 +762,8 @@ class Talend
 		// Création de l'arborescence.
 		$this->arborer($oDst);
 		
-		$this->_nœuds[$r['id']] = $oSrc;
-		$this->_nœuds[$r['id'].'.d'] = $oDst;
+		$this->_emballer($r['id'], $oSrc);
+		$this->_emballer($r['id'].'.d', $oDst);
 	}
 	
 	protected function _compilerNœud_tMap($nœud, $r)
@@ -899,7 +899,7 @@ class Talend
 		// [] + [] manuel, pour garder l'ordre de création d'origine (permet de représenter les blocs dans l'ordre si aucune dépendance entre eux), tout en écrasant par la dernière valeur si l'ID est déjà utilisé.
 		// Bon on pourrait aussi faire du array_diff_key() + $table, ou se dire qu'il n'y a pas de raison que Talend nous fournisse deux blocs de même ID, mais…
 		foreach($tables as $id => $table)
-			$this->_nœuds[$id] = $table;
+			$this->_emballer($id, $table);
 	}
 	
 	public function parcourirArbo($nr, $nom, $oVers, & $par, & $vers, & $champs, & $expressif, & $filtrant)
@@ -962,7 +962,7 @@ class Talend
 		$o->style = 'global';
 		$o->notifPrédécesseur = [ $this, '_notif_tFlowToIterate' ];
 		
-		$this->_nœuds[$r['id']] = $o;
+		$this->_emballer($r['id'], $o);
 	}
 	
 	protected function _notif_tFlowToIterate($oDe, $oVers)
@@ -997,9 +997,9 @@ class Talend
 		foreach($oc->d as $num => $champ)
 			$oc->depuis[] = [ $of, $num, $num, 'attr' ];
 		
-		$this->_nœuds[$infos['id'].'.a'] = $of;
-		$this->_nœuds[$infos['id']] = $oc;
-		$this->_nœuds[$infos['id'].'.d'] = $o; // Alors en fait, dans ce sens (données vers nuage), d ça ne veut plus dire données, ça veut dire droite. Parce que la sortie de la constellation données → nuage est à droite, dans le nuage.
+		$this->_emballer($infos['id'].'.a', $of);
+		$this->_emballer($infos['id'], $oc);
+		$this->_emballer($infos['id'].'.d', $o); // Alors en fait, dans ce sens (données vers nuage), d ça ne veut plus dire données, ça veut dire droite. Parce que la sortie de la constellation données → nuage est à droite, dans le nuage.
 		
 		/* À FAIRE: sur notifPrédécesseur(), simplifier si on est une liste de champs sur le même modèle ${rowX.champY}; on peut même faire sauter la colonne si toutes ses cases sont ainsi simplifiées. */
 	}
@@ -1026,8 +1026,8 @@ class Talend
 		foreach($od->d as $num => $champ)
 			$od->depuis[] = [ $of, $num, $num, 'attr' ];
 		
-		$this->_nœuds[$infos['id']] = $of;
-		$this->_nœuds[$infos['id'].'.d'] = $od;
+		$this->_emballer($infos['id'], $of);
+		$this->_emballer($infos['id'].'.d', $od);
 	}
 	
 	/*- Nœuds de persistance -------------------------------------------------*/
@@ -1040,7 +1040,7 @@ class Talend
 		$o = isset($this->_nœuds[$id]) ? $this->_nœuds[$id] : new Forme();
 		$o->titre = (isset($infos['nom']) ? $o->titre = $infos['nom']."\n" : '').$instance;
 		$o->forme = 'bdd';
-		$this->_nœuds[$id] = $o;
+		$this->_emballer($id, $o);
 		
 		return $id;
 	}
@@ -1055,12 +1055,12 @@ class Talend
 		$o = new Tableau($infos['nom'], explode("\n", $sql = trim($this->_déchaîne($infos['QUERY']))));
 		$o->forme = 'bdd';
 		$o->style = 'texte';
-		$this->_nœuds[$infos['id']] = $o;
+		$this->_emballer($infos['id'], $o);
 		
 		$os = new Tableau($infos['>n'][0]);
 		$os->style = 'd';
 		$os->prédécesseurs[] = $o;
-		$this->_nœuds[$infos['id'].'.d'] = $os;
+		$this->_emballer($infos['id'].'.d', $os);
 		
 		/* À FAIRE: gérer DBTABLE.TABLE, qui contient aussi le nom de la table. */
 		$this->_lierBdd($o, $infos, $sql);
@@ -1070,7 +1070,7 @@ class Talend
 	{
 		$o = new Tableau($infos['nom'], $infos['>n'][0]);
 		$o->style = 'd';
-		$this->_nœuds[$infos['id'].'.d'] = $o; // .d: nous sommes la table de données / départ officielle, de laquelle se poursuit le flux; les éventuels ADD_COLS, destinés uniquement à la base, seront dans le nœud non .d.
+		$this->_emballer($infos['id'].'.d', $o); // .d: nous sommes la table de données / départ officielle, de laquelle se poursuit le flux; les éventuels ADD_COLS, destinés uniquement à la base, seront dans le nœud non .d.
 		
 		/* Colonnes en plus.
 		 * Si la ligne à écrire en base contient des colonnes supplémentaires, on ne peut plus se contenter du bloc passant transmis à la suite du flux:
@@ -1080,7 +1080,7 @@ class Talend
 		if(isset($infos['ADD_COLS']) && count($infos['ADD_COLS']))
 		{
 			$odb = clone $o;
-			$this->_nœuds[$infos['id']] = $odb;
+			$this->_emballer($infos['id'], $odb);
 			$odb->prédécesseurs[] = $o;
 			foreach($infos['ADD_COLS'] as $cold)
 			{
@@ -1128,7 +1128,7 @@ class Talend
 		{
 			$ob = new Forme();
 			$ob->forme = 'bdd';
-			$this->_nœuds[$idBdd] = $ob;
+			$this->_emballer($idBdd, $ob);
 		}
 		$ob = $this->_nœuds[$idBdd];
 		
@@ -1159,7 +1159,7 @@ class Talend
 					$ot = $this->_nœuds[$idTable];
 				else
 				{
-					$ot = $this->_nœuds[$idTable] = new Forme($nomTable);
+					$ot = $this->_emballer($idTable, new Forme($nomTable));
 					$ot->forme = 'table';
 					if($this->basesÀDroite)
 					{
@@ -1229,7 +1229,7 @@ class Talend
 	{
 		$o = new Forme($infos['nom']);
 		$o->forme = '';
-		$this->_nœuds[$infos['id']] = $o;
+		$this->_emballer($infos['id'], $o);
 	}
 	
 	/*- Les liens ------------------------------------------------------------*/
@@ -1296,7 +1296,7 @@ class Talend
 		foreach(array_filter($this->_nœuds, function($clé) use($id) { return substr($clé, 0, strlen($id) + 1) == $id.'.'; }, ARRAY_FILTER_USE_KEY) as $satellite)
 			$o->d[spl_object_hash($satellite)] = $satellite;
 		
-		$this->_nœuds['#'.$infos['id']] = $o;
+		$this->_emballer('#'.$infos['id'], $o);
 	}
 	
 	/*- Optimisation ---------------------------------------------------------*/
@@ -1379,7 +1379,7 @@ class Talend
 		foreach($this->_nœuds as $clép => $pote) // $potentiel.
 		{
 			if($pote === $récessif)
-				$this->_nœuds[$clép] = $dominant;
+				$this->_emballer($clép, $dominant);
 			if(isset($pote->depuis))
 				foreach($pote->depuis as & $ptrDep)
 					if($ptrDep === $récessif)
@@ -1404,7 +1404,7 @@ class Talend
 			if(isset($n->forme) && in_array($n->forme, [ 'bdd', 'table' ]))
 			{
 				unset($this->_nœuds[$clé]);
-				$this->_nœuds[$clé] = $n;
+				$this->_emballer($clé, $n);
 			}
 		}
 	}
