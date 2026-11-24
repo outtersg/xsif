@@ -204,6 +204,25 @@ class DrawIo
 		
 		$tailleDessin = $placeur->disposer($modèle);
 		
+		// Les Conteneurs doivent être affichés en premier, sans quoi ils recouvrent leur contenu (même transparents, le clic ne passera pas).
+		usort($modèle, function($a, $b)
+		{
+			$ca = get_class($a);
+			$cb = get_class($b);
+			$ca = preg_match('/Conteneur/', $ca);
+			$cb = preg_match('/Conteneur/', $cb);
+			if(!$cb)
+				return $ca ? -1 : 0;
+			if(!$ca)
+				return 1;
+			// Comparaison par aire.
+			$pa = $this->_p->pos($a);
+			$pb = $this->_p->pos($b);
+			$ta = isset($pa->h) ? $pa->h * $pa->l : 0;
+			$tb = isset($pb->h) ? $pb->h * $pb->l : 0;
+			return $tb - $ta;
+		});
+		
 		foreach($modèle as $bloc)
 			if(isset($this->_p->pos($bloc)->aff))
 				call_user_func($this->_p->pos($bloc)->aff, $bloc);
@@ -632,8 +651,6 @@ class DrawIo
 	public function affConteneur($o)
 	{
 		$coord = $this->_p->pos($o);
-		
-		/* À FAIRE: à l'arrière-plan. Donc à dessiner en premier? */
 		
 		$x0 = $y0 = $x1 = $y1 = null;
 		foreach($o->d as $fil)
