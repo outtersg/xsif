@@ -108,10 +108,19 @@ class Talend
 		if(!method_exists($this, $fonc = '_compilerNœud_'.$type)) { fprintf(STDERR, "# Je ne sais pas gérer les nœuds %s.\n", $type); return; }
 		
 		$infos = $this->_infosNœud($nœud);
-		if(isset($infos['ACTIVATE']) && $infos['ACTIVATE'] == 'false') return;
+		// Les nœuds inactifs participent tout de même au flux, on ne les élimine pas tout de suite mais on les marque.
+		/* À FAIRE: éliminer les culs-de-sac inactifs dans une phase d'optim après calcul des conteneurs. */
+		if(isset($infos['ACTIVATE']) && $infos['ACTIVATE'] == 'false')
+			$avantPourInac = $this->_nœuds;
 		$infos['type'] = $type;
 		
-		return $this->$fonc($nœud, $infos);
+		$r = $this->$fonc($nœud, $infos);
+		
+		if(isset($avantPourInac))
+			foreach(array_diff_key($this->_nœuds, $avantPourInac) as $inac)
+				$inac->style = isset($inac->style) ? $inac->style.' inactif' : 'inactif';
+		
+		return $r;
 	}
 	
 	protected function _infosNœud($nœud)
