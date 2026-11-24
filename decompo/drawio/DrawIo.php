@@ -270,6 +270,7 @@ class DrawIo
 	
 	public function _sortir($chaine)
 	{
+		$chaine .= "\n";
 		if(isset($this->_s))
 			fwrite($this->_s, $chaine);
 		else
