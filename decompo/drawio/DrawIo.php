@@ -628,6 +628,11 @@ class DrawIo
 		{
 			/* À FAIRE: les conteneurs de conteneurs doivent invoquer l'affConteneur récursivement (et marquer comme tels les enfants, pour qu'ils ne soient pas repondus). */
 			$cf = $this->_p->pos($fil);
+			if(!isset($cf->x)) // Pas de coordonnées? Un fils récursif, ou pas dans l'arbo. On se protège.
+			{
+				fprintf(STDERR, "[31mConteneur %s à fils non encore placé %s.[0m\n", $o->id, $fil->id);
+				continue;
+			}
 			if(!isset($x0) || $x0 > $cf->x) $x0 = $cf->x;
 			if(!isset($y0) || $y0 > $cf->y) $y0 = $cf->y;
 			if(!isset($x1) || $x1 < $cf->x + $cf->l) $x1 = $cf->x + $cf->l;
