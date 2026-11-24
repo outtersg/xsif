@@ -69,6 +69,13 @@ class DrawIo
 				'strokeColor' => '#BFBFBF',
 			],
 		],
+		'succès' =>
+		[
+			'Lien' =>
+			[
+				'fontColor' => '#007F00',
+			],
+		],
 		/* Attribut: pas un nœud complet. */
 		'attr' =>
 		[
