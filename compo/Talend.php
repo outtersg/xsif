@@ -254,6 +254,18 @@ class Talend
 		return $r;
 	}
 	
+	protected function _emballer($id, $o)
+	{
+		if(is_array($id)) $id = $id['id'];
+		if(!isset($o->id)) $o->id = $id;
+		if(!isset($o->ids)) $o->ids = [];
+		$o->ids[$id] = true;
+		
+		$this->_nœuds[$id] = $o;
+		
+		return $o;
+	}
+	
 	/**
 	 * Convertit une chaîne Java (éléments fixes entre guillemets, éléments variables tels quels) en chaîne shell (éléments fixes tels quels, éléments variables entre ${…}).
 	 */
