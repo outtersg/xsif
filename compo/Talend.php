@@ -1253,6 +1253,7 @@ class Talend
 		switch($type)
 		{
 			case 'FLOW':
+			case 'COMPONENT_OK':
 				break;
 			default:
 				fprintf(STDERR, "# Je ne sais pas gérer les nœuds %s.\n", $type);
@@ -1286,6 +1287,12 @@ class Talend
 		}
 		
 		$oVers->prédécesseurs[] = $oDe;
+		switch($type)
+		{
+			case 'COMPONENT_OK':
+				$oVers->depuis[] = [ $oDe, null, null, 'succès', 'si OK' ];
+				break;
+		}
 		if(isset($oVers->notifPrédécesseur))
 			call_user_func($oVers->notifPrédécesseur, $oDe, $oVers);
 	}
