@@ -441,7 +441,7 @@ class Talend
 	public function arborer($o)
 	{
 		$mode = 0;
-		if(isset($this->optionsNœuds[$o->titre]))
+		if(isset($o->id) && isset($this->optionsNœuds[$o->id]))
 		{
 			$opts = $this->optionsNœuds[$o->titre];
 			if(isset($opts['xml']) && $opts['xml'])
