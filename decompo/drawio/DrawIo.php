@@ -74,6 +74,8 @@ class DrawIo
 			'Lien' =>
 			[
 				'fontColor' => '#007F00',
+				/* À FAIRE: ce strokeColor, distinguant un lien à succès d'un lien nominal, est-il justifié? Ça fonctionne pour Talend (qui a un seul flux nominal, et les succès sont des représentations parallèles), mais partout ailleurs la dérivation n'est pas différente du nominal: ne serait-ce pas à Compo/Talend de s'adapter? */
+				'strokeColor' => '#007F00',
 			],
 		],
 		'erreur' =>
