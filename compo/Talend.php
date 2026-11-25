@@ -1272,6 +1272,8 @@ class Talend
 			case 'COMPONENT_OK':
 			case 'COMPONENT_ERROR':
 			case 'RUN_IF':
+			case 'SUBJOB_OK':
+			case 'SUBJOB_ERROR':
 				break;
 			default:
 				fprintf(STDERR, "# Je ne sais pas gérer les nœuds %s.\n", $type);
@@ -1329,6 +1331,12 @@ class Talend
 				$formu .= ' '.$this->abrégerFormule($infos['cond']);
 				/* À FAIRE: Talend entrepose un lineStyle: reporter si on arrive à trouver leur signification (ex.: attention). */
 				$oVers->depuis[] = [ $oDe, null, null, 'cond', $formu ];
+				break;
+			case 'SUBJOB_OK':
+				$oVers->depuis[] = [ $oDe, null, null, 'succès inter', 'si OK' ];
+				break;
+			case 'SUBJOB_ERROR':
+				$oVers->depuis[] = [ $oDe, null, null, 'erreur inter', 'si ERREUR' ];
 				break;
 		}
 		if(isset($oVers->notifPrédécesseur))
