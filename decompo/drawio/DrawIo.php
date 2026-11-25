@@ -94,6 +94,14 @@ class DrawIo
 				'fontColor' => '#00007F',
 			],
 		],
+		'inter' =>
+		[
+			'Lien' =>
+			[
+				'strokeWidth' => 3,
+				'fontColor' => '#00007F',
+			],
+		],
 		/* Attribut: pas un nœud complet. */
 		'attr' =>
 		[
