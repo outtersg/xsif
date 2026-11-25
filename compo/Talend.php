@@ -266,6 +266,7 @@ class Talend
 		return $r;
 	}
 	
+	/* À FAIRE: pouvoir se faire balancer une liste de nœuds et y retrouver les ->id; appeler marquerBouts(). */
 	protected function _emballer($id, $o)
 	{
 		if(is_array($id)) $id = $id['id'];
@@ -654,6 +655,52 @@ class Talend
 		 * Il faudrait donc ajouter un tour de boucle en …/A/B/…/feuille et …/B/A/…/feuille.
 		 */
 		return $liste;
+	}
+	
+	/**
+	 * Dans un ensemble de nœuds, marque ceux qui sont tout au début et ceux qui sont tout à la fin.
+	 */
+	/* À FAIRE: notion de cul-de-sac, pour dire qu'un nœud ne doit pas être pris en compte. */
+	/* À FAIRE: une sous-partie, trouverBouts(), pourrait probablement servir pour mieux cerner les <subjob>. */
+	public function marquerBouts($nœuds)
+	{
+		if(count($nœuds) < 2) return;
+		
+		$début = [];
+		$fin = [];
+		
+		foreach($nœuds as $n)
+		{
+			if(!count($n->prédécesseurs))
+				$début[] = $n;
+			foreach($n->prédécesseurs as $p)
+			{
+				if(!isset($p->successeurs)) $p->successeurs = [];
+				$p->successeurs[spl_object_hash($n)] = $n;
+			}
+		}
+		foreach($nœuds as $n)
+		{
+			if(!isset($n->successeurs) || !count($n->successeurs))
+				$fin[] = $n;
+		}
+		
+		/* À FAIRE?: signaler les boucles, en choisir arbitrairement un comme départ et un comme arrivée. Par exemple selon leur ordre d'apparition? */
+		
+		if(count($début))
+		{
+			if(count($début) > 1)
+				fprintf(STDERR, "# Plusieurs nœuds points de départ d'un sous-réseau. On choisit arbitrairement %s.\n", $début[0]->id);
+			foreach($nœuds as $n)
+				$n->début = $début[0];
+		}
+		if(count($fin))
+		{
+			if(count($fin) > 1)
+				fprintf(STDERR, "# Plusieurs nœuds points de sortie d'un sous-réseau. On choisit arbitrairement %s.\n", $fin[0]->id);
+			foreach($nœuds as $n)
+				$n->fin = $fin[0];
+		}
 	}
 	
 	/**
@@ -1355,6 +1402,7 @@ class Talend
 		$of = $this->_nœuds[$id = $infos['id']];
 		$o->d = [ spl_object_hash($of) => $of ];
 		// Les nœuds peuvent avoir instancié des satellites en amont de celui possédant l'identifiant nominal.
+		/* À FAIRE: exploiter ->début. */
 		foreach(array_filter($this->_nœuds, function($clé) use($id) { return substr($clé, 0, strlen($id) + 1) == $id.'.'; }, ARRAY_FILTER_USE_KEY) as $satellite)
 			$o->d[spl_object_hash($satellite)] = $satellite;
 		
