@@ -147,7 +147,9 @@ class Talend
 			],
 			'MEMO_JAVA' =>
 			[
+				 /* À FAIRE: agréger les CODE_START, CODE_MAIN, CODE_END (comme les IMPORT et CODE). */
 				'CODE' => 'code',
+				'CONDITION' => 'cond',
 			],
 			'MEMO_IMPORT' =>
 			[
@@ -1254,7 +1256,10 @@ class Talend
 		{
 			case 'FLOW':
 			case 'COMPONENT_OK':
+			case 'COMPONENT_ERROR':
+			case 'RUN_IF':
 				break;
+			/* À FAIRE: SUBJOB_*: à temporiser, pour que le lien ne fasse pas considérer la cible comme sous-flux de la source. */
 			default:
 				fprintf(STDERR, "# Je ne sais pas gérer les nœuds %s.\n", $type);
 				return;
@@ -1287,10 +1292,30 @@ class Talend
 		}
 		
 		$oVers->prédécesseurs[] = $oDe;
+		/* À FAIRE: matérialiser l'ordre dans lequel sont joués les différentes suites.
+		 * https://community.qlik.com/t5/Talend-Studio/Order-of-components-execution-Main-If-OnComponentOk-OnSubJobOK/td-p/2271455
+		 * https://community.qlik.com/t5/Talend-Studio/Dœs-a-quot-Run-if-quot-connection-wait-for-subsequent-subjobs/m-p/2355682
+		 * https://talend4devs.wordpress.com/2018/04/26/difference-between-onsubjobok-and-oncomponentok/
+		 * https://community.qlik.com/t5/Talend-Studio/OnSubJobOk-vs-OnComponentOk/td-p/2256503
+		 * D'abord les onComponentXxx et les If (ordonnés entre eux), puis reprise du FLOW?
+		 */
+		/* À FAIRE: dans le commentaire ci-dessus, le "ordonnés entre eux", vérifier: en fait il semble que ce soit juste l'ordre d'apparition dans le fichier. */
+		/* À FAIRE: proposer une sortie alternative où le conditionnel sort sous forme d'un losange dans la machine à états. */
+		/* À FAIRE: ne pas matérialiser les COMPONENT_OK dans le PreJob (rendre une base de données successeur d'une autre, ça fait bizarre). */
 		switch($type)
 		{
 			case 'COMPONENT_OK':
 				$oVers->depuis[] = [ $oDe, null, null, 'succès', 'si OK' ];
+				break;
+			case 'COMPONENT_ERROR':
+				$oVers->depuis[] = [ $oDe, null, null, 'erreur', 'si ERREUR' ];
+				break;
+			case 'RUN_IF':
+				$formu = $lien->getAttribute('label');
+				/* À FAIRE?: franciser le If. */
+				$formu .= ' '.$this->abrégerFormule($infos['cond']);
+				/* À FAIRE: Talend entrepose un lineStyle: reporter si on arrive à trouver leur signification (ex.: attention). */
+				$oVers->depuis[] = [ $oDe, null, null, 'cond', $formu ];
 				break;
 		}
 		if(isset($oVers->notifPrédécesseur))
