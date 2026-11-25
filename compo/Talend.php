@@ -1273,7 +1273,6 @@ class Talend
 			case 'COMPONENT_ERROR':
 			case 'RUN_IF':
 				break;
-			/* À FAIRE: SUBJOB_*: à temporiser, pour que le lien ne fasse pas considérer la cible comme sous-flux de la source. */
 			default:
 				fprintf(STDERR, "# Je ne sais pas gérer les nœuds %s.\n", $type);
 				return;
@@ -1500,6 +1499,8 @@ class Talend
 		$o->conteneurs = [];
 		foreach($o->prédécesseurs as $op)
 		{
+			// Les tâches distinctes mais enchaînées par un SUBJOB_* ne doivent pas finir dans la même tâche.
+			if(($infosLien = $this->_lien($op, $o)) && isset($infosLien[Lien::STYLE + 1]) && preg_match('/\binter\b/', $infosLien[LIEN::STYLE + 1])) continue;
 			/* À FAIRE: être bien rigoureux et ne suivre que le FLOW. */
 			/* À FAIRE: ne pas englober les mutualisés (BdD, tables, etc.). */
 			if(!($cons = $this->_opti_calcConteneurs($op)) || !count($cons)) continue;
