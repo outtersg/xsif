@@ -1351,6 +1351,9 @@ class Talend
 					{
 						$où .= $suffLien.$suffType;
 						$o = $this->_nœuds[$où];
+						if(substr($type, 0, 7) == 'SUBJOB_')
+							if(isset($o->début))
+								$o = $o->début;
 						break 2;
 					}
 			if(!isset($o)) { fprintf(STDERR, "# Lien depuis le nœud inconnu %s[.%s]\n", $où, $infos['id']); return; }
