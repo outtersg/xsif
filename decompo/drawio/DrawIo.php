@@ -693,6 +693,7 @@ class DrawIo
 		$coord->x = $x0; $coord->l = $x1 - $x0;
 		$coord->y = $y0; $coord->h = $y1 - $y0;
 		
+		/* À FAIRE: Draw.io a-t-il une notion de conteneur auto-agrandissant fonction de son contenu? */
 		if(!isset($coord->y)) return;
 		$affLibellé = $this->affT($o->titre);
 		$this->_sortir(<<<TERMINE
