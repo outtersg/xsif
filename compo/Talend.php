@@ -23,6 +23,7 @@
 
 require_once dirname(__FILE__).'/../Modele/Diagramme/Conteneur.php';
 require_once dirname(__FILE__).'/../Modele/Diagramme/Forme.php';
+require_once dirname(__FILE__).'/../Modele/Diagramme/Lien.php';
 require_once dirname(__FILE__).'/../Modele/Diagramme/Tableau.php';
 
 use Gui\Xsif\Modele\Diagramme\Conteneur;
