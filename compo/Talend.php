@@ -656,6 +656,19 @@ class Talend
 		return $liste;
 	}
 	
+	/**
+	 * Retrouve l'éventuel lien stylé entre deux nœuds.
+	 */
+	/* À FAIRE: un param pour choisir un retour tableau ou non, et d'embarquer les liens vers sous-élém ou non. */
+	protected function _lien($de, $vers)
+	{
+		if(!isset($vers->depuis)) return;
+		
+		foreach($vers->depuis as $infosLien)
+			if($infosLien[0] === $de)
+				return $infosLien;
+	}
+	
 	/*- Nœuds de mise en correspondance --------------------------------------*/
 	
 	protected function _compilerNœud_tFixedFlowInput($nœud, $r)
