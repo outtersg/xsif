@@ -804,6 +804,8 @@ class Talend
 		if($arbo)
 			$this->arborer($oTransfo);
 		
+		$this->marquerBouts([ $oTransfo, $oRés ]);
+		
 		$this->_emballer($r['id'], $oTransfo);
 		$this->_emballer($r['id'].'.d', $oRés);
 	}
@@ -833,6 +835,8 @@ class Talend
 		
 		// Création de l'arborescence.
 		$this->arborer($oDst);
+		
+		$this->marquerBouts([ $oSrc, $oDst ]);
 		
 		$this->_emballer($r['id'], $oSrc);
 		$this->_emballer($r['id'].'.d', $oDst);
@@ -1069,6 +1073,8 @@ class Talend
 		foreach($oc->d as $num => $champ)
 			$oc->depuis[] = [ $of, $num, $num, 'attr' ];
 		
+		$this->marquerBouts([ $of, $oc, $o ]);
+		
 		$this->_emballer($infos['id'].'.a', $of);
 		$this->_emballer($infos['id'], $oc);
 		$this->_emballer($infos['id'].'.d', $o); // Alors en fait, dans ce sens (données vers nuage), d ça ne veut plus dire données, ça veut dire droite. Parce que la sortie de la constellation données → nuage est à droite, dans le nuage.
@@ -1097,6 +1103,8 @@ class Talend
 		$od->prédécesseurs[] = $of;
 		foreach($od->d as $num => $champ)
 			$od->depuis[] = [ $of, $num, $num, 'attr' ];
+		
+		$this->marquerBouts([ $of, $od ]);
 		
 		$this->_emballer($infos['id'], $of);
 		$this->_emballer($infos['id'].'.d', $od);
@@ -1134,6 +1142,8 @@ class Talend
 		$os->prédécesseurs[] = $o;
 		$this->_emballer($infos['id'].'.d', $os);
 		
+		$this->marquerBouts([ $o, $os ]);
+		
 		/* À FAIRE: gérer DBTABLE.TABLE, qui contient aussi le nom de la table. */
 		$this->_lierBdd($o, $infos, $sql);
 	}
@@ -1166,6 +1176,8 @@ class Talend
 			// Pour la suite des événements (lien à la base), c'est lui qui joue.
 			$o = $odb;
 		}
+		
+		//$this->marquerBouts([ … ]);
 		
 		/* À FAIRE: les ADD_COLS. Ils s'ajoutent uniquement à la partie qui part en base, pas à ce qui poursuit son bonhomme de chemin.
 		 * Peut-être créer deux blocs données distincts, un pour la base, un pour le FLOW, et reposer sur l'optim pour fondre le second dans le premier s'il n'a aucune sortie propre outre celle base, cf. "simplification partielle". */
