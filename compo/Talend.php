@@ -1611,6 +1611,27 @@ class Talend
 			if(isset($o->conteneurs))
 				foreach($o->conteneurs as $oc)
 					$oc->d[spl_object_hash($o)] = $o;
+		
+		/* Sous Talend, les déclencheurs de succès du conteneur sont greffés à son nœud de départ.
+		 * On les raccroche plutôt au conteneur lui-même. */
+		
+		foreach($this->_nœuds as $oc)
+			if($oc instanceof Conteneur)
+			{
+				list($ds, $fs) = $this->trouverBouts($oc->d);
+				
+				/* À FAIRE: voir comment se comportent les sous-réseaux. Existe-t-il des connexions partant des sous-réseaux, et en ce cas doit-on aussi les leur voler? Pour le moment on se contente d'explorer les points de départ. */
+				if($ds)
+				foreach($ds as $d)
+					foreach($d->successeurs as $s)
+						if(count($liens = $this->_délier($d, $s, 'inter')))
+						{
+							foreach($liens as /*&*/ $ptrLien)
+								$ptrLien[0] = $oc;
+							$s->depuis = array_merge($s->depuis, $liens);
+							/* À FAIRE: matérialiser aussi que c'est après chacun des points de sortie ($fs) que $s prendra la suite. */
+						}
+			}
 	}
 	
 	protected function _opti_calcConteneurs($o)
