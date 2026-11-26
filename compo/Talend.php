@@ -725,6 +725,50 @@ class Talend
 				return $infosLien;
 	}
 	
+	/**
+	 * Sort les liens entre deux nœuds.
+	 */
+	protected function _délier($de, $vers)
+	{
+		$r = [];
+		
+		if(!isset($vers->depuis)) return $r;
+		
+		$filtres = func_get_args();
+		array_shift($filtres);
+		array_shift($filtres);
+		
+		foreach($vers->depuis as $clé => $infosLien)
+			if($infosLien[0] === $de)
+			{
+				foreach($filtres as $filtre)
+					if(!isset($infosLien[LIEN::STYLE + 1]) || !preg_match('/\b'.$filtre.'\b/', $infosLien[LIEN::STYLE + 1]))
+					{
+						// Si après notre passage il reste encore des liens entre les deux nœuds (par exemple parce qu'ils ne répondaient pas au crible).
+						$encore = true;
+						continue 2;
+					}
+				$r[$clé] = $infosLien;
+			}
+		
+		$vers->depuis = array_diff_key($vers->depuis, $r);
+		
+		// Si ces lien étaient les seuls doublant une référence dans .prédécesseurs, on supprime cette dernière.
+		if(!isset($encore))
+		{
+			foreach($vers->prédécesseurs as $clé => $p)
+				if($p === $de)
+				{
+					unset($vers->prédécesseurs[$clé]);
+					if(isset($de->successeurs))
+						unset($de->successeurs[spl_object_hash($vers)]);
+					break;
+				}
+		}
+		
+		return $r;
+	}
+	
 	/*- Nœuds de mise en correspondance --------------------------------------*/
 	
 	protected function _compilerNœud_tFixedFlowInput($nœud, $r)
