@@ -658,11 +658,10 @@ class Talend
 	}
 	
 	/**
-	 * Dans un ensemble de nœuds, marque ceux qui sont tout au début et ceux qui sont tout à la fin.
+	 * Dans un ensemble de nœuds, déniche les extrémités.
 	 */
 	/* À FAIRE: notion de cul-de-sac, pour dire qu'un nœud ne doit pas être pris en compte. */
-	/* À FAIRE: une sous-partie, trouverBouts(), pourrait probablement servir pour mieux cerner les <subjob>. */
-	public function marquerBouts($nœuds)
+	public function trouverBouts($nœuds)
 	{
 		if(count($nœuds) < 2) return;
 		
@@ -686,6 +685,16 @@ class Talend
 		}
 		
 		/* À FAIRE?: signaler les boucles, en choisir arbitrairement un comme départ et un comme arrivée. Par exemple selon leur ordre d'apparition? */
+		
+		return [ $début, $fin ];
+	}
+	
+	/**
+	 * Dans un ensemble de nœuds, marque ceux qui sont tout au début et ceux qui sont tout à la fin.
+	 */
+	public function marquerBouts($nœuds)
+	{
+		list($début, $fin) = $this->trouverBouts($nœuds);
 		
 		if(count($début))
 		{
