@@ -1566,7 +1566,7 @@ class Talend
 						$ptrDep[0] = $dominant;
 		}
 		
-		/* À FAIRE: s'assurer qu'il n'est pas référencé directement comme prédécesseur ou depuis d'un autre nœud. On pourrait avoir un successeurs, calculé en première passe, listant tous ceux qui nous ont comme prédécesseur */
+		/* À FAIRE: s'assurer qu'il n'est pas référencé directement comme prédécesseur ou depuis d'un autre nœud. On pourrait avoir un successeurs, calculé en première passe, listant tous ceux qui nous ont comme prédécesseur. Cf. ->successeurs. */
 	}
 	
 	/**
